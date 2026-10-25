@@ -7,9 +7,11 @@
   import { exportBackup as exportBackupFile } from '../lib/actions';
   import { downloadFile } from '../lib/download';
   import { exportNotesText, textExportFilename } from '../lib/export/text';
+  import { setSplashEnabled, splashEnabled } from '../lib/splash';
   import { loadTheme, MODES, PALETTES, saveTheme } from '../lib/theme';
 
   let theme = $state(loadTheme());
+  let showSplash = $state(splashEnabled());
   $effect(() => saveTheme({ mode: theme.mode, palette: theme.palette }));
 
   let rolloverHour = $state(4);
@@ -125,6 +127,14 @@
       {/each}
     </div>
   </fieldset>
+  <label class="check">
+    <input
+      type="checkbox"
+      bind:checked={showSplash}
+      onchange={() => setSplashEnabled(showSplash)}
+    />
+    Show welcome screen when opening Nenrin
+  </label>
 </div>
 
 <h3 class="section-title">Studying</h3>

@@ -15,6 +15,7 @@
   import ConfirmDialog from './components/ConfirmDialog.svelte';
   import { paletteState } from './lib/palette.svelte';
   import ShortcutsDialog from './components/ShortcutsDialog.svelte';
+  import Splash from './components/Splash.svelte';
   import UpdatePrompt from './components/UpdatePrompt.svelte';
   import { isTyping, shortcutsDialog } from './lib/shortcuts.svelte';
 
@@ -150,6 +151,7 @@
 <ShortcutsDialog />
 <ConfirmDialog />
 <CommandPalette />
+{#if ready}<Splash />{/if}
 <UpdatePrompt />
 <svelte:window onkeydown={onKey} />
 
