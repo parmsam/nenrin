@@ -2,7 +2,14 @@
   import { liveQuery } from 'dexie';
   import Counts from '../components/Counts.svelte';
   import { db } from '../lib/db';
-  import { createDeck, deckTree, deleteDeck, renameDeck, updateDeckConfig } from '../lib/db/decks';
+  import {
+    createDeck,
+    deckSubtreeIds,
+    deckTree,
+    deleteDeck,
+    renameDeck,
+    updateDeckConfig,
+  } from '../lib/db/decks';
   import { downloadFile } from '../lib/download';
   import { exportNotesText, textExportFilename } from '../lib/export/text';
   import { navigate } from '../lib/router.svelte';
@@ -85,6 +92,18 @@
     );
   }
 
+  /** Drops personal FSRS parameters for this deck and its sub-decks. */
+  async function useDefaultParams() {
+    const reset = {
+      fsrsParams: undefined,
+      fsrsOptimizedAt: undefined,
+      fsrsOptimizedReviews: undefined,
+    };
+    for (const deckId of await deckSubtreeIds(db, id)) await updateDeckConfig(db, deckId, reset);
+  }
+
+  const dateFmt = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' });
+
   async function remove() {
     const d = $data;
     if (!d) return;
@@ -149,6 +168,7 @@
         href="#/browse?q={encodeURIComponent(`deck:"${node.path.replace(/ \/ /g, '::')}"`)}"
         >Browse notes</a
       >
+      <a class="button secondary" href="#/stats?deck={id}">Stats</a>
       <button
         class="secondary"
         onclick={exportText}
@@ -190,6 +210,24 @@
         good default.</span
       >
     </label>
+    <p class="params">
+      {#if deck.config.fsrsParams}
+        <strong>Personal FSRS parameters</strong>
+        <span class="muted">
+          {deck.config.fsrsOptimizedAt
+            ? `optimized ${dateFmt.format(deck.config.fsrsOptimizedAt)}`
+            : ''}{deck.config.fsrsOptimizedReviews
+            ? ` from ${deck.config.fsrsOptimizedReviews.toLocaleString()} reviews`
+            : ''}
+        </span>
+        <button type="button" class="secondary small" onclick={useDefaultParams}
+          >Use defaults</button
+        >
+      {:else}
+        <span class="muted">Default FSRS parameters.</span>
+      {/if}
+      <a href="{import.meta.env.BASE_URL}optimize.html?deck={id}">Optimize for my reviews…</a>
+    </p>
     <div class="row">
       <button type="submit">Save settings</button>
       {#if saved}<span class="muted" role="status">Saved</span>{/if}
@@ -254,6 +292,14 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1rem;
+  }
+  .params {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem 0.6rem;
+    margin: 0;
+    font-size: 0.875rem;
   }
   .hint {
     font-weight: 400;

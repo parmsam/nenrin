@@ -2,8 +2,11 @@
 
 Nenrin follows [semantic versioning](https://semver.org/). Until 1.0, each roadmap phase in [PLAN.md](PLAN.md) bumps the minor version.
 
-## Unreleased
+## 0.4.0 (2026-10-25): Stats, personal scheduling, audio, deck styling
 
+- **Stats**: review heatmap, 30-day retention, streaks, a 30-day review forecast and cards by stage, per deck or overall, with keyboard readouts and table views.
+- **Optimize scheduling** to your own review history with the official FSRS optimizer, on your device. Saved per deck, and you can revert to the defaults.
+- **Learn about spaced repetition**: a short explainer for first-time users, with links to Wikipedia.
 - **Fixed: stuck on an old version.** Devices that installed Nenrin before the update prompt kept running that version: the update waited behind it, and the old version had no prompt to show. New versions now take over immediately on those devices. From then on, updates wait for you to choose "Reload".
 - **Audio autoplay**, like Anki: the question's audio plays when a card appears and the answer's new audio on reveal; <kbd>R</kbd> replays. Can be turned off in Settings.
 - **Deck styling**: imported decks keep their look, contained to the card with CSS `@scope`, with remote resources blocked, deck fonts loaded from media, and automatic dark mode for light-only styles. Can be turned off in Settings.

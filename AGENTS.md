@@ -39,7 +39,8 @@ src/
   routes/        # screens: Home, DeckView, Review, Editor, Settings (hash router in lib/router.svelte.ts)
   components/    # shared UI: CardView (renders sanitized card HTML + media), Counts
   workers/       # anki.worker.ts: package parsing off the main thread
-public/          # favicon.svg, logo.svg, screenshots/ (PNG icons are generated at build)
+public/          # favicon.svg, logo.svg, screenshots/, sw-custom.js (imported into the service worker)
+optimize.html    # separate cross-origin isolated page for the FSRS optimizer (see PLAN decision log)
 scripts/         # generate-brand.mjs (logo), screenshots.mjs
 docs/brand/      # logo files + palette; see docs/brand/README.md
 tests/e2e/       # Playwright specs; unit tests sit next to the code as *.test.ts
@@ -58,6 +59,7 @@ ref/             # GITIGNORED local research: competitor notes + page snapshots
 7. **Times.** Store UTC epoch milliseconds. Compute the "day" boundary from the user's configurable rollover hour (default 4 AM local, matching Anki).
 8. **Accessibility.** Every review action has a keyboard shortcut (Space/Enter to flip, 1–4 to rate, Z to undo). Use semantic HTML, visible focus, and work with `prefers-reduced-motion` and dark mode.
    - Testing gotcha: jsdom/happy-dom leak memory on large card HTML. Judge performance and memory with `npm run check:decks` (real Chromium), not unit tests.
+   - Isolation gotcha: only `optimize.html` (and `optimize.worker`) get COOP/COEP, from `public/sw-custom.js` in production and a Vite plugin in dev/preview. Don't isolate the main app: it would break remote images and OAuth popups.
    - Svelte gotcha: never hand deep `$state` objects to IndexedDB (Proxies can't be cloned). Use `$state.raw` or `$state.snapshot()`.
 9. **Small diffs.** One concern per PR. Don't reformat unrelated code. Add or adjust tests for any behavior change.
 10. **Keep docs in sync.** When you finish a milestone item, tick it in `PLAN.md`. If you change a feature's status, update the Nenrin row in `COMPARISON.md`.

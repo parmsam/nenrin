@@ -33,7 +33,7 @@
   <img src="public/screenshots/mobile-decks-light.png" width="200" alt="Home screen: today’s progress ring, streak, Study now, and decks">
 </p>
 
-> **Status: v0.3.0, pre-alpha, usable for daily study.** See the [changelog](CHANGELOG.md). Import your Anki decks (`.apkg` / `.colpkg`) or make your own Basic, Reversed and Cloze cards with Markdown, math and images, and review them with FSRS, offline. See [PLAN.md](PLAN.md).
+> **Status: v0.4.0, pre-alpha, usable for daily study.** See the [changelog](CHANGELOG.md). Import your Anki decks (`.apkg` / `.colpkg`) or make your own Basic, Reversed and Cloze cards with Markdown, math and images, and review them with FSRS, offline. See [PLAN.md](PLAN.md).
 
 ## What's in the name
 
@@ -65,11 +65,13 @@ See [COMPARISON.md](COMPARISON.md) for how this stacks up against Anki, RemNote,
 - **Keyboard-first**: <kbd>Space</kbd> to show the answer or rate Good, <kbd>1</kbd>–<kbd>4</kbd> to rate, <kbd>Z</kbd> to undo, <kbd>E</kbd> to edit, <kbd>Esc</kbd> to leave; press <kbd>?</kbd> for the full list
 - **Import from Anki**: `.apkg` decks and `.colpkg` collections (modern and legacy formats) with images, audio, sub-decks and, optionally, your review history and FSRS memory. Re-importing an updated deck updates notes without touching your progress. Deck styling is applied safely inside each card (with automatic dark mode), and card audio autoplays (<kbd>R</kbd> replays)
 - **Anki-compatible text import/export**: `.txt` / `.csv` / `.tsv` with Anki's file headers (`#separator`, `#html`, `#deck column`, `#guid column` …), column mapping, and update/skip/duplicate handling. Export as Anki's "Notes in Plain Text"
+- **Stats**: review heatmap, retention, streaks, a 30-day forecast and cards by stage, per deck or overall
+- **Personal scheduling**: optimize FSRS to your own review history with the official optimizer (WASM, on your device)
 - **Your data**: JSON backup and restore, including review history and images; a configurable day rollover hour; persistent-storage request
 - **Themes**: System / Light / Dark, with Wood, Matcha, Sakura and Indigo accents
 - **Offline PWA**: install it on any device; it works with no network. When a new version is deployed, it asks before reloading
 
-$1
+## Install it
 
 Open **<https://parmsam.github.io/nenrin/>**, then:
 

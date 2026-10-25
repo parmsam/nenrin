@@ -1,8 +1,36 @@
 /// <reference types="vitest/config" />
-import { defineConfig } from 'vite';
+import { defineConfig, type Plugin } from 'vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { VitePWA } from 'vite-plugin-pwa';
 import pkg from './package.json' with { type: 'json' };
+
+/**
+ * The optimizer page needs cross-origin isolation (COOP/COEP) for WASM threads. In production the
+ * service worker adds these headers (public/sw-custom.js); this does the same for `vite` and
+ * `vite preview`, including the very first load before the service worker is installed.
+ */
+function isolateOptimizerPage(): Plugin {
+  const middleware = (
+    req: { url?: string },
+    res: { setHeader(k: string, v: string): void },
+    next: () => void,
+  ) => {
+    const path = req.url?.split('?')[0] ?? '';
+    if (path.endsWith('/optimize.html')) {
+      res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+      res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
+    } else if (/optimize\.worker/.test(path)) {
+      // The isolated page's worker must carry the embedder policy too, or it won't start.
+      res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
+    }
+    next();
+  };
+  return {
+    name: 'nenrin-isolate-optimizer',
+    configureServer: (server) => void server.middlewares.use(middleware),
+    configurePreviewServer: (server) => void server.middlewares.use(middleware),
+  };
+}
 
 // GitHub Pages serves project sites from /<repo>/; CI sets BASE_PATH accordingly.
 const base = process.env.BASE_PATH ?? '/';
@@ -13,6 +41,7 @@ export default defineConfig({
     __APP_VERSION__: JSON.stringify(pkg.version),
   },
   plugins: [
+    isolateOptimizerPage(),
     svelte(),
     VitePWA({
       // New versions wait for the user (UpdatePrompt.svelte) instead of swapping in mid-review.
@@ -70,11 +99,16 @@ export default defineConfig({
         globIgnores: ['screenshots/**'],
         // Control the page on first install; later updates still wait for the prompt.
         clientsClaim: true,
-        // Rescues users on versions without the prompt (see public/sw-migrate.js).
-        importScripts: ['sw-migrate.js'],
+        // Update-prompt rescue + isolation headers for optimize.html (see public/sw-custom.js).
+        importScripts: ['sw-custom.js'],
       },
     }),
   ],
+  build: {
+    rollupOptions: {
+      input: { main: 'index.html', optimize: 'optimize.html' },
+    },
+  },
   // Pre-bundle up front so the dev server doesn't reload mid-session when the import
   // worker first pulls these in.
   optimizeDeps: { include: ['sql.js', 'fflate', 'fzstd'] },

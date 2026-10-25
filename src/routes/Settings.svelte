@@ -222,6 +222,16 @@
   <p>
     <strong>Nenrin v{__APP_VERSION__}</strong> <span class="muted">(pre-alpha)</span>
   </p>
+  <p class="small">
+    Scheduling uses <a
+      href="https://en.wikipedia.org/wiki/Spaced_repetition#Algorithms"
+      target="_blank"
+      rel="noreferrer">FSRS</a
+    >, a modern
+    <a href="https://en.wikipedia.org/wiki/Spaced_repetition" target="_blank" rel="noreferrer"
+      >spaced repetition</a
+    > algorithm that predicts when you'll forget each card.
+  </p>
   <p class="muted small">
     Free and open source under the MIT license.
     <a

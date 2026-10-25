@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="description" content="Tune Nenrin's FSRS scheduler to your own review history." />
+    <title>Optimize scheduling · Nenrin</title>
+    <script>
+      // Apply the saved theme before first paint (see src/lib/theme.ts).
+      try {
+        var t = JSON.parse(localStorage.getItem('nenrin:theme') || '{}');
+        if (t.mode === 'light' || t.mode === 'dark')
+          document.documentElement.dataset.theme = t.mode;
+        if (t.palette && t.palette !== 'wood') document.documentElement.dataset.palette = t.palette;
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/optimize.ts"></script>
+  </body>
+</html>

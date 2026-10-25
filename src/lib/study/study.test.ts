@@ -1,14 +1,14 @@
 import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { NenrinDB } from '../db';
+import { NenrinDB, type Card } from '../db';
 import { createDeck, updateDeckConfig } from '../db/decks';
 import { setPrefs } from '../db/prefs';
 import { recordReview } from '../db/repo';
 import { addNote, ensureBuiltins } from '../notes';
-import { Rating, State } from '../scheduler';
+import { newSchedulingState, Rating, State, type Grade } from '../scheduler';
 import { dayStart, formatInterval, nextDayStart } from './day';
 import { LEARN_AHEAD_MS, studyState } from './queue';
-import { streakFrom, todaySummary } from './stats';
+import { computeStats, longestStreak, streakFrom, todaySummary } from './stats';
 
 const MIN = 60_000;
 const DAY = 86_400_000;
@@ -161,5 +161,73 @@ describe('today summary', () => {
       ),
     );
     expect(streakFrom(days, new Date(2026, 2, 30, 4).getTime())).toBe(3);
+  });
+});
+
+describe('stats', () => {
+  const at = (d: number, h = 12) => new Date(2026, 0, d, h).getTime();
+  const log = (cardId: string, ts: number, rating: number, state: State, durationMs = 6000) => ({
+    id: `${cardId}-${ts}`,
+    cardId,
+    ts,
+    rating: rating as Grade,
+    state,
+    elapsedDays: 0,
+    scheduledDays: 0,
+    stability: 0,
+    difficulty: 0,
+    durationMs,
+  });
+  const card = (id: string, state: State, due: number, extra: Partial<Card> = {}): Card => ({
+    ...newSchedulingState(at(1)),
+    id,
+    noteId: id,
+    deckId,
+    ordinal: 0,
+    suspended: false,
+    buried: false,
+    state,
+    due,
+    ...extra,
+  });
+
+  it('computes streaks, retention, heatmap, forecast and card counts', () => {
+    const now = at(20, 15);
+    const cards = [
+      card('n', State.New, at(1)),
+      card('l', State.Learning, at(20, 16)),
+      card('y', State.Review, at(19), { scheduledDays: 5 }), // overdue → today
+      card('m', State.Review, at(25), { scheduledDays: 40 }),
+      card('s', State.Review, at(21), { suspended: true }),
+      card('far', State.Review, at(20) + 60 * 86_400_000, { scheduledDays: 60 }),
+    ];
+    const logs = [
+      ...[10, 11, 12].map((d) => log('y', at(d), 3, State.Review)),
+      log('y', at(15), 1, State.Review),
+      log('m', at(19), 3, State.Review),
+      log('l', at(20, 9), 3, State.New, 60_000),
+      log('l', at(20, 10), 4, State.Learning, 60_000),
+    ];
+    const s = computeStats(cards, logs, now, 4);
+    expect(s.reviewsToday).toBe(2);
+    expect(s.minutesToday).toBe(2);
+    expect(s.streak).toBe(2); // days 19 and 20
+    expect(s.longestStreak).toBe(3); // days 10–12
+    expect(s.retention30).toEqual({ passed: 4, total: 5 });
+    expect(s.cards).toEqual({ new: 1, learning: 1, young: 1, mature: 2, suspended: 1 });
+    // Today holds the learning card and the overdue one; day 5 holds the mature card.
+    expect(s.forecast[0].count).toBe(2);
+    expect(s.forecast[5].count).toBe(1);
+    expect(s.forecast.reduce((n, f) => n + f.count, 0)).toBe(3);
+    // Heatmap starts on a Monday and ends today.
+    expect(new Date(s.heatmap[0].day).getDay()).toBe(1);
+    expect(s.heatmap.at(-1)!.day).toBe(new Date(2026, 0, 20, 4).getTime());
+    expect(s.heatmap.find((d) => d.day === new Date(2026, 0, 10, 4).getTime())!.count).toBe(1);
+  });
+
+  it('finds the longest streak', () => {
+    const days = new Set([1, 2, 3, 7, 8].map((d) => new Date(2026, 0, d, 4).getTime()));
+    expect(longestStreak(days)).toBe(3);
+    expect(longestStreak(new Set())).toBe(0);
   });
 });

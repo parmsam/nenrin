@@ -10,6 +10,7 @@
   import Import from './routes/Import.svelte';
   import Review from './routes/Review.svelte';
   import Settings from './routes/Settings.svelte';
+  import Stats from './routes/Stats.svelte';
   import ShortcutsDialog from './components/ShortcutsDialog.svelte';
   import UpdatePrompt from './components/UpdatePrompt.svelte';
   import { isTyping, shortcutsDialog } from './lib/shortcuts.svelte';
@@ -52,6 +53,7 @@
     if (p === '/add') return { name: 'add' } as const;
     if (p === '/import') return { name: 'import' } as const;
     if (p === '/browse') return { name: 'browse' } as const;
+    if (p === '/stats') return { name: 'stats' } as const;
     if (p === '/settings') return { name: 'settings' } as const;
     return { name: 'home' } as const;
   });
@@ -123,6 +125,8 @@
     {#key route.id}<Editor noteId={route.id} />{/key}
   {:else if route.name === 'add'}
     <Editor />
+  {:else if route.name === 'stats'}
+    <Stats />
   {:else if route.name === 'browse'}
     <Browse />
   {:else if route.name === 'import'}

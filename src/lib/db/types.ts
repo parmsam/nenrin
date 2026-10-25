@@ -6,6 +6,9 @@ export interface DeckConfig {
   desiredRetention: number;
   /** Personal FSRS weights from the optimizer, if trained. */
   fsrsParams?: number[];
+  /** When fsrsParams were computed, and from how many reviews. */
+  fsrsOptimizedAt?: number;
+  fsrsOptimizedReviews?: number;
 }
 
 export interface Deck {

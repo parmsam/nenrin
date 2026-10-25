@@ -73,9 +73,40 @@
     <img src={logo} alt="" width="132" height="132" />
     <h2>Memory grows ring by ring</h2>
     <p class="muted">
-      Free, open-source flashcards with FSRS spaced repetition. Everything stays on this device,
-      works offline, and needs no account.
+      Free, open-source flashcards with
+      <a
+        href="https://en.wikipedia.org/wiki/Spaced_repetition#Algorithms"
+        target="_blank"
+        rel="noreferrer">FSRS</a
+      >
+      <a href="https://en.wikipedia.org/wiki/Spaced_repetition" target="_blank" rel="noreferrer"
+        >spaced repetition</a
+      >. Everything stays on this device, works offline, and needs no account.
     </p>
+    <details class="intro">
+      <summary>New to spaced repetition?</summary>
+      <p>
+        You forget things on a predictable curve. Spaced repetition shows you each card just before
+        you'd forget it: right after you learn it, then days later, then weeks, then months. Every
+        successful review pushes the next one further out, like a tree adding a ring.
+      </p>
+      <p>
+        You rate each answer (Again, Hard, Good, Easy), and the FSRS scheduler uses your ratings to
+        predict when your memory of that card will fade. A few minutes a day keeps thousands of
+        cards fresh.
+      </p>
+      <p>
+        <a href="https://en.wikipedia.org/wiki/Spaced_repetition" target="_blank" rel="noreferrer"
+          >Learn more about spaced repetition</a
+        >
+        ·
+        <a
+          href="https://en.wikipedia.org/wiki/Spaced_repetition#Algorithms"
+          target="_blank"
+          rel="noreferrer">how the algorithms compare</a
+        >
+      </p>
+    </details>
     <div class="row center">
       <button onclick={addSample} disabled={busy}>Add a sample deck</button>
       <a class="button secondary" href="#/import">Import a file</a>
@@ -132,6 +163,10 @@
         ><path d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15zM16 16l5 5" /></svg
       >
       Browse
+    </a>
+    <a href="#/stats">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20V11M12 20V5M19 20v-6" /></svg>
+      Stats
     </a>
   </nav>
 
@@ -191,6 +226,23 @@
   .empty p {
     max-width: 26rem;
     margin: 0 auto 1.75rem;
+  }
+  .intro {
+    max-width: 28rem;
+    margin: -0.75rem auto 1.5rem;
+    text-align: left;
+    font-size: 0.9rem;
+  }
+  .intro summary {
+    cursor: pointer;
+    text-align: center;
+    font-weight: 600;
+    color: var(--accent);
+  }
+  .intro p {
+    margin: 0.6rem 0 0;
+    max-width: none;
+    color: var(--muted);
   }
   .center {
     justify-content: center;
@@ -262,7 +314,7 @@
   }
   .quick {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 0.5rem;
     margin-top: 0.9rem;
   }
@@ -279,6 +331,11 @@
     font-weight: 600;
     font-size: 0.9rem;
     text-decoration: none;
+  }
+  @media (max-width: 420px) {
+    .quick {
+      grid-template-columns: repeat(2, 1fr);
+    }
   }
   .quick a:hover {
     border-color: var(--accent);

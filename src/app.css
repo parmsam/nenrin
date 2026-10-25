@@ -55,6 +55,12 @@
   --new: #2c6a9a;
   --learning: #b8322a;
   --review: #2f7a4a;
+  /* Card-stage chart colors: validated with the dataviz palette checks (light surface). */
+  --chart-new: #2a78d6;
+  --chart-learning: #eb6834;
+  --chart-young: #1baf7a;
+  --chart-mature: #6250d6;
+  --chart-muted: #b3aca2;
   color-scheme: light;
 }
 
@@ -80,6 +86,11 @@
     --new: #8cbfe8;
     --learning: #f08a80;
     --review: #7fc79a;
+    --chart-new: #3987e5;
+    --chart-learning: #d95926;
+    --chart-young: #199e70;
+    --chart-mature: #9085e9;
+    --chart-muted: #5a534b;
     color-scheme: dark;
   }
 }
@@ -106,6 +117,11 @@
   --new: #8cbfe8;
   --learning: #f08a80;
   --review: #7fc79a;
+  --chart-new: #3987e5;
+  --chart-learning: #d95926;
+  --chart-young: #199e70;
+  --chart-mature: #9085e9;
+  --chart-muted: #5a534b;
   color-scheme: dark;
 }
 
