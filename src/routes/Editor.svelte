@@ -7,6 +7,7 @@
   import { addNote, cardOrdinals, deleteNote, parseTags, updateNote } from '../lib/notes';
   import { renderCard } from '../lib/render';
   import { clozeNumbers } from '../lib/render/template';
+  import { parsePastedCard, SPLIT_LABELS } from '../lib/notes/paste';
   import { navigate, router } from '../lib/router.svelte';
 
   /** Edit an existing note when set; otherwise add new notes. */
@@ -26,28 +27,62 @@
   let previewSide = $state<'front' | 'back'>('front');
   let loaded = $state(false);
   let textareas: HTMLTextAreaElement[] = $state([]);
+  /** Fields: one box per field. Paste: one Markdown block (e.g. from an LLM), split for you. */
+  let mode = $state<'fields' | 'paste'>('fields');
+  let pasteText = $state('');
+  let pasteArea: HTMLTextAreaElement | undefined = $state();
 
   const noteType = $derived(noteTypes.find((t) => t.id === typeId));
   const returnTo = $derived(router.query.get('return'));
+  const pasted = $derived(mode === 'paste' ? parsePastedCard(pasteText) : null);
+  /** Field boxes to show: none while pasting a new card. */
+  const fieldNames = $derived(mode === 'paste' && !note ? [] : (noteType?.fields ?? []));
+
+  /** What will actually be saved: the field boxes, or the parsed paste. */
+  const target = $derived.by((): { type: NoteType; fields: Record<string, string> } | null => {
+    if (mode === 'fields') return noteType ? { type: noteType, fields } : null;
+    if (!pasted) return null;
+    if (pasted.kind === 'cloze') {
+      const cloze = noteTypes.find((t) => t.id === 'cloze');
+      return cloze
+        ? { type: cloze, fields: { Text: pasted.front, 'Back Extra': pasted.back } }
+        : null;
+    }
+    // Use the chosen type if it has a front and back; otherwise plain Basic.
+    const type =
+      noteType && noteType.kind === 'basic' && noteType.fields.length >= 2
+        ? noteType
+        : noteTypes.find((t) => t.id === 'basic');
+    if (!type) return null;
+    const [front, back] = type.fields;
+    return {
+      type,
+      fields: {
+        ...Object.fromEntries(type.fields.map((f) => [f, ''])),
+        [front]: pasted.front,
+        [back]: pasted.back,
+      },
+    };
+  });
 
   const preview = $derived.by(() => {
-    if (!noteType) return null;
-    const ordinals = cardOrdinals(noteType, fields);
+    if (!target) return null;
+    const ordinals = cardOrdinals(target.type, target.fields);
     if (ordinals.length === 0) return { count: 0, html: '' };
     const fake: Note = {
       id: '',
-      noteTypeId: noteType.id,
-      fields,
+      noteTypeId: target.type.id,
+      fields: target.fields,
       tags: [],
       createdAt: 0,
       updatedAt: 0,
       format: note?.format,
     };
-    const card = renderCard(noteType, fake, ordinals[0]);
+    const card = renderCard(target.type, fake, ordinals[0]);
     return { count: ordinals.length, html: previewSide === 'front' ? card.front : card.back };
   });
 
-  function readLast(): { deckId?: string; typeId?: string } {
+  function readLast(): { deckId?: string; typeId?: string; mode?: 'fields' | 'paste' } {
     try {
       return JSON.parse(localStorage.getItem(LAST_KEY) ?? '{}');
     } catch {
@@ -57,7 +92,7 @@
 
   function rememberLast() {
     try {
-      localStorage.setItem(LAST_KEY, JSON.stringify({ deckId, typeId }));
+      localStorage.setItem(LAST_KEY, JSON.stringify({ deckId, typeId, mode }));
     } catch {
       // Private mode etc.: just don't remember.
     }
@@ -84,12 +119,27 @@
       const wanted = router.query.get('deck') ?? last.deckId;
       deckId = decks.find((d) => d.id === wanted)?.id ?? decks[0]?.id ?? '';
       typeId = noteTypes.find((t) => t.id === last.typeId)?.id ?? 'basic';
+      mode = last.mode === 'paste' ? 'paste' : 'fields';
       resetFields(noteTypes.find((t) => t.id === typeId));
     }
     loaded = true;
     await tick();
-    textareas[0]?.focus();
+    focusFirst();
   });
+
+  function focusFirst() {
+    if (mode === 'paste') pasteArea?.focus();
+    else textareas[0]?.focus();
+  }
+
+  async function switchMode(next: 'fields' | 'paste') {
+    mode = next;
+    error = '';
+    message = '';
+    rememberLast();
+    await tick();
+    focusFirst();
+  }
 
   function changeType() {
     resetFields(noteType);
@@ -111,19 +161,25 @@
         if (changes) alert(`Saved. ${changes}.`);
         navigate(returnTo ?? (deckId ? `/deck/${deckId}` : '/'), { replace: true });
       } else {
+        if (!target) {
+          throw new Error(
+            'Couldn’t find a front and back. Put a line with --- between them, or use Q: and A:.',
+          );
+        }
         await addNote(db, {
-          noteTypeId: typeId,
+          noteTypeId: target.type.id,
           deckId,
-          fields: { ...fields },
-          tags: parseTags(tags),
+          fields: { ...target.fields },
+          tags: [...new Set([...parseTags(tags), ...(pasted?.tags ?? [])])],
         });
         rememberLast();
         const count = preview?.count ?? 1;
         message = `Added ${count} ${count === 1 ? 'card' : 'cards'}.`;
+        pasteText = '';
         resetFields(undefined);
         resetFields(noteType);
         await tick();
-        textareas[0]?.focus();
+        focusFirst();
       }
     } catch (err) {
       error = (err as Error).message;
@@ -152,6 +208,16 @@
   function wrapCloze(i: number) {
     const n = Math.max(0, ...clozeNumbers(Object.values(fields).join('\n'))) + 1;
     insertAt(i, `{{c${n}::`, '}}');
+  }
+
+  /** Pasted images in the Markdown box become ![](file) at the cursor. */
+  async function onPasteMarkdown(e: ClipboardEvent) {
+    const image = [...(e.clipboardData?.files ?? [])].find((f) => f.type.startsWith('image/'));
+    if (!image || !pasteArea) return;
+    e.preventDefault();
+    const filename = await addImage(db, image);
+    const [s, end] = [pasteArea.selectionStart, pasteArea.selectionEnd];
+    pasteText = `${pasteText.slice(0, s)}![](${filename})${pasteText.slice(end)}`;
   }
 
   async function onPaste(e: ClipboardEvent, i: number) {
@@ -183,6 +249,25 @@
   </nav>
   <h2>{note ? 'Edit note' : 'Add cards'}</h2>
 
+  {#if !note}
+    <div class="segmented" role="radiogroup" aria-label="How to enter the card">
+      <button
+        type="button"
+        role="radio"
+        aria-checked={mode === 'fields'}
+        class:checked={mode === 'fields'}
+        onclick={() => switchMode('fields')}>Fields</button
+      >
+      <button
+        type="button"
+        role="radio"
+        aria-checked={mode === 'paste'}
+        class:checked={mode === 'paste'}
+        onclick={() => switchMode('paste')}>Paste Markdown</button
+      >
+    </div>
+  {/if}
+
   <form class="editor" onsubmit={save}>
     <div class="grid2">
       <label>
@@ -199,7 +284,44 @@
       </label>
     </div>
 
-    {#each noteType?.fields ?? [] as name, i (name)}
+    {#if mode === 'paste' && !note}
+      <div class="field">
+        <label for="paste-md">Markdown</label>
+        <textarea
+          id="paste-md"
+          class="paste"
+          bind:this={pasteArea}
+          bind:value={pasteText}
+          rows="9"
+          onpaste={onPasteMarkdown}
+          onkeydown={(e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') save(e);
+          }}
+          placeholder={'Paste a card, for example from ChatGPT or Claude:\n\nQ: What does FSRS stand for?\nA: Free Spaced Repetition Scheduler.\n\nOr put a line with --- between front and back,\nor write clozes like {{c1::this}}.\nAn optional last line "Tags: biology exam" adds tags.'}
+        ></textarea>
+        <p class="detected" role="status" aria-live="polite">
+          {#if pasted && target}
+            Detected: <strong>{target.type.name}</strong>
+            {[SPLIT_LABELS[pasted.method], pasted.tags.length && `tags: ${pasted.tags.join(' ')}`]
+              .filter(Boolean)
+              .map((part) => `· ${part}`)
+              .join(' ')}
+          {:else if pasteText.trim()}
+            <span class="error"
+              >No answer found yet. Put a line with <code>---</code> between front and back, or use
+              <code>Q:</code> / <code>A:</code>.</span
+            >
+          {:else}
+            <span class="muted"
+              >Splits on <code>---</code>, <code>Q:</code>/<code>A:</code>, a heading, or the first
+              paragraph.</span
+            >
+          {/if}
+        </p>
+      </div>
+    {/if}
+
+    {#each fieldNames as name, i (name)}
       <div class="field">
         <div class="field-head">
           <label for="field-{i}">{name}</label>
@@ -291,6 +413,32 @@
   .field {
     display: grid;
     gap: 0.35rem;
+  }
+  .segmented {
+    display: inline-flex;
+    padding: 3px;
+    margin-bottom: 1rem;
+    border-radius: 12px;
+    background: var(--surface-2);
+  }
+  .segmented button {
+    padding: 0.45rem 1rem;
+    border-radius: 9px;
+    background: transparent;
+    color: var(--muted);
+  }
+  .segmented button.checked {
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: 0 1px 3px rgb(0 0 0 / 12%);
+  }
+  .paste {
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 0.9rem;
+  }
+  .detected {
+    margin: 0;
+    font-size: 0.85rem;
   }
   .field-head {
     display: flex;

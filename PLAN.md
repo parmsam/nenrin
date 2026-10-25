@@ -56,6 +56,7 @@ Last updated: 2026-10-25
 - [x] Dark mode and responsive layout
 - [x] "Last backup" reminder; device id on review logs (groundwork for sync, see docs/storage-strategy.md)
 - [x] Keyboard shortcuts dialog: press <kbd>?</kbd> anywhere, or use the keyboard button in the header and review screen
+- [x] Paste Markdown mode in the editor: one block (e.g. from an LLM) is split into front/back by `---`, `Q:`/`A:` labels, a heading or the first paragraph; clozes switch to the Cloze type; fences are stripped; a final `Tags:` line becomes tags
 - [x] Theme options: System / Light / Dark, plus accent palettes Wood 木, Matcha 抹茶, Sakura 桜 and Indigo 藍 (Settings → Appearance; per device, applied before first paint)
 - [ ] Exit criteria: a week of real daily use on a phone (needs a human!)
 
@@ -117,6 +118,7 @@ From the Anki manual ([importing](https://docs.ankiweb.net/manual/importing/intr
 ### Phase 3: Polish and insights (weeks 6–7)
 
 - [ ] Browser: search (`tag:`, `deck:`, `is:due`, free text), bulk edit, suspend, move
+- [ ] Paste several cards at once (one block, many Q/A pairs), building on the single-card paste parser
 - [ ] **Command palette** (<kbd>⌘K</kbd> / <kbd>Ctrl+K</kbd>): fuzzy search across actions (study a deck, add cards, open settings, export backup, enable Typst), decks, and later notes.
   - Built on the same registry as the shortcuts dialog (`src/lib/shortcuts.svelte.ts`), so each command shows its shortcut, and the shortcuts list and palette can never disagree.
   - Recent commands first; fully keyboard-driven (arrows, <kbd>Enter</kbd>, <kbd>Esc</kbd>); a native `<dialog>` like the shortcuts modal.

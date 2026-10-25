@@ -6,7 +6,7 @@
 
 <p align="center">
   <strong>Memory grows ring by ring.</strong><br>
-  Free, open-source, local-first flashcards with FSRS spaced repetition.<br>
+  Free, open-source, local-first flashcards with <a href="https://en.wikipedia.org/wiki/Spaced_repetition#Algorithms">FSRS</a> <a href="https://en.wikipedia.org/wiki/Spaced_repetition">spaced repetition</a>.<br>
   An MIT-licensed alternative to Anki.
 </p>
 
@@ -36,7 +36,7 @@
 
 ## What's in the name
 
-**<ruby>年輪<rt>ねんりん</rt></ruby> (nenrin)** means "tree rings" in Japanese. A tree adds one ring each year, and the rings are what make the trunk strong. Spaced repetition works the same way: each review adds a ring, and each ring makes the memory last longer.
+**<ruby>年輪<rt>ねんりん</rt></ruby> (nenrin)** means "tree rings" in Japanese. A tree adds one ring each year, and the rings are what make the trunk strong. [Spaced repetition](https://en.wikipedia.org/wiki/Spaced_repetition) works the same way: each review adds a ring, and each ring makes the memory last longer.
 
 ## Why another flashcard app?
 
@@ -44,7 +44,7 @@ Anki has the best scheduler and the biggest deck ecosystem, but its interface is
 
 Nenrin aims for the middle ground:
 
-- **Modern scheduling.** [FSRS](https://github.com/open-spaced-repetition) (via `ts-fsrs`), with optional on-device parameter optimization.
+- **Modern scheduling.** [FSRS](https://github.com/open-spaced-repetition), the Free Spaced Repetition Scheduler (via `ts-fsrs`), with optional on-device parameter optimization. It's a newer, more accurate alternative to the SM-2 algorithm Anki used by default for years; see [how spaced repetition algorithms compare](https://en.wikipedia.org/wiki/Spaced_repetition#Algorithms).
 - **Brings your Anki decks along.** Import `.apkg` / `.colpkg` with media, plus CSV/TSV.
 - **Local-first and private.** Works offline, needs no account, has no analytics, and keeps your data on your device.
 - **Runs everywhere.** It's an installable PWA (iPhone, iPad, Android, desktop browsers), with an optional native macOS wrapper.
@@ -57,6 +57,7 @@ See [COMPARISON.md](COMPARISON.md) for how this stacks up against Anki, RemNote,
 
 - **Decks and sub-decks**: create, rename, delete, and per-deck settings (new cards per day, reviews per day, desired retention)
 - **Card types**: Basic, Basic (and reversed card), and Cloze (`{{c1::answer::hint}}`), with Anki-compatible templates
+- **Paste from an LLM**: switch the editor to _Paste Markdown_, paste one block from ChatGPT, Claude and the like, and Nenrin splits it into front and back (at `---`, `Q:`/`A:` labels, a heading, or the first paragraph), spots clozes, and reads a final `Tags:` line
 - **Rich cards**: Markdown, LaTeX math (`$x^2$`, `$$…$$`) via KaTeX, and pasted images, with a live preview
 - **Review**: FSRS-6 scheduling, learning steps, interval previews on each button, sibling burying, and undo
 - **Keyboard-first**: <kbd>Space</kbd> to show the answer or rate Good, <kbd>1</kbd>–<kbd>4</kbd> to rate, <kbd>Z</kbd> to undo, <kbd>E</kbd> to edit, <kbd>Esc</kbd> to leave; press <kbd>?</kbd> for the full list
