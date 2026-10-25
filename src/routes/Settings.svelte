@@ -194,6 +194,27 @@
   </p>
 </div>
 
+<h3 class="section-title">About</h3>
+<div class="panel stack">
+  <p>
+    <strong>Nenrin v{__APP_VERSION__}</strong> <span class="muted">(pre-alpha)</span>
+  </p>
+  <p class="muted small">
+    Free and open source under the MIT license.
+    <a
+      href="https://github.com/parmsam/nenrin/blob/main/CHANGELOG.md"
+      target="_blank"
+      rel="noreferrer">What’s new</a
+    >
+    ·
+    <a href="https://github.com/parmsam/nenrin" target="_blank" rel="noreferrer">Source</a>
+    ·
+    <a href="https://github.com/parmsam/nenrin/issues" target="_blank" rel="noreferrer"
+      >Report a problem</a
+    >
+  </p>
+</div>
+
 <style>
   .crumbs {
     font-size: 0.875rem;

@@ -14,7 +14,8 @@ export default defineConfig(
   svelte.configs.recommended,
   {
     languageOptions: {
-      globals: { ...globals.browser, ...globals.node },
+      // __APP_VERSION__ is injected by Vite's `define` (see vite.config.ts).
+      globals: { ...globals.browser, ...globals.node, __APP_VERSION__: 'readonly' },
     },
   },
   {

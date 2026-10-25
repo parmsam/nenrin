@@ -57,6 +57,9 @@ Last updated: 2026-10-25
 - [x] "Last backup" reminder; device id on review logs (groundwork for sync, see docs/storage-strategy.md)
 - [x] Keyboard shortcuts dialog: press <kbd>?</kbd> anywhere, or use the keyboard button in the header and review screen
 - [x] Paste Markdown mode in the editor: one block (e.g. from an LLM) is split into front/back by `---`, `Q:`/`A:` labels, a heading or the first paragraph; clozes switch to the Cloze type; fences are stripped; a final `Tags:` line becomes tags
+- [x] Home screen for returning users: today's progress ring (tree-ring style), cards left, reviews today, streak, one-tap "Study now" for the deck with the most due, per-deck Study buttons, and quick actions (Add, Import, Browse)
+- [x] Version shown in the app (header badge, footer, Settings → About) from `package.json`, with a README badge and `CHANGELOG.md`. Each phase bumps the minor version until 1.0
+- [x] Update prompt: new deploys wait for "A new version of Nenrin is ready → Reload" instead of swapping in mid-review; checks hourly and when the app comes back to the foreground
 - [x] Theme options: System / Light / Dark, plus accent palettes Wood 木, Matcha 抹茶, Sakura 桜 and Indigo 藍 (Settings → Appearance; per device, applied before first paint)
 - [ ] Exit criteria: a week of real daily use on a phone (needs a human!)
 

@@ -8,6 +8,7 @@ import { addNote, ensureBuiltins } from '../notes';
 import { Rating, State } from '../scheduler';
 import { dayStart, formatInterval, nextDayStart } from './day';
 import { LEARN_AHEAD_MS, studyState } from './queue';
+import { streakFrom, todaySummary } from './stats';
 
 const MIN = 60_000;
 const DAY = 86_400_000;
@@ -130,5 +131,35 @@ describe('study queue', () => {
     const n = await add('a');
     await db.cards.where('noteId').equals(n.id).modify({ suspended: true });
     expect((await studyState(db, deckId, T0)).next).toBeUndefined();
+  });
+});
+
+describe('today summary', () => {
+  it('counts today’s reviews and the streak', async () => {
+    const at = (d: number, h = 12) => new Date(2026, 0, d, h).getTime();
+    for (const [i, day] of [7, 8, 9, 10].entries()) {
+      const n = await add(`s${i}`, 'basic', at(day));
+      const card = (await db.cards.where('noteId').equals(n.id).first())!;
+      await recordReview(db, card.id, Rating.Good, { now: at(day) });
+    }
+    // One review on each of four consecutive days.
+    expect(await todaySummary(db, at(10, 18))).toEqual({
+      reviewedToday: 1,
+      streak: 4,
+      studiedToday: true,
+    });
+    // Next day, before studying: the streak is still alive.
+    expect(await todaySummary(db, at(11, 9))).toMatchObject({ streak: 4, studiedToday: false });
+    // Two days later it's broken.
+    expect(await todaySummary(db, at(12, 9))).toMatchObject({ streak: 0, reviewedToday: 0 });
+  });
+
+  it('computes streaks across a DST change', () => {
+    const days = new Set(
+      [new Date(2026, 2, 28, 4), new Date(2026, 2, 29, 4), new Date(2026, 2, 30, 4)].map((d) =>
+        d.getTime(),
+      ),
+    );
+    expect(streakFrom(days, new Date(2026, 2, 30, 4).getTime())).toBe(3);
   });
 });

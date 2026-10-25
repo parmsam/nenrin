@@ -28,7 +28,7 @@ const reviewAnswer = async (page) => {
 };
 const addCloze = async (page) => {
   await addSample(page);
-  await page.getByRole('link', { name: '+ Add cards' }).click();
+  await page.getByRole('link', { name: 'Add cards', exact: true }).click();
   await page.getByLabel('Type').selectOption('cloze');
   await page
     .getByLabel('Text')

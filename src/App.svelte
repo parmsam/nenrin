@@ -11,6 +11,7 @@
   import Review from './routes/Review.svelte';
   import Settings from './routes/Settings.svelte';
   import ShortcutsDialog from './components/ShortcutsDialog.svelte';
+  import UpdatePrompt from './components/UpdatePrompt.svelte';
   import { isTyping, shortcutsDialog } from './lib/shortcuts.svelte';
 
   const logo = `${import.meta.env.BASE_URL}logo.svg`;
@@ -63,7 +64,7 @@
       <h1>Nenrin</h1>
       <ruby class="kanji" lang="ja">年輪<rp>(</rp><rt>ねんりん</rt><rp>)</rp></ruby>
     </a>
-    <span class="badge">pre-alpha</span>
+    <span class="badge" title="Pre-alpha: expect rough edges">v{__APP_VERSION__}</span>
     <a class="icon-link" href="#/browse" aria-label="Browse notes" title="Browse notes">
       <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"
         ><path
@@ -134,11 +135,13 @@
 </main>
 
 <ShortcutsDialog />
+<UpdatePrompt />
 <svelte:window onkeydown={onKey} />
 
 {#if route.name !== 'study'}
   <footer class="muted">
-    Local-first · works offline · <a href="https://github.com/parmsam/nenrin">Source (MIT)</a>
+    Nenrin v{__APP_VERSION__} (pre-alpha) · Local-first · works offline ·
+    <a href="https://github.com/parmsam/nenrin">Source (MIT)</a>
   </footer>
 {/if}
 
@@ -173,10 +176,11 @@
   }
   .badge {
     margin-left: auto;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
     font-size: 0.7rem;
     font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.04em;
     padding: 0.2rem 0.55rem;
     border-radius: 999px;
     background: var(--surface-2);

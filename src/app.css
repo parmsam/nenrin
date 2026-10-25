@@ -46,6 +46,7 @@
   --accent-soft: var(--accent-soft-l);
   --hero: #2b2520;
   --hero-text: #f4e2c2;
+  --hero-accent: var(--accent-d);
   --shadow: 0 1px 2px rgb(43 37 32 / 6%), 0 8px 24px rgb(43 37 32 / 6%);
   --again: #b8322a;
   --hard: #8a6a2f;
@@ -70,6 +71,7 @@
     --accent-soft: var(--accent-soft-d);
     --hero: #ecd3a8;
     --hero-text: #2b2520;
+    --hero-accent: var(--accent-l);
     --shadow: none;
     --again: #f08a80;
     --hard: #d8b46a;
@@ -95,6 +97,7 @@
   --accent-soft: var(--accent-soft-d);
   --hero: #ecd3a8;
   --hero-text: #2b2520;
+  --hero-accent: var(--accent-l);
   --shadow: none;
   --again: #f08a80;
   --hard: #d8b46a;

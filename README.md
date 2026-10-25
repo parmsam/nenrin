@@ -16,6 +16,7 @@
 
 <p align="center">
   <a href="https://github.com/parmsam/nenrin/actions/workflows/ci.yml"><img src="https://github.com/parmsam/nenrin/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="CHANGELOG.md"><img src="https://img.shields.io/github/package-json/v/parmsam/nenrin?label=version&color=2b2520" alt="Version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-b35a24" alt="MIT license"></a>
   <img src="https://img.shields.io/badge/PWA-offline--ready-2b2520" alt="Offline-ready PWA">
   <img src="https://img.shields.io/badge/scheduler-FSRS--6-d9773a" alt="FSRS-6">
@@ -29,10 +30,10 @@
   &nbsp;
   <img src="public/screenshots/mobile-add-light.png" width="200" alt="Adding a cloze card with Markdown">
   &nbsp;
-  <img src="public/screenshots/mobile-empty-light.png" width="200" alt="Welcome screen: Memory grows ring by ring">
+  <img src="public/screenshots/mobile-decks-light.png" width="200" alt="Home screen: today’s progress ring, streak, Study now, and decks">
 </p>
 
-> **Status: pre-alpha, usable for daily study.** Import your Anki decks (`.apkg` / `.colpkg`) or make your own Basic, Reversed and Cloze cards with Markdown, math and images, and review them with FSRS, offline. See [PLAN.md](PLAN.md).
+> **Status: v0.3.0, pre-alpha, usable for daily study.** See the [changelog](CHANGELOG.md). Import your Anki decks (`.apkg` / `.colpkg`) or make your own Basic, Reversed and Cloze cards with Markdown, math and images, and review them with FSRS, offline. See [PLAN.md](PLAN.md).
 
 ## What's in the name
 
@@ -66,7 +67,7 @@ See [COMPARISON.md](COMPARISON.md) for how this stacks up against Anki, RemNote,
 - **Anki-compatible text import/export**: `.txt` / `.csv` / `.tsv` with Anki's file headers (`#separator`, `#html`, `#deck column`, `#guid column` …), column mapping, and update/skip/duplicate handling. Export as Anki's "Notes in Plain Text"
 - **Your data**: JSON backup and restore, including review history and images; a configurable day rollover hour; persistent-storage request
 - **Themes**: System / Light / Dark, with Wood, Matcha, Sakura and Indigo accents
-- **Offline PWA**: install it on any device; it works with no network
+- **Offline PWA**: install it on any device; it works with no network. When a new version is deployed, it asks before reloading
 
 $1
 

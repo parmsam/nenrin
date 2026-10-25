@@ -2,17 +2,21 @@
 import { defineConfig } from 'vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { VitePWA } from 'vite-plugin-pwa';
+import pkg from './package.json' with { type: 'json' };
 
 // GitHub Pages serves project sites from /<repo>/; CI sets BASE_PATH accordingly.
 const base = process.env.BASE_PATH ?? '/';
 
 export default defineConfig({
   base,
+  define: {
+    __APP_VERSION__: JSON.stringify(pkg.version),
+  },
   plugins: [
     svelte(),
     VitePWA({
-      registerType: 'autoUpdate',
-      injectRegister: 'auto',
+      // New versions wait for the user (UpdatePrompt.svelte) instead of swapping in mid-review.
+      registerType: 'prompt',
       pwaAssets: {
         image: 'public/favicon.svg',
         preset: 'minimal-2023',
@@ -64,6 +68,8 @@ export default defineConfig({
         // conflicting duplicate entry, and Workbox then silently precaches nothing.
         globPatterns: ['**/*.{js,css,html,svg,png,ico,wasm,woff2}'],
         globIgnores: ['screenshots/**'],
+        // Control the page on first install; later updates still wait for the prompt.
+        clientsClaim: true,
       },
     }),
   ],
