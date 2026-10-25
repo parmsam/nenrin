@@ -195,56 +195,59 @@
     if (e.target === dialog) dialog.close();
   }}
 >
-  <div class="box">
-    <div class="search">
-      <svg viewBox="0 0 24 24" aria-hidden="true"
-        ><path d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15zM16 16l5 5" /></svg
-      >
-      <input
-        bind:this={input}
-        bind:value={query}
-        oninput={() => (active = 0)}
-        onkeydown={onKey}
-        placeholder="Type a command or deck…"
-        role="combobox"
-        aria-expanded="true"
-        aria-controls="palette-list"
-        aria-activedescendant={results.length ? `cmd-${active}` : undefined}
-        aria-autocomplete="list"
-        autocomplete="off"
-        spellcheck="false"
-      />
-      <kbd>Esc</kbd>
-    </div>
-    <ul id="palette-list" role="listbox" aria-label="Commands">
-      {#each results as cmd, i (cmd.id)}
-        <li
-          id="cmd-{i}"
-          role="option"
-          aria-selected={i === active}
-          class:active={i === active}
-          onpointermove={() => (active = i)}
-          onclick={() => choose(cmd)}
-          onkeydown={() => {}}
+  <!-- Only rendered while open: keeps hidden commands out of the page and out of the way. -->
+  {#if paletteState.open}
+    <div class="box">
+      <div class="search">
+        <svg viewBox="0 0 24 24" aria-hidden="true"
+          ><path d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15zM16 16l5 5" /></svg
         >
-          <span class="label">{cmd.label}</span>
-          {#if cmd.keys}
-            <span class="keys"
-              >{#each cmd.keys as k (k)}<kbd>{k}</kbd>{/each}</span
-            >
-          {/if}
-          <span class="group">{cmd.group}</span>
-        </li>
-      {:else}
-        <li class="empty" role="presentation">No matches</li>
-      {/each}
-    </ul>
-    <p class="foot muted">
-      {#if note}<span role="status">{note}</span>{:else}
-        <kbd>↑</kbd><kbd>↓</kbd> to move · <kbd>Enter</kbd> to run · <kbd>{MOD}</kbd><kbd>K</kbd> anywhere
-      {/if}
-    </p>
-  </div>
+        <input
+          bind:this={input}
+          bind:value={query}
+          oninput={() => (active = 0)}
+          onkeydown={onKey}
+          placeholder="Type a command or deck…"
+          role="combobox"
+          aria-expanded="true"
+          aria-controls="palette-list"
+          aria-activedescendant={results.length ? `cmd-${active}` : undefined}
+          aria-autocomplete="list"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <kbd>Esc</kbd>
+      </div>
+      <ul id="palette-list" role="listbox" aria-label="Commands">
+        {#each results as cmd, i (cmd.id)}
+          <li
+            id="cmd-{i}"
+            role="option"
+            aria-selected={i === active}
+            class:active={i === active}
+            onpointermove={() => (active = i)}
+            onclick={() => choose(cmd)}
+            onkeydown={() => {}}
+          >
+            <span class="label">{cmd.label}</span>
+            {#if cmd.keys}
+              <span class="keys"
+                >{#each cmd.keys as k (k)}<kbd>{k}</kbd>{/each}</span
+              >
+            {/if}
+            <span class="group">{cmd.group}</span>
+          </li>
+        {:else}
+          <li class="empty" role="presentation">No matches</li>
+        {/each}
+      </ul>
+      <p class="foot muted">
+        {#if note}<span role="status">{note}</span>{:else}
+          <kbd>↑</kbd><kbd>↓</kbd> to move · <kbd>Enter</kbd> to run · <kbd>{MOD}</kbd><kbd>K</kbd> anywhere
+        {/if}
+      </p>
+    </div>
+  {/if}
 </dialog>
 
 <style>
