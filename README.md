@@ -23,14 +23,16 @@
 </p>
 
 <p align="center">
-  <img src="public/screenshots/mobile-empty-light.png" width="250" alt="Nenrin welcome screen on a phone">
+  <img src="public/screenshots/mobile-review-light.png" width="200" alt="Reviewing a card: answer shown, with Again, Hard, Good and Easy buttons and their next intervals">
   &nbsp;
-  <img src="public/screenshots/mobile-decks-light.png" width="250" alt="Deck list with cards due today, light theme">
+  <img src="public/screenshots/mobile-review-dark.png" width="200" alt="The same review screen in dark mode">
   &nbsp;
-  <img src="public/screenshots/mobile-decks-dark.png" width="250" alt="Deck list, dark theme">
+  <img src="public/screenshots/mobile-add-light.png" width="200" alt="Adding a cloze card with Markdown">
+  &nbsp;
+  <img src="public/screenshots/mobile-empty-light.png" width="200" alt="Welcome screen: Memory grows ring by ring">
 </p>
 
-> **Status: pre-alpha.** The foundation is in place: offline PWA, FSRS scheduler, local database, CI, and GitHub Pages deploys. Studying and Anki import are next. See [PLAN.md](PLAN.md).
+> **Status: pre-alpha, usable for daily study.** Create decks, add Basic, Reversed and Cloze cards with Markdown, math and images, and review them with FSRS, offline. Anki import is next. See [PLAN.md](PLAN.md).
 
 ## What's in the name
 
@@ -51,7 +53,17 @@ Nenrin aims for the middle ground:
 
 See [COMPARISON.md](COMPARISON.md) for how this stacks up against Anki, RemNote, Mochi, Noji, AlgoApp, and others.
 
-## Install it
+## What works today
+
+- **Decks and sub-decks**: create, rename, delete, and per-deck settings (new cards per day, reviews per day, desired retention)
+- **Card types**: Basic, Basic (and reversed card), and Cloze (`{{c1::answer::hint}}`), with Anki-compatible templates
+- **Rich cards**: Markdown, LaTeX math (`$x^2$`, `$$…$$`) via KaTeX, and pasted images, with a live preview
+- **Review**: FSRS-6 scheduling, learning steps, interval previews on each button, sibling burying, and undo
+- **Keyboard-first**: <kbd>Space</kbd> to show the answer or rate Good, <kbd>1</kbd>–<kbd>4</kbd> to rate, <kbd>Z</kbd> to undo, <kbd>E</kbd> to edit, <kbd>Esc</kbd> to leave
+- **Your data**: JSON backup and restore, including review history and images; a configurable day rollover hour; persistent-storage request
+- **Offline PWA**: install it on any device; it works with no network
+
+$1
 
 Open **<https://parmsam.github.io/nenrin/>**, then:
 

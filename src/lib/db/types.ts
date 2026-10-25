@@ -39,6 +39,8 @@ export interface Note {
   tags: string[];
   createdAt: number;
   updatedAt: number;
+  /** Field markup. Notes made in Nenrin are Markdown; Anki imports are HTML. Default: markdown. */
+  format?: 'markdown' | 'html';
   /** Anki note GUID, kept so re-importing a deck updates instead of duplicating. */
   ankiGuid?: string;
 }
@@ -59,6 +61,8 @@ export interface ReviewLog extends ReviewOutcome {
   id: string;
   cardId: string;
   durationMs: number;
+  /** Which device recorded it (see docs/storage-strategy.md). Missing on very early logs. */
+  deviceId?: string;
 }
 
 export interface Media {
@@ -67,6 +71,18 @@ export interface Media {
   mime: string;
   sha1: string;
 }
+
+export interface Setting {
+  key: string;
+  value: unknown;
+}
+
+export interface Prefs {
+  /** Local hour at which a new study day starts (Anki default: 4 AM). */
+  rolloverHour: number;
+}
+
+export const DEFAULT_PREFS: Prefs = { rolloverHour: 4 };
 
 export const DEFAULT_DECK_CONFIG: DeckConfig = {
   newPerDay: 20,

@@ -1,5 +1,5 @@
 import Dexie, { type EntityTable } from 'dexie';
-import type { Card, Deck, Media, Note, NoteType, ReviewLog } from './types';
+import type { Card, Deck, Media, Note, NoteType, ReviewLog, Setting } from './types';
 
 export * from './types';
 
@@ -10,6 +10,7 @@ export class NenrinDB extends Dexie {
   cards!: EntityTable<Card, 'id'>;
   reviewLogs!: EntityTable<ReviewLog, 'id'>;
   media!: EntityTable<Media, 'filename'>;
+  settings!: EntityTable<Setting, 'key'>;
 
   constructor(name = 'nenrin') {
     super(name);
@@ -21,6 +22,11 @@ export class NenrinDB extends Dexie {
       cards: 'id, noteId, deckId, due, [deckId+due]',
       reviewLogs: 'id, cardId, ts',
       media: 'filename, sha1',
+    });
+    // v2: key-value settings, and an index for picking new cards per deck.
+    this.version(2).stores({
+      cards: 'id, noteId, deckId, due, [deckId+due], [deckId+state]',
+      settings: 'key',
     });
   }
 }

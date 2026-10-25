@@ -11,6 +11,13 @@
   --hero: #2b2520;
   --hero-text: #f4e2c2;
   --shadow: 0 1px 2px rgb(43 37 32 / 6%), 0 8px 24px rgb(43 37 32 / 6%);
+  --again: #b8322a;
+  --hard: #8a6a2f;
+  --good: #2f7a4a;
+  --easy: #2c6a9a;
+  --new: #2c6a9a;
+  --learning: #b8322a;
+  --review: #2f7a4a;
   color-scheme: light;
 }
 
@@ -28,6 +35,13 @@
     --hero: #ecd3a8;
     --hero-text: #2b2520;
     --shadow: none;
+    --again: #f08a80;
+    --hard: #d8b46a;
+    --good: #7fc79a;
+    --easy: #8cbfe8;
+    --new: #8cbfe8;
+    --learning: #f08a80;
+    --review: #7fc79a;
     color-scheme: dark;
   }
 }
@@ -79,9 +93,97 @@ button {
   cursor: pointer;
 }
 
+button.secondary,
+a.button.secondary {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+button.danger {
+  background: transparent;
+  color: var(--again);
+  border: 1px solid currentColor;
+}
+
+a.button {
+  display: inline-block;
+  font-weight: 600;
+  padding: 0.7rem 1.3rem;
+  border-radius: 10px;
+  background: var(--accent);
+  color: var(--accent-text);
+  text-decoration: none;
+}
+
 button:disabled {
   opacity: 0.6;
   cursor: default;
+}
+
+input,
+select,
+textarea {
+  font: inherit;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.6rem 0.75rem;
+  width: 100%;
+}
+
+input[type='range'] {
+  padding: 0;
+  accent-color: var(--accent);
+}
+
+input[type='file'] {
+  border: 0;
+  padding: 0;
+}
+
+label {
+  display: grid;
+  gap: 0.35rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.1rem 1.2rem;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.error {
+  color: var(--again);
+}
+
+.section-title {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin: 1.75rem 0 0.6rem;
+}
+
+kbd {
+  font:
+    0.75rem ui-monospace,
+    monospace;
+  padding: 0.05rem 0.35rem;
+  border: 1px solid var(--border);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  color: var(--muted);
 }
 
 :focus-visible {

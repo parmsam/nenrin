@@ -30,11 +30,25 @@ export default defineConfig({
         // Shown in the richer install dialog on Android and desktop Chrome. Regenerate with `npm run screenshots`.
         screenshots: [
           {
+            src: 'screenshots/mobile-review-light.png',
+            sizes: '1179x1977',
+            type: 'image/png',
+            form_factor: 'narrow',
+            label: 'Review with FSRS: interval previews on every button',
+          },
+          {
             src: 'screenshots/mobile-decks-light.png',
             sizes: '1179x1977',
             type: 'image/png',
             form_factor: 'narrow',
             label: 'Your decks and what is due today',
+          },
+          {
+            src: 'screenshots/desktop-review-light.png',
+            sizes: '1280x800',
+            type: 'image/png',
+            form_factor: 'wide',
+            label: 'Keyboard-first review on desktop',
           },
           {
             src: 'screenshots/desktop-decks-light.png',
@@ -48,7 +62,7 @@ export default defineConfig({
       workbox: {
         // The plugin precaches manifest.webmanifest itself. Globbing it too creates a
         // conflicting duplicate entry, and Workbox then silently precaches nothing.
-        globPatterns: ['**/*.{js,css,html,svg,png,ico,wasm}'],
+        globPatterns: ['**/*.{js,css,html,svg,png,ico,wasm,woff2}'],
         globIgnores: ['screenshots/**'],
       },
     }),

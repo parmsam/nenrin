@@ -28,11 +28,14 @@ Run `npm run lint && npm test` before you call a task done. If you can't run the
 src/
   lib/
     scheduler/   # thin wrapper over ts-fsrs, the only place that imports it
+    study/       # day rollover, interval labels, today's queue (limits, learning, burying)
+    notes/       # built-in note types; add/update/delete notes and sync their cards
     db/          # Dexie schema, migrations, repositories
     import/      # apkg, colpkg, csv parsers (run in a Web Worker)
     export/      # json backup, csv, apkg (later)
     render/      # card templates, cloze, markdown, KaTeX, sanitization
-  routes/        # UI screens: decks, review, browse, edit, stats, settings
+  routes/        # screens: Home, DeckView, Review, Editor, Settings (hash router in lib/router.svelte.ts)
+  components/    # shared UI: CardView (renders sanitized card HTML + media), Counts
   workers/
 public/          # favicon.svg, logo.svg, screenshots/ (PNG icons are generated at build)
 scripts/         # generate-brand.mjs (logo), screenshots.mjs
@@ -52,6 +55,7 @@ ref/             # GITIGNORED local research: competitor notes + page snapshots
 6. **Heavy work off the main thread.** Imports, optimization, and search indexing run in Web Workers.
 7. **Times.** Store UTC epoch milliseconds. Compute the "day" boundary from the user's configurable rollover hour (default 4 AM local, matching Anki).
 8. **Accessibility.** Every review action has a keyboard shortcut (Space/Enter to flip, 1–4 to rate, Z to undo). Use semantic HTML, visible focus, and work with `prefers-reduced-motion` and dark mode.
+   - Svelte gotcha: never hand deep `$state` objects to IndexedDB (Proxies can't be cloned). Use `$state.raw` or `$state.snapshot()`.
 9. **Small diffs.** One concern per PR. Don't reformat unrelated code. Add or adjust tests for any behavior change.
 10. **Keep docs in sync.** When you finish a milestone item, tick it in `PLAN.md`. If you change a feature's status, update the Nenrin row in `COMPARISON.md`.
 

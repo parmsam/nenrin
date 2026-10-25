@@ -30,7 +30,7 @@ Last updated: 2026-10-25
 ### Open questions
 
 - [x] Name: Nenrin (年輪). Still check trademarks, domains, and app stores before launch
-- [ ] Should a sync option (Phase 4) target iCloud via Tauri, WebDAV, or a CRDT approach (Automerge/Yjs) over a user-supplied relay?
+- [ ] Storage/sync: see the draft in [docs/storage-strategy.md](docs/storage-strategy.md) (per-device append-only logs over a pluggable file store; Dropbox/Google Drive on the web, iCloud via the native app)
 - [ ] Do we want an iOS App Store presence (Tauri mobile or Capacitor), or is a PWA enough?
 
 ## Roadmap
@@ -46,16 +46,18 @@ Last updated: 2026-10-25
 - [x] Scheduler wrapper (`src/lib/scheduler`) and `recordReview` transaction, with unit tests
 - [x] E2E tests: sample deck persists; app loads offline after first visit
 
-### Phase 1: MVP study loop (weeks 2–3)
+- [x] Create, rename, and delete decks and sub-decks
+- [x] Note types: Basic, Basic + Reverse, Cloze
+- [x] Card editor with Markdown, KaTeX, and image paste
+- [x] Review screen: flip, rate 1–4, undo, keyboard shortcuts, interval preview on buttons
+- [x] FSRS scheduling via `ts-fsrs`; per-deck desired retention and daily new/review limits
+- [x] Learning steps, day rollover hour, bury siblings
+- [x] JSON backup export/import
+- [x] Dark mode and responsive layout
+- [x] "Last backup" reminder; device id on review logs (groundwork for sync, see docs/storage-strategy.md)
+- [ ] Exit criteria: a week of real daily use on a phone (needs a human!)
 
-- [ ] Create, rename, and delete decks and sub-decks
-- [ ] Note types: Basic, Basic + Reverse, Cloze
-- [ ] Card editor with Markdown, KaTeX, and image paste
-- [ ] Review screen: flip, rate 1–4, undo, keyboard shortcuts, interval preview on buttons
-- [ ] FSRS scheduling via `ts-fsrs`; per-deck desired retention and daily new/review limits
-- [ ] Learning steps, day rollover hour, bury siblings
-- [ ] JSON backup export/import
-- [ ] Dark mode and responsive layout
+Known gaps, picked up in Phase 3: no browser/search yet (edit a note from the review screen with <kbd>E</kbd>), and no suspend/bury buttons in the UI.
 
 **Exit criteria:** you can study a hand-made deck daily on a phone, offline, for a week without data loss.
 
@@ -79,7 +81,7 @@ Last updated: 2026-10-25
 - [ ] Study reminders (Web Push / notifications where supported)
 - [ ] Audio playback, TTS fallback via the Web Speech API
 - [ ] Onboarding with sample decks; first-run "Import from Anki" flow
-- [ ] Lighthouse PWA/a11y score ≥ 95
+- [ ] Lighthouse PWA/a11y score ≥ 95 (lazy-load KaTeX: it is most of the 540 KB bundle)
 
 **🚀 v1.0 release:** public on GitHub Pages and announced.
 
@@ -109,6 +111,7 @@ Last updated: 2026-10-25
 
 ## Decision log
 
+- **2026-10-25:** Phase 1 shipped. Hash routing (works on GitHub Pages without rewrites). Notes are Markdown; imported Anki notes will be HTML (`Note.format`). Undo deletes the review log it just wrote; every other log write is append-only. Siblings are buried by leaving them out of today's queue, not by writing state, so nothing needs un-burying. Svelte deep `$state` proxies can't be stored in IndexedDB, so data headed back to the database uses `$state.raw`.
 - **2026-10-25:** Phase 0 shipped. The offline e2e test caught a real bug: globbing `manifest.webmanifest` duplicated a precache entry, and Workbox silently cached nothing. Playwright's `setOffline` bypasses service workers in Chromium, so the test stops a real server instead.
 - **2026-10-25:** Named the project Nenrin (年輪, "tree rings"). "Memora" was taken by the-memora.com and similar sites. Alternatives that had no flashcard-app hits: Hanpuku (反復), Fukushū (復習), Kurikaeshi (繰り返し).
 - **2026-10-25:** Chose PWA-first on GitHub Pages, Svelte + ts-fsrs + Dexie, MIT. Deferred macOS (Tauri) and sync until after v1.

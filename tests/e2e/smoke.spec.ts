@@ -1,16 +1,16 @@
 import { spawn } from 'node:child_process';
 import { expect, test } from '@playwright/test';
 
-test('shows the empty state and creates a sample deck', async ({ page }) => {
+test('shows the welcome screen and creates a sample deck that persists', async ({ page }) => {
   await page.goto('./');
   await expect(page.getByRole('heading', { name: 'Nenrin' })).toBeVisible();
   await page.getByRole('button', { name: 'Add a sample deck' }).click();
-  await expect(page.getByText('Japanese: Nature')).toBeVisible();
-  await expect(page.getByText('5 due')).toBeVisible();
+  await expect(page.getByRole('link', { name: /Japanese: Nature/ })).toBeVisible();
+  await expect(page.getByLabel('5 new, 0 learning, 0 to review')).toBeVisible();
 
   // Data survives a reload (IndexedDB).
   await page.reload();
-  await expect(page.getByText('Japanese: Nature')).toBeVisible();
+  await expect(page.getByRole('link', { name: /Japanese: Nature/ })).toBeVisible();
 });
 
 test('works offline after the first visit', async ({ page }) => {
