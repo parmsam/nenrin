@@ -90,6 +90,7 @@ After the first visit, it works fully offline.
 - **Scheduler:** [`ts-fsrs`](https://github.com/open-spaced-repetition/ts-fsrs) (FSRS-6). Later, [`fsrs-browser`](https://github.com/open-spaced-repetition/fsrs-browser) (fsrs-rs in WASM) for optimization
 - **Storage:** IndexedDB via Dexie; media stored as Blobs
 - **Offline:** service worker via `vite-plugin-pwa`
+- **Diagrams and Typst (Phase 3):** [Pele](https://github.com/obsidianmd/pele) for Mermaid; [typst.ts](https://github.com/Myriad-Dreamin/typst.ts) for opt-in Typst (WASM, lazy-loaded)
 - **Anki import (Phase 2):** `sql.js` (SQLite → WASM), `fflate` (zip), `fzstd` (newer zstd-compressed collections)
 - **Desktop (later):** [Tauri 2](https://tauri.app) for a signed macOS `.app`
 - **Hosting:** GitHub Pages via GitHub Actions

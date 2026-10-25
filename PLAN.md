@@ -83,6 +83,21 @@ Known gaps, picked up in Phase 3: no browser/search yet (edit a note from the re
 - [ ] Onboarding with sample decks; first-run "Import from Anki" flow
 - [ ] Lighthouse PWA/a11y score ≥ 95 (lazy-load KaTeX: it is most of the 540 KB bundle)
 
+#### Rich content: diagrams and Typst
+
+Math is already covered by KaTeX (`$…$`, `$$…$$`, and Anki's `\(…\)` / `\[…\]`).
+
+- [ ] **Mermaid diagrams** via [Pele](https://github.com/obsidianmd/pele) (MIT, from the Obsidian team). Fenced ` ```mermaid ` blocks in Markdown fields render to SVG.
+  - Load it on demand with `pele/lazy` so cards without diagrams pay nothing.
+  - Map Pele's CSS variables (`--pele-bg`, `--pele-fg`, `--pele-accent` …) to our tokens, so diagrams follow light/dark mode without re-rendering.
+  - Pass the SVG through DOMPurify (SVG profile) like everything else.
+- [ ] **Typst** for fenced ` ```typst ` blocks (math and layouts that KaTeX can't do).
+  - There's no official Typst JS/WASM package. Use [typst.ts](https://github.com/Myriad-Dreamin/typst.ts) (Apache-2.0, the most mature), and benchmark [typst-wasm](https://github.com/typst-wasm/typst-wasm) (MIT, worker/JSPI backends) as a lighter option. ([typst.js](https://github.com/typst-community/typst.js) wraps the CLI and is Node-only, so it's out.)
+  - The compiler is ~25 MB of WASM plus fonts, so make it **opt-in**: Settings → "Enable Typst (one-time download)". The service worker caches it at runtime, not in the precache.
+  - Compile in a Web Worker. Cache rendered SVG in IndexedDB by hash of the source, so each block compiles once per device; the cache can be part of backups.
+  - Without Typst enabled, show the source in a code block with an "Enable Typst to render" hint, never an error.
+- [ ] Editor: preview diagrams and Typst live (debounced), with error messages from Pele/Typst shown inline.
+
 **🚀 v1.0 release:** public on GitHub Pages and announced.
 
 ### Phase 4: Desktop and sync (post-v1)
@@ -111,6 +126,7 @@ Known gaps, picked up in Phase 3: no browser/search yet (edit a note from the re
 
 ## Decision log
 
+- **2026-10-25:** Rich content plan: Mermaid via Pele (MIT, lazy-loaded, themed with CSS variables); Typst via typst.ts (Apache-2.0), opt-in because of its ~25 MB WASM, compiled in a worker with SVG cached by source hash. typst-wasm (MIT) to be benchmarked; typst.js rejected (Node-only CLI wrapper). KaTeX stays the math renderer.
 - **2026-10-25:** Phase 1 shipped. Hash routing (works on GitHub Pages without rewrites). Notes are Markdown; imported Anki notes will be HTML (`Note.format`). Undo deletes the review log it just wrote; every other log write is append-only. Siblings are buried by leaving them out of today's queue, not by writing state, so nothing needs un-burying. Svelte deep `$state` proxies can't be stored in IndexedDB, so data headed back to the database uses `$state.raw`.
 - **2026-10-25:** Phase 0 shipped. The offline e2e test caught a real bug: globbing `manifest.webmanifest` duplicated a precache entry, and Workbox silently cached nothing. Playwright's `setOffline` bypasses service workers in Chromium, so the test stops a real server instead.
 - **2026-10-25:** Named the project Nenrin (年輪, "tree rings"). "Memora" was taken by the-memora.com and similar sites. Alternatives that had no flashcard-app hits: Hanpuku (反復), Fukushū (復習), Kurikaeshi (繰り返し).
