@@ -27,6 +27,9 @@ test('prompts to reload when a new version is deployed', async ({ page }) => {
     await page.goto(url);
     await page.waitForFunction(() => navigator.serviceWorker.controller !== null);
     await expect(page.getByText('A new version of Nenrin is ready.')).toBeHidden();
+    // The page marks this device as able to prompt, so the next worker waits for the user
+    // (without the marker, public/sw-migrate.js would take over immediately).
+    await page.waitForFunction(() => caches.has('nenrin-meta'));
 
     // New deploy: any change to sw.js makes the browser install a new worker.
     appendFileSync(join(site, 'sw.js'), '\n// next version\n');

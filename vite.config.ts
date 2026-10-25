@@ -70,6 +70,8 @@ export default defineConfig({
         globIgnores: ['screenshots/**'],
         // Control the page on first install; later updates still wait for the prompt.
         clientsClaim: true,
+        // Rescues users on versions without the prompt (see public/sw-migrate.js).
+        importScripts: ['sw-migrate.js'],
       },
     }),
   ],

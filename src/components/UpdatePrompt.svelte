@@ -6,6 +6,14 @@
   const { needRefresh, offlineReady, updateServiceWorker } = useRegisterSW({
     onRegisteredSW(_url, registration) {
       if (!registration) return;
+      // Tell future service workers this device can show the update prompt, so they wait
+      // for the user instead of taking over (see public/sw-migrate.js).
+      caches
+        ?.open('nenrin-meta')
+        .then((c) =>
+          c.put(new URL('__nenrin-update-prompt', registration.scope).href, new Response('1')),
+        )
+        .catch(() => {});
       // Installed apps can stay open for days: check hourly and whenever the app comes back.
       setInterval(() => registration.update(), HOUR);
       document.addEventListener('visibilitychange', () => {
