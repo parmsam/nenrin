@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parsePastedCard } from './paste';
+import { parsePastedCard, parsePastedCards } from './paste';
 
 describe('parsePastedCard', () => {
   it('splits at a --- line', () => {
@@ -78,5 +78,63 @@ describe('parsePastedCard', () => {
     expect(parsePastedCard('Just one line')).toBeNull();
     expect(parsePastedCard('Q: only a question\nA:   ')).toBeNull();
     expect(parsePastedCard('   ')).toBeNull();
+  });
+});
+
+describe('parsePastedCards (several cards)', () => {
+  it('splits numbered Q/A pairs with an intro line, dividers and headings', () => {
+    const text = [
+      'Here are 3 flashcards on cell biology:',
+      '',
+      '### Card 1',
+      '1. **Q:** What is the powerhouse of the cell?',
+      '   **A:** The mitochondrion.',
+      '',
+      '---',
+      '',
+      '### Card 2',
+      '2. **Q:** What does DNA stand for?',
+      '   **A:** Deoxyribonucleic acid',
+      '',
+      '---',
+      '',
+      '3. **Question 3:** Name two organelles.',
+      '   **Answer:**',
+      '   - nucleus',
+      '   - ribosome',
+      '',
+      'Tags: biology',
+    ].join('\n');
+    const cards = parsePastedCards(text);
+    expect(cards.map((c) => [c.front, c.back])).toEqual([
+      ['What is the powerhouse of the cell?', 'The mitochondrion.'],
+      ['What does DNA stand for?', 'Deoxyribonucleic acid'],
+      ['Name two organelles.', '- nucleus\n   - ribosome'],
+    ]);
+    expect(cards.every((c) => c.method === 'pairs' && c.tags[0] === 'biology')).toBe(true);
+  });
+
+  it('reads a Markdown table, one card per row', () => {
+    const text =
+      '| Front | Back |\n|---|:---:|\n| 犬 | dog |\n| 猫 | cat<br>(animal) |\n| a \\| b | pipe |';
+    expect(parsePastedCards(text).map((c) => [c.front, c.back, c.method])).toEqual([
+      ['犬', 'dog', 'table'],
+      ['猫', 'cat\n(animal)', 'table'],
+      ['a | b', 'pipe', 'table'],
+    ]);
+  });
+
+  it('makes one cloze card per paragraph', () => {
+    const cards = parsePastedCards('{{c1::Paris}} is in France.\n\n{{c1::Tokyo}} is in Japan.');
+    expect(cards.map((c) => [c.kind, c.front])).toEqual([
+      ['cloze', '{{c1::Paris}} is in France.'],
+      ['cloze', '{{c1::Tokyo}} is in Japan.'],
+    ]);
+  });
+
+  it('falls back to a single card', () => {
+    expect(parsePastedCards('Q: one?\nA: yes')).toHaveLength(1);
+    expect(parsePastedCards('Front\n---\nBack')).toMatchObject([{ method: 'separator' }]);
+    expect(parsePastedCards('nothing here')).toEqual([]);
   });
 });

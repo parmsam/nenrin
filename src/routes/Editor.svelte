@@ -7,7 +7,7 @@
   import { addNote, cardOrdinals, deleteNote, parseTags, updateNote } from '../lib/notes';
   import { renderCard } from '../lib/render';
   import { clozeNumbers } from '../lib/render/template';
-  import { parsePastedCard, SPLIT_LABELS } from '../lib/notes/paste';
+  import { parsePastedCards, SPLIT_LABELS, type PastedCard } from '../lib/notes/paste';
   import { navigate, router } from '../lib/router.svelte';
 
   /** Edit an existing note when set; otherwise add new notes. */
@@ -34,14 +34,16 @@
 
   const noteType = $derived(noteTypes.find((t) => t.id === typeId));
   const returnTo = $derived(router.query.get('return'));
-  const pasted = $derived(mode === 'paste' ? parsePastedCard(pasteText) : null);
+  /** Cards found in the pasted Markdown; often one, sometimes a whole set. */
+  const pastedCards = $derived(mode === 'paste' ? parsePastedCards(pasteText) : []);
+  const pasted = $derived<PastedCard | null>(pastedCards[0] ?? null);
   /** Field boxes to show: none while pasting a new card. */
   const fieldNames = $derived(mode === 'paste' && !note ? [] : (noteType?.fields ?? []));
 
-  /** What will actually be saved: the field boxes, or the parsed paste. */
-  const target = $derived.by((): { type: NoteType; fields: Record<string, string> } | null => {
-    if (mode === 'fields') return noteType ? { type: noteType, fields } : null;
-    if (!pasted) return null;
+  type Target = { type: NoteType; fields: Record<string, string> };
+
+  /** The note type and fields a pasted card becomes. */
+  function targetFor(pasted: PastedCard): Target | null {
     if (pasted.kind === 'cloze') {
       const cloze = noteTypes.find((t) => t.id === 'cloze');
       return cloze
@@ -63,6 +65,12 @@
         [back]: pasted.back,
       },
     };
+  }
+
+  /** What will be saved (or previewed first): the field boxes, or the first pasted card. */
+  const target = $derived.by((): Target | null => {
+    if (mode === 'fields') return noteType ? { type: noteType, fields } : null;
+    return pasted ? targetFor(pasted) : null;
   });
 
   const preview = $derived.by(() => {
@@ -166,15 +174,32 @@
             'Couldn’t find a front and back. Put a line with --- between them, or use Q: and A:.',
           );
         }
-        await addNote(db, {
-          noteTypeId: target.type.id,
-          deckId,
-          fields: { ...target.fields },
-          tags: [...new Set([...parseTags(tags), ...(pasted?.tags ?? [])])],
-        });
+        const targets =
+          mode === 'paste' ? pastedCards.map((c) => ({ card: c, target: targetFor(c) })) : [];
+        const toAdd = mode === 'paste' ? targets : [{ card: null, target }];
+        let notesAdded = 0;
+        let cardsAdded = 0;
+        const failed: string[] = [];
+        for (const { card, target: t } of toAdd) {
+          if (!t) continue;
+          try {
+            await addNote(db, {
+              noteTypeId: t.type.id,
+              deckId,
+              fields: { ...t.fields },
+              tags: [...new Set([...parseTags(tags), ...(card?.tags ?? [])])],
+            });
+            notesAdded++;
+            cardsAdded += cardOrdinals(t.type, t.fields).length;
+          } catch (err) {
+            failed.push(`${(card?.front ?? '').slice(0, 40)}: ${(err as Error).message}`);
+          }
+        }
         rememberLast();
-        const count = preview?.count ?? 1;
-        message = `Added ${count} ${count === 1 ? 'card' : 'cards'}.`;
+        message =
+          `Added ${cardsAdded} ${cardsAdded === 1 ? 'card' : 'cards'}` +
+          (notesAdded > 1 ? ` from ${notesAdded} notes.` : '.');
+        if (failed.length) error = `Skipped ${failed.length}: ${failed.join('; ')}`;
         pasteText = '';
         resetFields(undefined);
         resetFields(noteType);
@@ -301,7 +326,10 @@
         ></textarea>
         <p class="detected" role="status" aria-live="polite">
           {#if pasted && target}
-            Detected: <strong>{target.type.name}</strong>
+            Detected:
+            <strong
+              >{pastedCards.length > 1 ? `${pastedCards.length} cards` : target.type.name}</strong
+            >
             {[SPLIT_LABELS[pasted.method], pasted.tags.length && `tags: ${pasted.tags.join(' ')}`]
               .filter(Boolean)
               .map((part) => `· ${part}`)
@@ -354,7 +382,9 @@
     </p>
 
     <div class="row">
-      <button type="submit">{note ? 'Save' : 'Add'}</button>
+      <button type="submit"
+        >{note ? 'Save' : pastedCards.length > 1 ? `Add all ${pastedCards.length}` : 'Add'}</button
+      >
       {#if note}<button type="button" class="danger" onclick={remove}>Delete note</button>{/if}
       {#if message}<span class="ok" role="status">{message}</span>{/if}
       {#if error}<span class="error" role="alert">{error}</span>{/if}
@@ -363,7 +393,11 @@
 
   <h3 class="section-title">
     Preview
-    {#if preview && preview.count > 1}<span class="muted">· card 1 of {preview.count}</span>{/if}
+    {#if pastedCards.length > 1}
+      <span class="muted">· first of {pastedCards.length} pasted cards</span>
+    {:else if preview && preview.count > 1}
+      <span class="muted">· card 1 of {preview.count}</span>
+    {/if}
   </h3>
   <div class="row tabs" role="tablist">
     <button
