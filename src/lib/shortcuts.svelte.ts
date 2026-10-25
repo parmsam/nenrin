@@ -31,6 +31,10 @@ export const SHORTCUTS: { group: string; items: Shortcut[] }[] = [
     ],
   },
   {
+    group: 'Browsing',
+    items: [{ keys: [['/']], action: 'Focus the search box' }],
+  },
+  {
     group: 'Adding and editing',
     items: [
       { keys: [[MOD, 'Enter']], action: 'Add or save' },

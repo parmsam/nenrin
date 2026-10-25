@@ -144,6 +144,11 @@
     <div class="row">
       <a class="button secondary" href="#/add?deck={id}">+ Add cards</a>
       <a class="button secondary" href="#/import?deck={id}">Import</a>
+      <a
+        class="button secondary"
+        href="#/browse?q={encodeURIComponent(`deck:"${node.path.replace(/ \/ /g, '::')}"`)}"
+        >Browse notes</a
+      >
       <button
         class="secondary"
         onclick={exportText}

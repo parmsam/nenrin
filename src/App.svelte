@@ -2,7 +2,8 @@
   import { onMount } from 'svelte';
   import { db } from './lib/db';
   import { ensureBuiltins } from './lib/notes';
-  import { match, router } from './lib/router.svelte';
+  import { match, navigate, router } from './lib/router.svelte';
+  import Browse from './routes/Browse.svelte';
   import DeckView from './routes/DeckView.svelte';
   import Editor from './routes/Editor.svelte';
   import Home from './routes/Home.svelte';
@@ -27,6 +28,20 @@
     ready = true;
   });
 
+  // Where to return when the gear is clicked again while Settings is open.
+  let beforeSettings = '/';
+  $effect(() => {
+    const here = location.hash.slice(1) || '/';
+    if (router.path !== '/settings') beforeSettings = here;
+  });
+
+  /** The gear toggles Settings: open it, or go back to where you were. */
+  function toggleSettings(e: MouseEvent) {
+    if (router.path !== '/settings') return;
+    e.preventDefault();
+    navigate(beforeSettings);
+  }
+
   const route = $derived.by(() => {
     const p = router.path;
     let m: Record<string, string> | null;
@@ -35,6 +50,7 @@
     if ((m = match('/edit/:id', p))) return { name: 'edit', id: m.id } as const;
     if (p === '/add') return { name: 'add' } as const;
     if (p === '/import') return { name: 'import' } as const;
+    if (p === '/browse') return { name: 'browse' } as const;
     if (p === '/settings') return { name: 'settings' } as const;
     return { name: 'home' } as const;
   });
@@ -48,6 +64,17 @@
       <ruby class="kanji" lang="ja">年輪<rp>(</rp><rt>ねんりん</rt><rp>)</rp></ruby>
     </a>
     <span class="badge">pre-alpha</span>
+    <a class="icon-link" href="#/browse" aria-label="Browse notes" title="Browse notes">
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"
+        ><path
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15zM16 16l5 5"
+        /></svg
+      >
+    </a>
     <button
       class="icon-link kbd-button"
       onclick={() => (shortcutsDialog.open = true)}
@@ -64,7 +91,15 @@
         /></svg
       >
     </button>
-    <a class="icon-link" href="#/settings" aria-label="Settings" title="Settings">
+    <a
+      class="icon-link"
+      class:active={route.name === 'settings'}
+      href="#/settings"
+      onclick={toggleSettings}
+      aria-label={route.name === 'settings' ? 'Close settings' : 'Settings'}
+      aria-current={route.name === 'settings' ? 'page' : undefined}
+      title={route.name === 'settings' ? 'Close settings' : 'Settings'}
+    >
       <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"
         ><path
           fill="currentColor"
@@ -87,6 +122,8 @@
     {#key route.id}<Editor noteId={route.id} />{/key}
   {:else if route.name === 'add'}
     <Editor />
+  {:else if route.name === 'browse'}
+    <Browse />
   {:else if route.name === 'import'}
     <Import />
   {:else if route.name === 'settings'}
@@ -162,6 +199,10 @@
     .kbd-button {
       display: none;
     }
+  }
+  .icon-link.active {
+    background: var(--accent-soft);
+    color: var(--accent);
   }
   .icon-link:hover {
     background: var(--surface-2);

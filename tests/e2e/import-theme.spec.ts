@@ -44,3 +44,13 @@ test('theme and accent choices apply immediately and persist', async ({ page }) 
   await page.getByText('System', { exact: true }).click();
   await expect(html).not.toHaveAttribute('data-theme', /.*/);
 });
+
+test('the gear toggles settings open and closed', async ({ page }) => {
+  await page.goto('./');
+  await page.getByRole('button', { name: 'Add a sample deck' }).click();
+  await page.getByRole('link', { name: /Japanese: Nature/ }).click();
+  await page.getByRole('link', { name: 'Settings' }).click();
+  await expect(page.getByRole('heading', { name: 'Settings' })).toBeVisible();
+  await page.getByRole('link', { name: 'Close settings' }).click();
+  await expect(page.getByRole('heading', { name: 'Japanese: Nature' })).toBeVisible();
+});

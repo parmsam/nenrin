@@ -60,7 +60,7 @@ Last updated: 2026-10-25
 - [x] Theme options: System / Light / Dark, plus accent palettes Wood 木, Matcha 抹茶, Sakura 桜 and Indigo 藍 (Settings → Appearance; per device, applied before first paint)
 - [ ] Exit criteria: a week of real daily use on a phone (needs a human!)
 
-Known gaps, picked up in Phase 3: no browser/search yet (edit a note from the review screen with <kbd>E</kbd>), and no suspend/bury buttons in the UI.
+Known gaps from Phase 1, now closed: browse/search and suspend shipped in Phase 3.
 
 **Exit criteria:** you can study a hand-made deck daily on a phone, offline, for a week without data loss.
 
@@ -117,7 +117,7 @@ From the Anki manual ([importing](https://docs.ankiweb.net/manual/importing/intr
 
 ### Phase 3: Polish and insights (weeks 6–7)
 
-- [ ] Browser: search (`tag:`, `deck:`, `is:due`, free text), bulk edit, suspend, move
+- [x] Browser: Anki-style search (words, `"phrases"`, `-exclude`, `deck:` incl. sub-decks, `tag:`, `note:`, `is:new/learn/review/due/suspended`, `added:N`, `*` wildcards), sort, and bulk suspend / move / tag / delete; query kept in the URL; <kbd>/</kbd> focuses search
 - [x] Paste several cards at once: repeated Q/A pairs (numbered, bulleted, or split by `---` / headings), a Markdown table, or cloze paragraphs
 - [ ] **Command palette** (<kbd>⌘K</kbd> / <kbd>Ctrl+K</kbd>): fuzzy search across actions (study a deck, add cards, open settings, export backup, enable Typst), decks, and later notes.
   - Built on the same registry as the shortcuts dialog (`src/lib/shortcuts.svelte.ts`), so each command shows its shortcut, and the shortcuts list and palette can never disagree.
