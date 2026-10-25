@@ -1,6 +1,8 @@
 /**
  * Anki-compatible card templates, as plain string functions (no DOM).
- * Supports {{Field}}, {{FrontSide}}, {{cloze:Field}}, {{#Field}}…{{/Field}} and {{^Field}}…{{/Field}}.
+ * Supports {{Field}}, {{FrontSide}}, {{#Field}}…{{/Field}}, {{^Field}}…{{/Field}}, special fields
+ * (Tags, Type, Deck, Subdeck, Card) and filters, chained right to left as in Anki:
+ * cloze, text, hint, type, furigana, kana, kanji, tts. Unknown filters pass the value through.
  */
 
 const CLOZE_RE = /\{\{c(\d+)::([\s\S]*?)(?:::([\s\S]*?))?\}\}/g;
@@ -32,6 +34,43 @@ export interface TemplateContext {
   cloze?: number;
 }
 
+// Anki's ruby syntax: "漢字[かんじ]", with an optional leading space to separate words.
+const RUBY_RE = / ?([^ >[\]]+?)\[([^\]]+)\]/g;
+
+/** Applies one template filter (e.g. `text`, `furigana`) to a value. */
+function applyFilter(
+  filter: string,
+  value: string,
+  fieldName: string,
+  ctx: TemplateContext,
+): string {
+  // `tts en_US voices=…` carries options after the name.
+  const name = filter.split(/\s+/)[0];
+  switch (name) {
+    case 'cloze':
+      return renderCloze(value, ctx.cloze ?? 0, ctx.side);
+    case 'text':
+      return stripHtml(value);
+    case 'hint':
+      return isBlank(value)
+        ? ''
+        : `<details class="hint"><summary>${fieldName}</summary>${value}</details>`;
+    case 'type':
+      // Type-in-the-answer isn't supported yet; show nothing rather than raw markup.
+      return '';
+    case 'furigana':
+      return value.replace(RUBY_RE, '<ruby>$1<rt>$2</rt></ruby>');
+    case 'kana':
+      return value.replace(RUBY_RE, '$2');
+    case 'kanji':
+      return value.replace(RUBY_RE, '$1');
+    case 'tts':
+      return value;
+    default:
+      return value;
+  }
+}
+
 const isBlank = (html: string | undefined) => !html || stripHtml(html).trim() === '';
 
 export function stripHtml(html: string): string {
@@ -51,9 +90,14 @@ export function renderTemplate(
   );
   return withSections.replace(/\{\{\s*([^#^/}][^}]*?)\s*\}\}/g, (_, tag: string) => {
     if (tag === 'FrontSide') return ctx.frontSide ?? '';
-    const cloze = tag.match(/^cloze:(.+)$/);
-    if (cloze) return renderCloze(fields[cloze[1]] ?? '', ctx.cloze ?? 0, ctx.side);
-    return fields[tag] ?? '';
+    const parts = tag.split(':');
+    const fieldName = parts.pop()!.trim();
+    return parts
+      .reverse()
+      .reduce(
+        (value, filter) => applyFilter(filter.trim(), value, fieldName, ctx),
+        fields[fieldName] ?? '',
+      );
   });
 }
 

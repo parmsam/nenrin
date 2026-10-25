@@ -75,7 +75,16 @@
     intervals = Object.fromEntries(
       GRADES.map((g) => [g, formatInterval(preview[g] - now)]),
     ) as Record<Grade, string>;
-    rendered = renderCard(noteType, note, next.ordinal);
+    // Full deck path for Anki's {{Deck}} / {{Subdeck}} template fields.
+    const deckPath: string[] = [];
+    for (
+      let d = await db.decks.get(next.deckId);
+      d;
+      d = d.parentId ? await db.decks.get(d.parentId) : undefined
+    ) {
+      deckPath.unshift(d.name);
+    }
+    rendered = renderCard(noteType, note, next.ordinal, { deckPath });
     card = next;
     finished = false;
     revealed = false;

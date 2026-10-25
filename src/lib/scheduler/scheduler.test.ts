@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createScheduler, newSchedulingState, Rating, State } from '.';
+import { createScheduler, newSchedulingState, Rating, replay, State } from '.';
 
 const T0 = Date.UTC(2026, 0, 1, 12);
 const DAY = 86_400_000;
@@ -48,5 +48,19 @@ describe('scheduler', () => {
     expect(lax.review(start, Rating.Easy, T0).next.due).toBeGreaterThan(
       strict.review(start, Rating.Easy, T0).next.due,
     );
+  });
+});
+
+describe('replay', () => {
+  it('matches reviewing the same ratings one by one', () => {
+    const reviews = [
+      { ts: T0, rating: Rating.Good },
+      { ts: T0 + 10 * 60_000, rating: Rating.Good },
+      { ts: T0 + 3 * DAY, rating: Rating.Hard },
+    ] as const;
+    let s = newSchedulingState(T0);
+    for (const r of reviews) s = scheduler.review(s, r.rating, r.ts).next;
+    expect(replay(reviews)).toEqual(s);
+    expect(replay([])).toBeUndefined();
   });
 });

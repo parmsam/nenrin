@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import PackageImport from '../components/PackageImport.svelte';
   import { db, type NoteType } from '../lib/db';
   import { createDeck, deckTree, type DeckNode } from '../lib/db/decks';
   import {
@@ -16,6 +17,8 @@
   let noteTypes = $state<NoteType[]>([]);
   let decks = $state<DeckNode[]>([]);
   let fileName = $state('');
+  /** An .apkg / .colpkg goes to PackageImport; text files are handled here. */
+  let packageFile = $state.raw<File | null>(null);
   let source = '';
   let file = $state.raw<TextFile | null>(null);
   let separator = $state('');
@@ -83,6 +86,13 @@
     const f = input.files?.[0];
     if (!f) return;
     fileName = f.name;
+    if (/\.(apkg|colpkg)$/i.test(f.name)) {
+      file = null;
+      error = '';
+      packageFile = f;
+      return;
+    }
+    packageFile = null;
     source = await f.text();
     load();
   }
@@ -121,25 +131,32 @@
 
 <section class="panel stack">
   <p>
-    Import notes from a text file: <strong>.txt</strong>, <strong>.csv</strong> or
-    <strong>.tsv</strong>, with fields separated by tabs, commas, semicolons or pipes. Files
+    Import an <strong>Anki package</strong> (<strong>.apkg</strong> deck or
+    <strong>.colpkg</strong> collection) with its media and, optionally, your review history.
+  </p>
+  <p>
+    Or a <strong>text file</strong> (<strong>.txt</strong>, <strong>.csv</strong>,
+    <strong>.tsv</strong>) with fields separated by tabs, commas, semicolons or pipes. Files
     exported from Anki (“Notes in Plain Text”) keep their note types, decks, tags and GUIDs.
     <a href="https://docs.ankiweb.net/manual/importing/text-files" target="_blank" rel="noreferrer"
       >Format details</a
     >
   </p>
-  <p class="muted small">Anki packages (.apkg / .colpkg) are coming next.</p>
   <label class="button secondary file">
     {fileName ? `Chosen: ${fileName}` : 'Choose a file…'}
     <input
       type="file"
-      accept=".txt,.csv,.tsv,text/plain,text/csv,text/tab-separated-values"
+      accept=".apkg,.colpkg,.txt,.csv,.tsv,text/plain,text/csv,text/tab-separated-values"
       onchange={pick}
     />
   </label>
 </section>
 
 {#if error}<p class="error" role="alert">{error}</p>{/if}
+
+{#if packageFile}
+  {#key packageFile}<PackageImport file={packageFile} />{/key}
+{/if}
 
 {#if file && noteType}
   <h3 class="section-title">Options</h3>

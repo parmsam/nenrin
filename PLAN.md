@@ -65,13 +65,22 @@ Known gaps, picked up in Phase 3: no browser/search yet (edit a note from the re
 
 ### Phase 2: Anki migration (weeks 4–5)
 
-- [ ] `.apkg` / `.colpkg` import in a worker: legacy `collection.anki2`, `collection.anki21`, and zstd-compressed `collection.anki21b`
-- [ ] Map Anki note types, fields, templates (`{{Field}}`, `{{cloze:Text}}`, `{{FrontSide}}`), CSS, tags, and sub-decks
-- [ ] Import media, with sanitized HTML rendering
-- [ ] Import review history (`revlog`) and convert card state to FSRS memory state
-- [x] Text import (`.txt` / `.csv` / `.tsv`) with column mapping, done early (see the format table below)
-- [ ] Re-import `.apkg` with GUID-based dedupe and updates (text import already does this)
-- [ ] Fixture tests built from small, self-made decks
+- [x] `.apkg` / `.colpkg` import in a Web Worker: legacy `collection.anki2` / `collection.anki21` (schema 11, JSON models) and zstd-compressed `collection.anki21b` (schema 18, protobuf configs)
+- [x] Map Anki note types, fields, templates, tags and sub-decks; template filters (`cloze`, `text`, `hint`, `furigana`, `kana`, `kanji`, `tts`) and special fields (`Tags`, `Type`, `Deck`, `Subdeck`, `Card`)
+- [x] Import media (zstd and legacy), with sanitized HTML rendering; `[sound:…]` becomes an audio player
+- [x] Import review history (`revlog`); keep Anki's due dates and FSRS memory (`card.data`), or rebuild memory by replaying history through FSRS
+- [x] Text import (`.txt` / `.csv` / `.tsv`) with column mapping (see the format table below)
+- [x] Re-import `.apkg` with GUID-based dedupe: newer notes update, missing cards are added, scheduling is kept
+- [x] Fixture tests against real packages written by Anki 26.09 (`fixtures/generate.py`)
+- [ ] Try a few large public shared decks by hand (language decks with audio) and fix what breaks
+- [ ] Apply each note type's CSS, in a sandboxed iframe so deck styles and scripts can't touch the app
+
+Known limits for now:
+
+- **Big files are loaded into memory.** The whole package is unzipped in memory, so very large media decks (1 GB+) may fail on phones. Streaming unzip is a later improvement.
+- **Imported learning cards restart their learning steps.** Their due time is kept.
+- **Filtered decks aren't recreated.** Their cards go back to their home decks.
+- **Type-in-the-answer fields render blank.** That's Phase 5.
 
 **Exit criteria:** popular shared decks (e.g., large language decks with audio) import and render correctly.
 
@@ -79,19 +88,19 @@ Known gaps, picked up in Phase 3: no browser/search yet (edit a note from the re
 
 From the Anki manual ([importing](https://docs.ankiweb.net/manual/importing/intro), [text files](https://docs.ankiweb.net/manual/importing/text-files), [exporting](https://docs.ankiweb.net/manual/exporting)):
 
-| Format                                                                                                                                                  | Anki | Nenrin | When                                                                                   |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- | ------ | -------------------------------------------------------------------------------------- |
-| Text import: `.txt` / `.csv` / `.tsv`. Separator sniffing, quoted fields with `""` escapes and newlines, `#` comment lines, UTF-8 (BOM ok)              | ✅   | ✅     | **Done**                                                                               |
-| Text file headers: `#separator`, `#html`, `#tags`, `#columns`, `#notetype`, `#deck`, `#notetype column`, `#deck column`, `#tags column`, `#guid column` | ✅   | ✅     | **Done**                                                                               |
-| Duplicate handling: match on first field (per note type) or GUID; update / skip / import as new                                                         | ✅   | ✅     | **Done** (match scope "note type + deck" not yet)                                      |
-| Text export: "Notes in Plain Text" (tab-separated, HTML, with GUID / note type / deck / tags columns)                                                   | ✅   | ✅     | **Done**. Markdown becomes HTML, and math becomes `\(…\)` / `\[…\]` for Anki's MathJax |
-| `[sound:…]` and `<img>` media references in text files                                                                                                  | ✅   | ◐      | Images render if the file is already in Nenrin's media; audio in Phase 3               |
-| `.apkg` deck package import (merge; optional scheduling; update newer notes)                                                                            | ✅   | ☐      | Phase 2                                                                                |
-| `.colpkg` collection package import (replace everything)                                                                                                | ✅   | ☐      | Phase 2                                                                                |
-| `.apkg` / `.colpkg` export                                                                                                                              | ✅   | ☐      | Phase 4                                                                                |
-| "Cards in Plain Text" export (rendered question/answer)                                                                                                 | ✅   | ☐      | Phase 3                                                                                |
-| Mnemosyne 2.0 `.db` import                                                                                                                              | ✅   | ☐      | Phase 5 (rare)                                                                         |
-| Nenrin JSON backup (everything incl. review history and media)                                                                                          | n/a  | ✅     | **Done**                                                                               |
+| Format                                                                                                                                                  | Anki | Nenrin | When                                                                                              |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- | ------ | ------------------------------------------------------------------------------------------------- |
+| Text import: `.txt` / `.csv` / `.tsv`. Separator sniffing, quoted fields with `""` escapes and newlines, `#` comment lines, UTF-8 (BOM ok)              | ✅   | ✅     | **Done**                                                                                          |
+| Text file headers: `#separator`, `#html`, `#tags`, `#columns`, `#notetype`, `#deck`, `#notetype column`, `#deck column`, `#tags column`, `#guid column` | ✅   | ✅     | **Done**                                                                                          |
+| Duplicate handling: match on first field (per note type) or GUID; update / skip / import as new                                                         | ✅   | ✅     | **Done** (match scope "note type + deck" not yet)                                                 |
+| Text export: "Notes in Plain Text" (tab-separated, HTML, with GUID / note type / deck / tags columns)                                                   | ✅   | ✅     | **Done**. Markdown becomes HTML, and math becomes `\(…\)` / `\[…\]` for Anki's MathJax            |
+| `[sound:…]` and `<img>` media references                                                                                                                | ✅   | ✅     | **Done** (audio plays with built-in controls; for text files, the media must already be imported) |
+| `.apkg` deck package import (merge; optional scheduling; update newer notes)                                                                            | ✅   | ✅     | **Done** (modern and legacy formats)                                                              |
+| `.colpkg` collection package import (replace everything)                                                                                                | ✅   | ✅     | **Done** (media and settings are kept, as in Anki)                                                |
+| `.apkg` / `.colpkg` export                                                                                                                              | ✅   | ☐      | Phase 4                                                                                           |
+| "Cards in Plain Text" export (rendered question/answer)                                                                                                 | ✅   | ☐      | Phase 3                                                                                           |
+| Mnemosyne 2.0 `.db` import                                                                                                                              | ✅   | ☐      | Phase 5 (rare)                                                                                    |
+| Nenrin JSON backup (everything incl. review history and media)                                                                                          | n/a  | ✅     | **Done**                                                                                          |
 
 ### Phase 3: Polish and insights (weeks 6–7)
 
@@ -105,6 +114,7 @@ From the Anki manual ([importing](https://docs.ankiweb.net/manual/importing/intr
 - [ ] Study reminders (Web Push / notifications where supported)
 - [ ] Audio playback, TTS fallback via the Web Speech API
 - [ ] Onboarding with sample decks; first-run "Import from Anki" flow
+- [ ] **Welcome splash** on launch: logo, 年輪 with furigana, the tagline, and today's due count, then straight into the app. Toggle it off in Settings → Appearance ("Show welcome screen"). Respect `prefers-reduced-motion`, and never show it on top of a deep link (e.g. `#/study/…`).
 - [ ] Lighthouse PWA/a11y score ≥ 95 (lazy-load KaTeX: it is most of the 540 KB bundle)
 
 #### Rich content: diagrams and Typst
@@ -150,6 +160,7 @@ Math is already covered by KaTeX (`$…$`, `$$…$$`, and Anki's `\(…\)` / `\[
 
 ## Decision log
 
+- **2026-10-25:** Phase 2 core shipped: `.apkg`/`.colpkg` import. Parsing (fflate + fzstd + sql.js, all MIT) runs in a Web Worker and stays out of the main bundle. Anki's custom `unicase` SQLite collation can't load in sql.js, so the importer strips it from the in-memory schema (it only does full-table reads). A small protobuf reader covers the few config fields needed. Fixtures are generated by the real Anki library (AGPL, dev-only, never bundled). Imported cards keep Anki's due dates; FSRS memory comes from `card.data` when Anki used FSRS, otherwise from replaying the review log.
 - **2026-10-25:** Rich content plan: Mermaid via Pele (MIT, lazy-loaded, themed with CSS variables); Typst via typst.ts (Apache-2.0), opt-in because of its ~25 MB WASM, compiled in a worker with SVG cached by source hash. typst-wasm (MIT) to be benchmarked; typst.js rejected (Node-only CLI wrapper). KaTeX stays the math renderer.
 - **2026-10-25:** Phase 1 shipped. Hash routing (works on GitHub Pages without rewrites). Notes are Markdown; imported Anki notes will be HTML (`Note.format`). Undo deletes the review log it just wrote; every other log write is append-only. Siblings are buried by leaving them out of today's queue, not by writing state, so nothing needs un-burying. Svelte deep `$state` proxies can't be stored in IndexedDB, so data headed back to the database uses `$state.raw`.
 - **2026-10-25:** Phase 0 shipped. The offline e2e test caught a real bug: globbing `manifest.webmanifest` duplicated a precache entry, and Workbox silently cached nothing. Playwright's `setOffline` bypasses service workers in Chromium, so the test stops a real server instead.

@@ -25,16 +25,30 @@ function renderMath(src: string): { text: string; math: string[] } {
   return { text, math };
 }
 
+const attr = (s: string) => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+
+/** Anki's `[sound:file.mp3]` → an audio player for that media file. */
+function renderSounds(html: string): string {
+  return html.replace(
+    /\[sound:([^\]]+)\]/g,
+    (_, file: string) => `<audio controls preload="none" src="${attr(file.trim())}"></audio>`,
+  );
+}
+
 /** Converts one field's source to HTML. Markdown notes get Markdown + math; HTML notes get math only. */
 export function fieldToHtml(value: string, format: Note['format'] = 'markdown'): string {
   const { text, math } = renderMath(value);
   const html =
     format === 'html' ? text : (marked.parse(text, { async: false, breaks: true }) as string);
-  return html.replace(/@@MATH(\d+)@@/g, (_, i) => math[Number(i)]);
+  return renderSounds(html.replace(/@@MATH(\d+)@@/g, (_, i) => math[Number(i)]));
 }
 
 export function sanitize(html: string): string {
-  return DOMPurify.sanitize(html, { FORBID_TAGS: ['style', 'form', 'input', 'button'] });
+  return DOMPurify.sanitize(html, {
+    FORBID_TAGS: ['style', 'form', 'input', 'button'],
+    // Keep `controls`/`preload` on Anki's audio players.
+    ADD_ATTR: ['controls', 'preload'],
+  });
 }
 
 export interface RenderedCard {
@@ -42,14 +56,33 @@ export interface RenderedCard {
   back: string;
 }
 
+/** Context for Anki's special fields {{Deck}} and {{Subdeck}}. */
+export interface RenderExtras {
+  /** Full deck path segments, e.g. ["Japanese", "Vocab"]. */
+  deckPath?: string[];
+}
+
 /** `ordinal` is the template index for basic types, or cloze number − 1 for cloze types. */
-export function renderCard(noteType: NoteType, note: Note, ordinal: number): RenderedCard {
-  const fields = Object.fromEntries(
-    Object.entries(note.fields).map(([k, v]) => [k, fieldToHtml(v, note.format)]),
-  );
+export function renderCard(
+  noteType: NoteType,
+  note: Note,
+  ordinal: number,
+  extras: RenderExtras = {},
+): RenderedCard {
   const cloze = noteType.kind === 'cloze' ? ordinal + 1 : undefined;
   const tpl = noteType.kind === 'cloze' ? noteType.templates[0] : noteType.templates[ordinal];
   if (!tpl) return { front: '', back: '' };
+  const fields: Record<string, string> = {
+    // Special fields first, so a real field with the same name wins.
+    Tags: note.tags.join(' '),
+    Type: noteType.name,
+    Card: tpl.name,
+    Deck: extras.deckPath?.join('::') ?? '',
+    Subdeck: extras.deckPath?.at(-1) ?? '',
+    ...Object.fromEntries(
+      Object.entries(note.fields).map(([k, v]) => [k, fieldToHtml(v, note.format)]),
+    ),
+  };
   const front = renderTemplate(tpl.front, fields, { side: 'front', cloze });
   const back = renderTemplate(tpl.back, fields, { side: 'back', cloze, frontSide: front });
   return { front: sanitize(front), back: sanitize(back) };

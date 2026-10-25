@@ -135,3 +135,18 @@ function fromFsrs(c: FsrsCard): SchedulingState {
     lastReview: c.last_review?.getTime(),
   };
 }
+
+/**
+ * Rebuilds FSRS state by replaying ratings in time order. Used for imported cards whose
+ * history comes from another scheduler (e.g. Anki's SM-2), so FSRS starts from what you know.
+ */
+export function replay(
+  reviews: readonly { ts: number; rating: Grade }[],
+  options: SchedulerOptions = {},
+): SchedulingState | undefined {
+  if (reviews.length === 0) return undefined;
+  const scheduler = createScheduler({ ...options, enableFuzz: false });
+  let state = newSchedulingState(reviews[0].ts);
+  for (const r of reviews) state = scheduler.review(state, r.rating, r.ts).next;
+  return state;
+}

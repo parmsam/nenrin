@@ -24,8 +24,11 @@
   "dependencies": {
     "dexie": "^4.4.7",
     "dompurify": "^3.4.17",
+    "fflate": "^0.8.3",
+    "fzstd": "^0.1.1",
     "katex": "^0.19.1",
     "marked": "^18.1.1",
+    "sql.js": "^1.15.1",
     "ts-fsrs": "^5.4.2"
   },
   "devDependencies": {
@@ -35,6 +38,7 @@
     "@tsconfig/svelte": "^5.0.8",
     "@types/jsdom": "^30.0.0",
     "@types/node": "^26.6.5",
+    "@types/sql.js": "^1.4.11",
     "@vite-pwa/assets-generator": "^2.0.0",
     "eslint": "^10.13.0",
     "eslint-plugin-svelte": "^3.23.1",

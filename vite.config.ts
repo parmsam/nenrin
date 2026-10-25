@@ -67,6 +67,8 @@ export default defineConfig({
       },
     }),
   ],
+  // ES module workers, so the Anki import worker can share code chunks with the app.
+  worker: { format: 'es' },
   test: {
     include: ['src/**/*.test.ts'],
     environment: 'node',

@@ -31,17 +31,18 @@ src/
     study/       # day rollover, interval labels, today's queue (limits, learning, burying)
     notes/       # built-in note types; add/update/delete notes and sync their cards
     db/          # Dexie schema, migrations, repositories
-    import/      # apkg, colpkg, csv parsers (run in a Web Worker)
+    anki/        # .apkg/.colpkg: package.ts (pure reader, runs in the worker), import.ts (writes to Dexie)
+    import/      # text (.txt/.csv/.tsv) parser and importer
     export/      # json backup, csv, apkg (later)
     render/      # card templates, cloze, markdown, KaTeX, sanitization
   routes/        # screens: Home, DeckView, Review, Editor, Settings (hash router in lib/router.svelte.ts)
   components/    # shared UI: CardView (renders sanitized card HTML + media), Counts
-  workers/
+  workers/       # anki.worker.ts: package parsing off the main thread
 public/          # favicon.svg, logo.svg, screenshots/ (PNG icons are generated at build)
 scripts/         # generate-brand.mjs (logo), screenshots.mjs
 docs/brand/      # logo files + palette; see docs/brand/README.md
 tests/e2e/       # Playwright specs; unit tests sit next to the code as *.test.ts
-fixtures/        # small sample .apkg/.csv files for tests (no copyrighted decks)
+fixtures/        # real Anki packages made by fixtures/generate.py (self-written content only)
 ref/             # GITIGNORED local research: competitor notes + page snapshots
 ```
 

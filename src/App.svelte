@@ -45,7 +45,7 @@
     <a class="brand" href="#/">
       <img src={logo} alt="" width="36" height="36" />
       <h1>Nenrin</h1>
-      <span class="kanji" lang="ja">年輪</span>
+      <ruby class="kanji" lang="ja">年輪<rp>(</rp><rt>ねんりん</rt><rp>)</rp></ruby>
     </a>
     <span class="badge">pre-alpha</span>
     <button
@@ -128,6 +128,11 @@
     color: var(--muted);
     font-size: 1rem;
     letter-spacing: 0.1em;
+    ruby-position: over;
+  }
+  .kanji rt {
+    font-size: 0.55em;
+    letter-spacing: 0.05em;
   }
   .badge {
     margin-left: auto;

@@ -82,3 +82,41 @@ describe('rendering', () => {
     );
   });
 });
+
+describe('Anki template features', () => {
+  const ctx = { side: 'front' as const };
+  it('applies filters right to left', () => {
+    const f = { Reading: '年輪[ねんりん]を 見[み]る', Html: '<b>bold</b>', Text: '{{c1::a}}' };
+    expect(renderTemplate('{{furigana:Reading}}', f, ctx)).toBe(
+      '<ruby>年輪<rt>ねんりん</rt></ruby>を<ruby>見<rt>み</rt></ruby>る',
+    );
+    expect(renderTemplate('{{kana:Reading}}', f, ctx)).toBe('ねんりんをみる');
+    expect(renderTemplate('{{kanji:Reading}}', f, ctx)).toBe('年輪を見る');
+    expect(renderTemplate('{{text:Html}}', f, ctx)).toBe('bold');
+    expect(renderTemplate('{{text:cloze:Text}}', f, { side: 'back', cloze: 1 })).toBe('a');
+    expect(renderTemplate('{{type:Html}}|{{tts en_US:Html}}', f, ctx)).toBe('|<b>bold</b>');
+    expect(renderTemplate('{{hint:Html}}', f, ctx)).toBe(
+      '<details class="hint"><summary>Html</summary><b>bold</b></details>',
+    );
+  });
+
+  it('fills special fields', () => {
+    const n = { ...note({ Front: 'q', Back: 'a' }), tags: ['x', 'y'] };
+    const tpl = {
+      ...basic,
+      templates: [
+        { name: 'Card 1', front: '{{Tags}}|{{Type}}|{{Card}}|{{Deck}}|{{Subdeck}}', back: '' },
+      ],
+    };
+    expect(renderCard(tpl, n, 0, { deckPath: ['Lang', 'Japanese'] }).front).toBe(
+      'x y|Basic|Card 1|Lang::Japanese|Japanese',
+    );
+  });
+
+  it('turns [sound:] tags into audio players', () => {
+    expect(fieldToHtml('[sound:ki.mp3]', 'html')).toBe(
+      '<audio controls preload="none" src="ki.mp3"></audio>',
+    );
+    expect(mediaRefs(sanitize(fieldToHtml('[sound:ki.mp3]', 'html')))).toEqual(['ki.mp3']);
+  });
+});

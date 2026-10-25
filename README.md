@@ -2,7 +2,7 @@
   <img src="docs/brand/logo.svg" width="128" height="128" alt="Nenrin logo: a cross-section of a tree trunk showing its growth rings">
 </p>
 
-<h1 align="center">Nenrin <sub>年輪</sub></h1>
+<h1 align="center">Nenrin <ruby>年輪<rp>(</rp><rt>ねんりん</rt><rp>)</rp></ruby></h1>
 
 <p align="center">
   <strong>Memory grows ring by ring.</strong><br>
@@ -32,11 +32,11 @@
   <img src="public/screenshots/mobile-empty-light.png" width="200" alt="Welcome screen: Memory grows ring by ring">
 </p>
 
-> **Status: pre-alpha, usable for daily study.** Create decks, add Basic, Reversed and Cloze cards with Markdown, math and images, and review them with FSRS, offline. Anki import is next. See [PLAN.md](PLAN.md).
+> **Status: pre-alpha, usable for daily study.** Import your Anki decks (`.apkg` / `.colpkg`) or make your own Basic, Reversed and Cloze cards with Markdown, math and images, and review them with FSRS, offline. See [PLAN.md](PLAN.md).
 
 ## What's in the name
 
-**年輪 (nenrin)** means "tree rings" in Japanese. A tree adds one ring each year, and the rings are what make the trunk strong. Spaced repetition works the same way: each review adds a ring, and each ring makes the memory last longer.
+**<ruby>年輪<rt>ねんりん</rt></ruby> (nenrin)** means "tree rings" in Japanese. A tree adds one ring each year, and the rings are what make the trunk strong. Spaced repetition works the same way: each review adds a ring, and each ring makes the memory last longer.
 
 ## Why another flashcard app?
 
@@ -60,6 +60,7 @@ See [COMPARISON.md](COMPARISON.md) for how this stacks up against Anki, RemNote,
 - **Rich cards**: Markdown, LaTeX math (`$x^2$`, `$$…$$`) via KaTeX, and pasted images, with a live preview
 - **Review**: FSRS-6 scheduling, learning steps, interval previews on each button, sibling burying, and undo
 - **Keyboard-first**: <kbd>Space</kbd> to show the answer or rate Good, <kbd>1</kbd>–<kbd>4</kbd> to rate, <kbd>Z</kbd> to undo, <kbd>E</kbd> to edit, <kbd>Esc</kbd> to leave; press <kbd>?</kbd> for the full list
+- **Import from Anki**: `.apkg` decks and `.colpkg` collections (modern and legacy formats) with images, audio, sub-decks and, optionally, your review history and FSRS memory. Re-importing an updated deck updates notes without touching your progress
 - **Anki-compatible text import/export**: `.txt` / `.csv` / `.tsv` with Anki's file headers (`#separator`, `#html`, `#deck column`, `#guid column` …), column mapping, and update/skip/duplicate handling. Export as Anki's "Notes in Plain Text"
 - **Your data**: JSON backup and restore, including review history and images; a configurable day rollover hour; persistent-storage request
 - **Themes**: System / Light / Dark, with Wood, Matcha, Sakura and Indigo accents

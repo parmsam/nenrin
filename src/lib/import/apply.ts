@@ -1,5 +1,5 @@
 import type { NenrinDB } from '../db';
-import { createDeck } from '../db/decks';
+import { ensureDeckPath } from '../db/decks';
 import type { Deck, Note, NoteType } from '../db/types';
 import { addNote, cardOrdinals, NoCardsError, updateNote } from '../notes';
 import { plainToHtml, type TextFile } from './text';
@@ -50,22 +50,7 @@ export function defaultMapping(file: TextFile, noteType: NoteType): ColumnTarget
 
 /** Finds a deck by id or Anki-style path ("Parent::Child"), creating missing levels. */
 async function resolveDeck(db: NenrinDB, decks: Deck[], ref: string): Promise<string> {
-  const byId = decks.find((d) => d.id === ref);
-  if (byId) return byId.id;
-  let parentId: string | undefined;
-  for (const name of ref
-    .split('::')
-    .map((s) => s.trim())
-    .filter(Boolean)) {
-    let deck = decks.find((d) => d.name === name && d.parentId === parentId);
-    if (!deck) {
-      deck = await createDeck(db, name, parentId);
-      decks.push(deck);
-    }
-    parentId = deck.id;
-  }
-  if (!parentId) throw new Error('Empty deck name');
-  return parentId;
+  return decks.find((d) => d.id === ref)?.id ?? ensureDeckPath(db, decks, ref.split('::'));
 }
 
 export async function importTextFile(

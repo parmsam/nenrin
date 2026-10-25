@@ -102,3 +102,26 @@ export function deckTree(decks: Deck[]): DeckNode[] {
   walk(undefined, 0, '');
   return out;
 }
+
+/**
+ * Finds the deck at a path like ["Japanese", "Vocab"], creating missing levels. `known` is a
+ * mutable cache of all decks (pass `await db.decks.toArray()`); new decks are added to it.
+ */
+export async function ensureDeckPath(
+  db: NenrinDB,
+  known: Deck[],
+  path: string[],
+  now = Date.now(),
+): Promise<string> {
+  let parentId: string | undefined;
+  for (const name of path.map((s) => s.trim()).filter(Boolean)) {
+    let deck = known.find((d) => d.name === name && d.parentId === parentId);
+    if (!deck) {
+      deck = await createDeck(db, name, parentId, now);
+      known.push(deck);
+    }
+    parentId = deck.id;
+  }
+  if (!parentId) throw new Error('Empty deck name');
+  return parentId;
+}

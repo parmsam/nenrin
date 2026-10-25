@@ -1,6 +1,6 @@
 # Nenrin brand
 
-**Name:** Nenrin, 年輪 ("tree rings"). Write it "Nenrin" in prose; add the kanji 年輪 beside the wordmark where there's room.
+**Name:** Nenrin, 年輪 ("tree rings"). Write it "Nenrin" in prose; add the kanji 年輪 beside the wordmark where there's room, with ねんりん as furigana above it (`<ruby>年輪<rt>ねんりん</rt></ruby>`) so non-Japanese readers know how to say it.
 
 **Tagline:** _Memory grows ring by ring._
 
