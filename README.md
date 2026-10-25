@@ -59,7 +59,7 @@ See [COMPARISON.md](COMPARISON.md) for how this stacks up against Anki, RemNote,
 - **Card types**: Basic, Basic (and reversed card), and Cloze (`{{c1::answer::hint}}`), with Anki-compatible templates
 - **Rich cards**: Markdown, LaTeX math (`$x^2$`, `$$…$$`) via KaTeX, and pasted images, with a live preview
 - **Review**: FSRS-6 scheduling, learning steps, interval previews on each button, sibling burying, and undo
-- **Keyboard-first**: <kbd>Space</kbd> to show the answer or rate Good, <kbd>1</kbd>–<kbd>4</kbd> to rate, <kbd>Z</kbd> to undo, <kbd>E</kbd> to edit, <kbd>Esc</kbd> to leave
+- **Keyboard-first**: <kbd>Space</kbd> to show the answer or rate Good, <kbd>1</kbd>–<kbd>4</kbd> to rate, <kbd>Z</kbd> to undo, <kbd>E</kbd> to edit, <kbd>Esc</kbd> to leave; press <kbd>?</kbd> for the full list
 - **Your data**: JSON backup and restore, including review history and images; a configurable day rollover hour; persistent-storage request
 - **Offline PWA**: install it on any device; it works with no network
 

@@ -90,3 +90,23 @@ test('backup export and restore', async ({ page }) => {
   await expect(fresh.getByRole('link', { name: /Japanese: Nature/ })).toBeVisible();
   await fresh.close();
 });
+
+test('keyboard shortcuts dialog opens with ? and closes with Esc', async ({ page }) => {
+  await page.goto('./');
+  await page.getByRole('button', { name: 'Add a sample deck' }).click();
+  await page.keyboard.press('?');
+  const dialog = page.getByRole('dialog', { name: 'Keyboard shortcuts' });
+  await expect(dialog).toBeVisible();
+  await expect(dialog).toContainText('Undo last rating');
+  await page.keyboard.press('Escape');
+  await expect(dialog).toBeHidden();
+
+  // In review, Esc closes the dialog instead of leaving the session.
+  await page.getByRole('link', { name: /Japanese: Nature/ }).click();
+  await page.getByRole('link', { name: 'Study now' }).click();
+  await page.getByRole('button', { name: 'Keyboard shortcuts' }).click();
+  await expect(dialog).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(dialog).toBeHidden();
+  await expect(page.getByRole('button', { name: /Show answer/ })).toBeVisible();
+});

@@ -8,9 +8,18 @@
   import Home from './routes/Home.svelte';
   import Review from './routes/Review.svelte';
   import Settings from './routes/Settings.svelte';
+  import ShortcutsDialog from './components/ShortcutsDialog.svelte';
+  import { isTyping, shortcutsDialog } from './lib/shortcuts.svelte';
 
   const logo = `${import.meta.env.BASE_URL}logo.svg`;
   let ready = $state(false);
+
+  function onKey(e: KeyboardEvent) {
+    if (e.key === '?' && !isTyping(e) && !e.metaKey && !e.ctrlKey) {
+      e.preventDefault();
+      shortcutsDialog.open = true;
+    }
+  }
 
   onMount(async () => {
     await ensureBuiltins(db);
@@ -37,6 +46,22 @@
       <span class="kanji" lang="ja">年輪</span>
     </a>
     <span class="badge">pre-alpha</span>
+    <button
+      class="icon-link kbd-button"
+      onclick={() => (shortcutsDialog.open = true)}
+      aria-label="Keyboard shortcuts"
+      title="Keyboard shortcuts (?)"
+    >
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"
+        ><path
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          d="M4 6h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1zM7 10h.01M11 10h.01M15 10h.01M7 14h10"
+        /></svg
+      >
+    </button>
     <a class="icon-link" href="#/settings" aria-label="Settings" title="Settings">
       <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"
         ><path
@@ -66,6 +91,9 @@
     <Home />
   {/if}
 </main>
+
+<ShortcutsDialog />
+<svelte:window onkeydown={onKey} />
 
 {#if route.name !== 'study'}
   <footer class="muted">
@@ -115,6 +143,16 @@
     height: 40px;
     border-radius: 10px;
     color: var(--muted);
+  }
+  button.icon-link {
+    padding: 0;
+    background: transparent;
+  }
+  /* Touch-only devices have no keyboard to need shortcuts for. */
+  @media (hover: none) {
+    .kbd-button {
+      display: none;
+    }
   }
   .icon-link:hover {
     background: var(--surface-2);

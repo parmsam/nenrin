@@ -55,6 +55,7 @@ Last updated: 2026-10-25
 - [x] JSON backup export/import
 - [x] Dark mode and responsive layout
 - [x] "Last backup" reminder; device id on review logs (groundwork for sync, see docs/storage-strategy.md)
+- [x] Keyboard shortcuts dialog: press <kbd>?</kbd> anywhere, or use the keyboard button in the header and review screen
 - [ ] Exit criteria: a week of real daily use on a phone (needs a human!)
 
 Known gaps, picked up in Phase 3: no browser/search yet (edit a note from the review screen with <kbd>E</kbd>), and no suspend/bury buttons in the UI.
@@ -76,6 +77,10 @@ Known gaps, picked up in Phase 3: no browser/search yet (edit a note from the re
 ### Phase 3: Polish and insights (weeks 6–7)
 
 - [ ] Browser: search (`tag:`, `deck:`, `is:due`, free text), bulk edit, suspend, move
+- [ ] **Command palette** (<kbd>⌘K</kbd> / <kbd>Ctrl+K</kbd>): fuzzy search across actions (study a deck, add cards, open settings, export backup, enable Typst), decks, and later notes.
+  - Built on the same registry as the shortcuts dialog (`src/lib/shortcuts.svelte.ts`), so each command shows its shortcut, and the shortcuts list and palette can never disagree.
+  - Recent commands first; fully keyboard-driven (arrows, <kbd>Enter</kbd>, <kbd>Esc</kbd>); a native `<dialog>` like the shortcuts modal.
+  - On touch devices, a search button in the header opens it.
 - [ ] Stats: heatmap, true retention, review forecast, card counts
 - [ ] FSRS parameter optimization from your own review log (`fsrs-browser`)
 - [ ] Study reminders (Web Push / notifications where supported)
