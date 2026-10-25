@@ -57,7 +57,7 @@ See [COMPARISON.md](COMPARISON.md) for how this stacks up against Anki, RemNote,
 
 - **Decks and sub-decks**: create, rename, delete, and per-deck settings (new cards per day, reviews per day, desired retention)
 - **Card types**: Basic, Basic (and reversed card), and Cloze (`{{c1::answer::hint}}`), with Anki-compatible templates
-- **Paste from an LLM**: switch the editor to _Paste Markdown_, paste one block from ChatGPT, Claude and the like, and Nenrin splits it into front and back (at `---`, `Q:`/`A:` labels, a heading, or the first paragraph), spots clozes, and reads a final `Tags:` line
+- **Paste from an LLM**: switch the editor to _Paste Markdown_ and paste what ChatGPT, Claude and the like give you. One card is split into front and back (at `---`, `Q:`/`A:` labels, a heading, or the first paragraph); a whole set becomes many cards (numbered Q/A pairs, a Markdown table, or cloze paragraphs). Clozes are detected, and a final `Tags:` line adds tags
 - **Rich cards**: Markdown, LaTeX math (`$x^2$`, `$$…$$`) via KaTeX, and pasted images, with a live preview
 - **Review**: FSRS-6 scheduling, learning steps, interval previews on each button, sibling burying, and undo
 - **Keyboard-first**: <kbd>Space</kbd> to show the answer or rate Good, <kbd>1</kbd>–<kbd>4</kbd> to rate, <kbd>Z</kbd> to undo, <kbd>E</kbd> to edit, <kbd>Esc</kbd> to leave; press <kbd>?</kbd> for the full list

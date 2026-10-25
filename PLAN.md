@@ -118,7 +118,7 @@ From the Anki manual ([importing](https://docs.ankiweb.net/manual/importing/intr
 ### Phase 3: Polish and insights (weeks 6–7)
 
 - [ ] Browser: search (`tag:`, `deck:`, `is:due`, free text), bulk edit, suspend, move
-- [ ] Paste several cards at once (one block, many Q/A pairs), building on the single-card paste parser
+- [x] Paste several cards at once: repeated Q/A pairs (numbered, bulleted, or split by `---` / headings), a Markdown table, or cloze paragraphs
 - [ ] **Command palette** (<kbd>⌘K</kbd> / <kbd>Ctrl+K</kbd>): fuzzy search across actions (study a deck, add cards, open settings, export backup, enable Typst), decks, and later notes.
   - Built on the same registry as the shortcuts dialog (`src/lib/shortcuts.svelte.ts`), so each command shows its shortcut, and the shortcuts list and palette can never disagree.
   - Recent commands first; fully keyboard-driven (arrows, <kbd>Enter</kbd>, <kbd>Esc</kbd>); a native `<dialog>` like the shortcuts modal.
