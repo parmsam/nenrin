@@ -56,6 +56,7 @@ Last updated: 2026-10-25
 - [x] Dark mode and responsive layout
 - [x] "Last backup" reminder; device id on review logs (groundwork for sync, see docs/storage-strategy.md)
 - [x] Keyboard shortcuts dialog: press <kbd>?</kbd> anywhere, or use the keyboard button in the header and review screen
+- [x] Theme options: System / Light / Dark, plus accent palettes Wood 木, Matcha 抹茶, Sakura 桜 and Indigo 藍 (Settings → Appearance; per device, applied before first paint)
 - [ ] Exit criteria: a week of real daily use on a phone (needs a human!)
 
 Known gaps, picked up in Phase 3: no browser/search yet (edit a note from the review screen with <kbd>E</kbd>), and no suspend/bury buttons in the UI.
@@ -68,11 +69,29 @@ Known gaps, picked up in Phase 3: no browser/search yet (edit a note from the re
 - [ ] Map Anki note types, fields, templates (`{{Field}}`, `{{cloze:Text}}`, `{{FrontSide}}`), CSS, tags, and sub-decks
 - [ ] Import media, with sanitized HTML rendering
 - [ ] Import review history (`revlog`) and convert card state to FSRS memory state
-- [ ] CSV/TSV import with field mapping
-- [ ] Re-import with GUID-based dedupe and updates
+- [x] Text import (`.txt` / `.csv` / `.tsv`) with column mapping, done early (see the format table below)
+- [ ] Re-import `.apkg` with GUID-based dedupe and updates (text import already does this)
 - [ ] Fixture tests built from small, self-made decks
 
 **Exit criteria:** popular shared decks (e.g., large language decks with audio) import and render correctly.
+
+#### File formats: parity with Anki
+
+From the Anki manual ([importing](https://docs.ankiweb.net/manual/importing/intro), [text files](https://docs.ankiweb.net/manual/importing/text-files), [exporting](https://docs.ankiweb.net/manual/exporting)):
+
+| Format                                                                                                                                                  | Anki | Nenrin | When                                                                                   |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- | ------ | -------------------------------------------------------------------------------------- |
+| Text import: `.txt` / `.csv` / `.tsv`. Separator sniffing, quoted fields with `""` escapes and newlines, `#` comment lines, UTF-8 (BOM ok)              | ✅   | ✅     | **Done**                                                                               |
+| Text file headers: `#separator`, `#html`, `#tags`, `#columns`, `#notetype`, `#deck`, `#notetype column`, `#deck column`, `#tags column`, `#guid column` | ✅   | ✅     | **Done**                                                                               |
+| Duplicate handling: match on first field (per note type) or GUID; update / skip / import as new                                                         | ✅   | ✅     | **Done** (match scope "note type + deck" not yet)                                      |
+| Text export: "Notes in Plain Text" (tab-separated, HTML, with GUID / note type / deck / tags columns)                                                   | ✅   | ✅     | **Done**. Markdown becomes HTML, and math becomes `\(…\)` / `\[…\]` for Anki's MathJax |
+| `[sound:…]` and `<img>` media references in text files                                                                                                  | ✅   | ◐      | Images render if the file is already in Nenrin's media; audio in Phase 3               |
+| `.apkg` deck package import (merge; optional scheduling; update newer notes)                                                                            | ✅   | ☐      | Phase 2                                                                                |
+| `.colpkg` collection package import (replace everything)                                                                                                | ✅   | ☐      | Phase 2                                                                                |
+| `.apkg` / `.colpkg` export                                                                                                                              | ✅   | ☐      | Phase 4                                                                                |
+| "Cards in Plain Text" export (rendered question/answer)                                                                                                 | ✅   | ☐      | Phase 3                                                                                |
+| Mnemosyne 2.0 `.db` import                                                                                                                              | ✅   | ☐      | Phase 5 (rare)                                                                         |
+| Nenrin JSON backup (everything incl. review history and media)                                                                                          | n/a  | ✅     | **Done**                                                                               |
 
 ### Phase 3: Polish and insights (weeks 6–7)
 

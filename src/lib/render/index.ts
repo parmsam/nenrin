@@ -71,3 +71,25 @@ export function resolveMedia(html: string, urls: Map<string, string>): string {
     return url ? `src="${url}"` : whole;
   });
 }
+
+const escapeHtml = (s: string) =>
+  s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+/**
+ * Field source → HTML for Anki: Markdown is rendered, but math stays as TeX in Anki's
+ * MathJax delimiters, \(…\) and \[…\], so it keeps rendering after export.
+ */
+export function fieldToAnkiHtml(value: string, format: Note['format'] = 'markdown'): string {
+  if (format === 'html') return value;
+  const math: string[] = [];
+  const text = value.replace(MATH_RE, (_, block1, block2, inline1, inline2) => {
+    const display = block1 !== undefined || block2 !== undefined;
+    const tex = escapeHtml(block1 ?? block2 ?? inline1 ?? inline2);
+    math.push(display ? `\\[${tex}\\]` : `\\(${tex}\\)`);
+    return `@@MATH${math.length - 1}@@`;
+  });
+  const html = (marked.parse(text, { async: false, breaks: true }) as string).trim();
+  // A lone paragraph is just text to Anki; drop the wrapper.
+  const unwrapped = /^<p>((?:(?!<\/?p>)[\s\S])*)<\/p>$/.exec(html)?.[1] ?? html;
+  return unwrapped.replace(/@@MATH(\d+)@@/g, (_, i) => math[Number(i)]);
+}

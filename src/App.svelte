@@ -6,6 +6,7 @@
   import DeckView from './routes/DeckView.svelte';
   import Editor from './routes/Editor.svelte';
   import Home from './routes/Home.svelte';
+  import Import from './routes/Import.svelte';
   import Review from './routes/Review.svelte';
   import Settings from './routes/Settings.svelte';
   import ShortcutsDialog from './components/ShortcutsDialog.svelte';
@@ -33,6 +34,7 @@
     if ((m = match('/study/:id', p))) return { name: 'study', id: m.id } as const;
     if ((m = match('/edit/:id', p))) return { name: 'edit', id: m.id } as const;
     if (p === '/add') return { name: 'add' } as const;
+    if (p === '/import') return { name: 'import' } as const;
     if (p === '/settings') return { name: 'settings' } as const;
     return { name: 'home' } as const;
   });
@@ -85,6 +87,8 @@
     {#key route.id}<Editor noteId={route.id} />{/key}
   {:else if route.name === 'add'}
     <Editor />
+  {:else if route.name === 'import'}
+    <Import />
   {:else if route.name === 'settings'}
     <Settings />
   {:else}

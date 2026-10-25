@@ -3,6 +3,8 @@
   import Counts from '../components/Counts.svelte';
   import { db } from '../lib/db';
   import { createDeck, deckTree, deleteDeck, renameDeck, updateDeckConfig } from '../lib/db/decks';
+  import { downloadFile } from '../lib/download';
+  import { exportNotesText, textExportFilename } from '../lib/export/text';
   import { navigate } from '../lib/router.svelte';
   import { formatInterval } from '../lib/study/day';
   import { studyState } from '../lib/study/queue';
@@ -73,6 +75,16 @@
     setTimeout(() => (saved = false), 1500);
   }
 
+  async function exportText() {
+    const d = $data;
+    if (!d) return;
+    downloadFile(
+      await exportNotesText(db, id),
+      textExportFilename(d.deck.name),
+      'text/plain;charset=utf-8',
+    );
+  }
+
   async function remove() {
     const d = $data;
     if (!d) return;
@@ -129,7 +141,15 @@
     {:else}
       <p><strong>Done for today.</strong> <span class="muted">Come back tomorrow.</span></p>
     {/if}
-    <a class="button secondary" href="#/add?deck={id}">+ Add cards</a>
+    <div class="row">
+      <a class="button secondary" href="#/add?deck={id}">+ Add cards</a>
+      <a class="button secondary" href="#/import?deck={id}">Import</a>
+      <button
+        class="secondary"
+        onclick={exportText}
+        disabled={cardCount === 0 && children.length === 0}>Export notes (.txt)</button
+      >
+    </div>
   </section>
 
   <h3 class="section-title">Sub-decks</h3>

@@ -5,6 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="description" content="Local-first flashcards with FSRS spaced repetition." />
     <title>Nenrin</title>
+    <script>
+      // Apply the saved theme before first paint (see src/lib/theme.ts).
+      try {
+        var t = JSON.parse(localStorage.getItem('nenrin:theme') || '{}');
+        if (t.mode === 'light' || t.mode === 'dark')
+          document.documentElement.dataset.theme = t.mode;
+        if (t.palette && t.palette !== 'wood') document.documentElement.dataset.palette = t.palette;
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="app"></div>

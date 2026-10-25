@@ -1,0 +1,46 @@
+import { readFile } from 'node:fs/promises';
+import { expect, test } from '@playwright/test';
+
+test('imports a CSV into a new deck, then exports it as Anki text', async ({ page }) => {
+  await page.goto('./#/import');
+  await page.locator('input[type=file]').setInputFiles({
+    name: 'capitals.csv',
+    mimeType: 'text/csv',
+    buffer: Buffer.from(
+      '# my capitals\nFrance,Paris\nJapan,"Tokyo, the capital"\n,missing front\n',
+    ),
+  });
+  await expect(page.getByLabel('Separator')).toHaveValue(',');
+  await expect(page.getByRole('cell', { name: 'Tokyo, the capital' })).toBeVisible();
+  await page.getByRole('button', { name: 'Import 3 notes' }).click();
+  await expect(page.getByRole('status')).toContainText(
+    '2 added · 0 updated · 0 skipped · 1 failed',
+  );
+  await expect(page.getByRole('status')).toContainText('Row 3');
+
+  // No deck existed, so a Default deck was created.
+  await page.getByRole('link', { name: 'Go to decks' }).click();
+  await page.getByRole('link', { name: /Default/ }).click();
+  const downloadPromise = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Export notes (.txt)' }).click();
+  const text = await readFile((await (await downloadPromise).path())!, 'utf8');
+  expect(text).toMatch(/^#separator:tab\n#html:true\n/);
+  expect(text).toContain('\tBasic\tDefault\tJapan\tTokyo, the capital\t');
+});
+
+test('theme and accent choices apply immediately and persist', async ({ page }) => {
+  await page.goto('./#/settings');
+  const html = page.locator('html');
+  await page.getByText('Dark', { exact: true }).click();
+  await expect(html).toHaveAttribute('data-theme', 'dark');
+  await page.getByText('Matcha').click();
+  await expect(html).toHaveAttribute('data-palette', 'matcha');
+  await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(26, 23, 20)');
+
+  await page.reload();
+  await expect(html).toHaveAttribute('data-theme', 'dark');
+  await expect(html).toHaveAttribute('data-palette', 'matcha');
+
+  await page.getByText('System', { exact: true }).click();
+  await expect(html).not.toHaveAttribute('data-theme', /.*/);
+});

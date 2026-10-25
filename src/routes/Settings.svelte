@@ -10,6 +10,12 @@
     restoreBackup,
   } from '../lib/db/backup';
   import { getPrefs, setPrefs } from '../lib/db/prefs';
+  import { downloadFile } from '../lib/download';
+  import { exportNotesText, textExportFilename } from '../lib/export/text';
+  import { loadTheme, MODES, PALETTES, saveTheme } from '../lib/theme';
+
+  let theme = $state(loadTheme());
+  $effect(() => saveTheme({ mode: theme.mode, palette: theme.palette }));
 
   let rolloverHour = $state(4);
   let persisted = $state<boolean | null>(null);
@@ -49,16 +55,14 @@
 
   async function exportBackup() {
     error = '';
-    const blob = new Blob([JSON.stringify(await createBackup(db))], {
-      type: 'application/json',
-    });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = backupFilename();
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(a.href), 10_000);
+    downloadFile(JSON.stringify(await createBackup(db)), backupFilename(), 'application/json');
     await db.settings.put({ key: 'lastBackupAt', value: Date.now() });
     status = 'Backup downloaded.';
+  }
+
+  async function exportAllText() {
+    downloadFile(await exportNotesText(db), textExportFilename(), 'text/plain;charset=utf-8');
+    status = 'Notes exported.';
   }
 
   async function importBackup(e: Event) {
@@ -97,6 +101,33 @@
 {#if status}<p class="ok" role="status">{status}</p>{/if}
 {#if error}<p class="error" role="alert">{error}</p>{/if}
 
+<h3 class="section-title">Appearance</h3>
+<div class="panel stack">
+  <fieldset>
+    <legend>Theme</legend>
+    <div class="segmented">
+      {#each MODES as m (m.id)}
+        <label class:checked={theme.mode === m.id}>
+          <input type="radio" name="mode" value={m.id} bind:group={theme.mode} />
+          {m.label}
+        </label>
+      {/each}
+    </div>
+  </fieldset>
+  <fieldset>
+    <legend>Accent</legend>
+    <div class="swatches">
+      {#each PALETTES as p (p.id)}
+        <label class:checked={theme.palette === p.id} style:--swatch={p.swatch}>
+          <input type="radio" name="palette" value={p.id} bind:group={theme.palette} />
+          <span class="dot" aria-hidden="true"></span>
+          <span>{p.label} <span class="muted" lang="ja">{p.kanji}</span></span>
+        </label>
+      {/each}
+    </div>
+  </fieldset>
+</div>
+
 <h3 class="section-title">Study day</h3>
 <div class="panel">
   <label>
@@ -128,6 +159,18 @@
       Restore from file…
       <input type="file" accept="application/json,.json" onchange={importBackup} />
     </label>
+  </div>
+</div>
+
+<h3 class="section-title">Import and export</h3>
+<div class="panel stack">
+  <p>
+    Move notes in and out as text files that Anki also reads and writes (tab-separated, with note
+    type, deck, tags and GUID columns).
+  </p>
+  <div class="row">
+    <a class="button secondary" href="#/import">Import .txt / .csv…</a>
+    <button class="secondary" onclick={exportAllText}>Export all notes (.txt)</button>
   </div>
 </div>
 
@@ -173,6 +216,77 @@
   .ok {
     color: var(--good);
     font-weight: 600;
+  }
+  fieldset {
+    border: 0;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.5rem;
+  }
+  legend {
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 0;
+    margin-bottom: 0.5rem;
+  }
+  .segmented {
+    display: inline-flex;
+    padding: 3px;
+    border-radius: 12px;
+    background: var(--surface-2);
+    width: fit-content;
+  }
+  .segmented label,
+  .swatches label {
+    position: relative;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .segmented label {
+    display: block;
+    padding: 0.45rem 1rem;
+    border-radius: 9px;
+    color: var(--muted);
+  }
+  .segmented label.checked {
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: 0 1px 3px rgb(0 0 0 / 12%);
+  }
+  .segmented input,
+  .swatches input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .segmented label:has(input:focus-visible),
+  .swatches label:has(input:focus-visible) {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+  }
+  .swatches {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .swatches label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.45rem 0.8rem 0.45rem 0.55rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+  }
+  .swatches label.checked {
+    border-color: var(--swatch);
+    box-shadow: inset 0 0 0 1px var(--swatch);
+  }
+  .dot {
+    width: 1.1rem;
+    height: 1.1rem;
+    border-radius: 50%;
+    background: var(--swatch);
   }
   .file {
     display: inline-block;

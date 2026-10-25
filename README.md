@@ -60,7 +60,9 @@ See [COMPARISON.md](COMPARISON.md) for how this stacks up against Anki, RemNote,
 - **Rich cards**: Markdown, LaTeX math (`$x^2$`, `$$…$$`) via KaTeX, and pasted images, with a live preview
 - **Review**: FSRS-6 scheduling, learning steps, interval previews on each button, sibling burying, and undo
 - **Keyboard-first**: <kbd>Space</kbd> to show the answer or rate Good, <kbd>1</kbd>–<kbd>4</kbd> to rate, <kbd>Z</kbd> to undo, <kbd>E</kbd> to edit, <kbd>Esc</kbd> to leave; press <kbd>?</kbd> for the full list
+- **Anki-compatible text import/export**: `.txt` / `.csv` / `.tsv` with Anki's file headers (`#separator`, `#html`, `#deck column`, `#guid column` …), column mapping, and update/skip/duplicate handling. Export as Anki's "Notes in Plain Text"
 - **Your data**: JSON backup and restore, including review history and images; a configurable day rollover hour; persistent-storage request
+- **Themes**: System / Light / Dark, with Wood, Matcha, Sakura and Indigo accents
 - **Offline PWA**: install it on any device; it works with no network
 
 $1
@@ -80,7 +82,7 @@ After the first visit, it works fully offline.
 | Study         | FSRS-6 scheduling, Again/Hard/Good/Easy, undo, daily limits, desired-retention setting |
 | Cards         | Basic, Basic + reverse, Cloze; Markdown + LaTeX (KaTeX); images and audio              |
 | Organize      | Decks, sub-decks, tags, search, browse/edit                                            |
-| Import/Export | Anki `.apkg`/`.colpkg`, CSV/TSV, full JSON backup                                      |
+| Import/Export | Anki text files (done), `.apkg`/`.colpkg`, full JSON backup (done)                     |
 | Insights      | Review heatmap, retention, forecast                                                    |
 | Platform      | Offline PWA, GitHub Pages hosting, macOS app (Tauri)                                   |
 

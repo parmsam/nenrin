@@ -35,6 +35,9 @@ export interface NoteInput {
   deckId: string;
   fields: Record<string, string>;
   tags?: string[];
+  /** Defaults to markdown. Imports use html. */
+  format?: Note['format'];
+  ankiGuid?: string;
 }
 
 export class NoCardsError extends Error {
@@ -63,7 +66,8 @@ export async function addNote(db: NenrinDB, input: NoteInput, now = Date.now()):
   return db.transaction('rw', db.noteTypes, db.notes, db.cards, async () => {
     const noteType = await db.noteTypes.get(input.noteTypeId);
     if (!noteType) throw new Error(`Unknown note type ${input.noteTypeId}`);
-    const ordinals = cardOrdinals(noteType, input.fields);
+    const format = input.format ?? 'markdown';
+    const ordinals = cardOrdinals(noteType, input.fields, format);
     if (ordinals.length === 0) throw new NoCardsError(noteType);
     const note: Note = {
       id: newId(),
@@ -72,7 +76,8 @@ export async function addNote(db: NenrinDB, input: NoteInput, now = Date.now()):
       tags: input.tags ?? [],
       createdAt: now,
       updatedAt: now,
-      format: 'markdown',
+      format,
+      ...(input.ankiGuid ? { ankiGuid: input.ankiGuid } : {}),
     };
     await db.notes.add(note);
     // Stagger `due` by ordinal so new cards come up in creation order.
@@ -88,7 +93,7 @@ export async function addNote(db: NenrinDB, input: NoteInput, now = Date.now()):
 export async function updateNote(
   db: NenrinDB,
   noteId: string,
-  changes: { fields: Record<string, string>; tags?: string[] },
+  changes: { fields: Record<string, string>; tags?: string[]; format?: Note['format'] },
   now = Date.now(),
 ): Promise<{ added: number; removed: number }> {
   return db.transaction('rw', db.noteTypes, db.notes, db.cards, db.reviewLogs, async () => {
@@ -96,7 +101,8 @@ export async function updateNote(
     if (!note) throw new Error(`Note ${noteId} not found`);
     const noteType = await db.noteTypes.get(note.noteTypeId);
     if (!noteType) throw new Error(`Unknown note type ${note.noteTypeId}`);
-    const wanted = new Set(cardOrdinals(noteType, changes.fields, note.format));
+    const format = changes.format ?? note.format;
+    const wanted = new Set(cardOrdinals(noteType, changes.fields, format));
     if (wanted.size === 0) throw new NoCardsError(noteType);
 
     const cards = await db.cards.where('noteId').equals(noteId).toArray();
@@ -108,6 +114,7 @@ export async function updateNote(
     await db.notes.update(noteId, {
       fields: { ...changes.fields },
       tags: changes.tags ?? note.tags,
+      format,
       updatedAt: now,
     });
     if (stale.length) {

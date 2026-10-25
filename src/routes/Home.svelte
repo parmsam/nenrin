@@ -67,6 +67,7 @@
     </p>
     <div class="row center">
       <button onclick={addSample} disabled={busy}>Add a sample deck</button>
+      <a class="button secondary" href="#/import">Import a file</a>
     </div>
     <form class="row center new-deck" onsubmit={addDeck}>
       <input
@@ -82,7 +83,10 @@
   <section class="today" aria-label="Today">
     <span class="today-count">{totalDue}</span>
     <span class="today-label">{totalDue === 1 ? 'card' : 'cards'} to study today</span>
-    <a class="button add" href="#/add">+ Add cards</a>
+    <span class="hero-actions">
+      <a class="button import" href="#/import">Import</a>
+      <a class="button" href="#/add">+ Add cards</a>
+    </span>
   </section>
 
   {#if $backupNudge}
@@ -158,9 +162,16 @@
   .today-label {
     opacity: 0.8;
   }
-  .add {
+  .hero-actions {
     margin-left: auto;
     align-self: center;
+    display: flex;
+    gap: 0.5rem;
+  }
+  .hero-actions .import {
+    background: transparent;
+    color: inherit;
+    box-shadow: inset 0 0 0 1px currentColor;
   }
   .nudge {
     margin: 1rem 0 0;
