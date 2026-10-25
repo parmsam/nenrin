@@ -26,6 +26,7 @@ export const SHORTCUTS: { group: string; items: Shortcut[] }[] = [
       { keys: [['3']], action: 'Good' },
       { keys: [['4']], action: 'Easy' },
       { keys: [['Z'], [MOD, 'Z']], action: 'Undo last rating' },
+      { keys: [['R']], action: 'Replay audio' },
       { keys: [['E']], action: 'Edit current note' },
       { keys: [['Esc']], action: 'Back to deck' },
     ],

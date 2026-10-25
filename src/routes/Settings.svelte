@@ -18,6 +18,8 @@
   $effect(() => saveTheme({ mode: theme.mode, palette: theme.palette }));
 
   let rolloverHour = $state(4);
+  let autoplayAudio = $state(true);
+  let deckStyling = $state(true);
   let persisted = $state<boolean | null>(null);
   let usage = $state('');
   let status = $state('');
@@ -31,7 +33,10 @@
     new Date(2000, 0, 1, h).toLocaleTimeString([], { hour: 'numeric' });
 
   onMount(async () => {
-    rolloverHour = (await getPrefs(db)).rolloverHour;
+    const prefs = await getPrefs(db);
+    rolloverHour = prefs.rolloverHour;
+    autoplayAudio = prefs.autoplayAudio;
+    deckStyling = prefs.deckStyling;
     await refreshStorage();
   });
 
@@ -128,8 +133,26 @@
   </fieldset>
 </div>
 
-<h3 class="section-title">Study day</h3>
-<div class="panel">
+<h3 class="section-title">Studying</h3>
+<div class="panel stack">
+  <label class="check">
+    <input
+      type="checkbox"
+      bind:checked={autoplayAudio}
+      onchange={() => setPrefs(db, { autoplayAudio })}
+    />
+    Play audio automatically <span class="muted small">(press R to replay)</span>
+  </label>
+  <label class="check">
+    <input
+      type="checkbox"
+      bind:checked={deckStyling}
+      onchange={() => setPrefs(db, { deckStyling })}
+    />
+    Use each deck’s own styling
+    <span class="muted small">(for imported decks; kept inside the card)</span>
+  </label>
+
   <label>
     Next day starts at
     <select bind:value={rolloverHour} onchange={saveRollover}>
@@ -233,6 +256,16 @@
   .small {
     font-size: 0.8rem;
     margin: 0.5rem 0 0;
+  }
+  .check {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-weight: 600;
+  }
+  .check input {
+    width: auto;
   }
   .ok {
     color: var(--good);

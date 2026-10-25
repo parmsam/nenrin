@@ -35,7 +35,7 @@ describe('backup', () => {
     expect(await other.decks.toArray()).toEqual(await db.decks.toArray());
     expect(await other.cards.toArray()).toEqual(await db.cards.toArray());
     expect(await other.reviewLogs.count()).toBe(1);
-    expect((await other.settings.get('prefs'))!.value).toEqual({ rolloverHour: 2 });
+    expect((await other.settings.get('prefs'))!.value).toMatchObject({ rolloverHour: 2 });
     const media = (await other.media.get(filename))!;
     expect(new Uint8Array(await media.blob.arrayBuffer())).toEqual(
       new Uint8Array([137, 80, 78, 71, 1, 2, 3]),

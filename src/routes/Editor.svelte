@@ -4,6 +4,7 @@
   import { db, type Note, type NoteType } from '../lib/db';
   import { deckTree, type DeckNode } from '../lib/db/decks';
   import { addImage } from '../lib/db/media';
+  import { getPrefs } from '../lib/db/prefs';
   import { addNote, cardOrdinals, deleteNote, parseTags, updateNote } from '../lib/notes';
   import { renderCard } from '../lib/render';
   import { clozeNumbers } from '../lib/render/template';
@@ -31,6 +32,7 @@
   let mode = $state<'fields' | 'paste'>('fields');
   let pasteText = $state('');
   let pasteArea: HTMLTextAreaElement | undefined = $state();
+  let deckStyling = $state(true);
 
   const noteType = $derived(noteTypes.find((t) => t.id === typeId));
   const returnTo = $derived(router.query.get('return'));
@@ -112,6 +114,7 @@
 
   onMount(async () => {
     noteTypes = await db.noteTypes.toArray();
+    deckStyling = (await getPrefs(db)).deckStyling;
     decks = deckTree(await db.decks.toArray());
     if (noteId) {
       note = (await db.notes.get(noteId)) ?? null;
@@ -417,7 +420,11 @@
   </div>
   <div class="panel preview">
     {#if preview && preview.count > 0}
-      <CardView html={preview.html} />
+      <CardView
+        html={preview.html}
+        css={deckStyling ? (target?.type.css ?? '') : ''}
+        side={previewSide === 'front' ? 'question' : 'answer'}
+      />
     {:else}
       <p class="muted">
         {noteType?.kind === 'cloze'

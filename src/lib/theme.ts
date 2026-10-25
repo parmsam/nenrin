@@ -55,3 +55,10 @@ export function saveTheme(theme: Theme): void {
     // Storage unavailable (private mode): the choice lasts for this session only.
   }
 }
+
+/** Whether the app is currently dark (explicit choice, or the OS setting in System mode). */
+export function isDarkMode(root: HTMLElement = document.documentElement): boolean {
+  const explicit = root.getAttribute('data-theme');
+  if (explicit) return explicit === 'dark';
+  return globalThis.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false;
+}

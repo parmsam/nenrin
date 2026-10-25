@@ -2,7 +2,8 @@
   import { onMount } from 'svelte';
   import CardView from '../components/CardView.svelte';
   import Counts from '../components/Counts.svelte';
-  import { db, type Card } from '../lib/db';
+  import { db, DEFAULT_PREFS, type Card, type Prefs } from '../lib/db';
+  import { getPrefs } from '../lib/db/prefs';
   import { recordReview, undoReview, type UndoEntry } from '../lib/db/repo';
   import { renderCard, type RenderedCard } from '../lib/render';
   import { navigate } from '../lib/router.svelte';
@@ -26,6 +27,9 @@
   let counts = $state<StudyCounts>({ new: 0, learning: 0, review: 0 });
   let card = $state.raw<Card | null>(null);
   let rendered = $state<RenderedCard>({ front: '', back: '' });
+  let cardCss = $state('');
+  let prefs = $state<Prefs>({ ...DEFAULT_PREFS });
+  let cardView: CardView | undefined = $state();
   let intervals = $state<Record<Grade, string> | null>(null);
   let revealed = $state(false);
   let finished = $state(false);
@@ -85,6 +89,7 @@
       deckPath.unshift(d.name);
     }
     rendered = renderCard(noteType, note, next.ordinal, { deckPath });
+    cardCss = prefs.deckStyling ? noteType.css : '';
     card = next;
     finished = false;
     revealed = false;
@@ -130,6 +135,8 @@
       return;
     } else if (e.key === 'Escape') {
       navigate(`/deck/${deckId}`);
+    } else if (e.key === 'r') {
+      cardView?.replay();
     } else if (e.key === 'e') {
       edit();
     } else if (e.key === ' ' || e.key === 'Enter') {
@@ -143,7 +150,10 @@
   }
 
   onMount(() => {
-    load();
+    getPrefs(db).then((p) => {
+      prefs = p;
+      load();
+    });
     return () => clearTimeout(timer);
   });
 </script>
@@ -186,7 +196,13 @@
     </section>
   {:else if card}
     <section class="card panel" aria-live="polite">
-      <CardView html={revealed ? rendered.back : rendered.front} />
+      <CardView
+        bind:this={cardView}
+        html={revealed ? rendered.back : rendered.front}
+        css={cardCss}
+        side={revealed ? 'answer' : 'question'}
+        autoplay={prefs.autoplayAudio}
+      />
     </section>
 
     <footer class="answer">

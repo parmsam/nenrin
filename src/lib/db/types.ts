@@ -80,9 +80,13 @@ export interface Setting {
 export interface Prefs {
   /** Local hour at which a new study day starts (Anki default: 4 AM). */
   rolloverHour: number;
+  /** Play a card's audio when it's shown (question) and when the answer is revealed. */
+  autoplayAudio: boolean;
+  /** Apply each note type's own CSS (e.g. from imported Anki decks), safely scoped. */
+  deckStyling: boolean;
 }
 
-export const DEFAULT_PREFS: Prefs = { rolloverHour: 4 };
+export const DEFAULT_PREFS: Prefs = { rolloverHour: 4, autoplayAudio: true, deckStyling: true };
 
 export const DEFAULT_DECK_CONFIG: DeckConfig = {
   newPerDay: 20,

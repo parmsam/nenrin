@@ -53,10 +53,14 @@ describe('reading packages', () => {
       expect(pkg.decks.map((d) => d.path.join('::'))).toEqual(
         expect.arrayContaining(['Nenrin Fixture::Japanese', 'Nenrin Fixture::Geography']),
       );
-      expect(pkg.notes).toHaveLength(7);
-      expect(pkg.cards).toHaveLength(9);
+      expect(pkg.notes).toHaveLength(8);
+      expect(pkg.cards).toHaveLength(10);
       expect(pkg.revlog).toHaveLength(3);
-      expect(pkg.media.map((m) => m.name).sort()).toEqual(['ki.mp3', 'tree.png']);
+      expect(pkg.media.map((m) => m.name).sort()).toEqual([
+        '_fixture-font.woff2',
+        'ki.mp3',
+        'tree.png',
+      ]);
       // PNG signature survives zip + zstd.
       expect([...pkg.media.find((m) => m.name === 'tree.png')!.data.subarray(1, 4)]).toEqual([
         0x50, 0x4e, 0x47,
@@ -94,10 +98,10 @@ describe('importing packages', () => {
   it('imports decks, notes, cards, media and review history', async () => {
     const result = await importAnkiPackage(db, read('modern.apkg'), { scheduling: true }, NOW);
     expect(result).toMatchObject({
-      notesAdded: 7,
-      cardsAdded: 9,
+      notesAdded: 8,
+      cardsAdded: 10,
       reviewsImported: 3,
-      mediaImported: 2,
+      mediaImported: 3,
     });
     // Only decks with cards (and their parents); Anki's empty Default deck is skipped.
     expect(deckTree(await db.decks.toArray()).map((d) => d.path)).toEqual([
@@ -110,12 +114,14 @@ describe('importing packages', () => {
     expect(cards.filter((c) => c.state === State.Learning)).toHaveLength(2);
     expect(cards.filter((c) => c.suspended)).toHaveLength(1);
 
-    // The graduated card keeps Anki's FSRS memory and a due date ~9 days out.
+    // The graduated card keeps Anki's FSRS memory and a due date about a week or more out.
     const review = cards.find((c) => c.state === State.Review)!;
     expect(review.stability).toBeCloseTo(8.2956, 3);
     expect(review.difficulty).toBeCloseTo(1, 3);
-    expect(review.scheduledDays).toBe(9);
-    expect((review.due - review.lastReview!) / 86_400_000).toBeGreaterThan(8);
+    // Anki fuzzes intervals, so regenerated fixtures vary by a day or two.
+    expect(review.scheduledDays).toBeGreaterThanOrEqual(7);
+    expect(review.scheduledDays).toBeLessThanOrEqual(12);
+    expect((review.due - review.lastReview!) / 86_400_000).toBeGreaterThan(6);
 
     expect(await db.media.get('tree.png')).toMatchObject({ mime: 'image/png' });
     expect(await db.reviewLogs.where('cardId').equals(review.id).count()).toBe(1);
@@ -151,9 +157,9 @@ describe('importing packages', () => {
   it('re-importing the same package adds nothing', async () => {
     await importAnkiPackage(db, read('modern.apkg'), { scheduling: true }, NOW);
     const again = await importAnkiPackage(db, read('legacy.apkg'), { scheduling: true }, NOW);
-    expect(again).toMatchObject({ notesAdded: 0, notesUnchanged: 7, cardsAdded: 0 });
-    expect(await db.notes.count()).toBe(7);
-    expect(await db.cards.count()).toBe(9);
+    expect(again).toMatchObject({ notesAdded: 0, notesUnchanged: 8, cardsAdded: 0 });
+    expect(await db.notes.count()).toBe(8);
+    expect(await db.cards.count()).toBe(10);
     expect(await db.decks.count()).toBe(3);
   });
 
@@ -167,7 +173,7 @@ describe('importing packages', () => {
       NOW,
     );
     expect((await db.decks.toArray()).map((d) => d.name)).not.toContain('Mine');
-    expect(await db.cards.count()).toBe(9);
+    expect(await db.cards.count()).toBe(10);
     expect(await db.reviewLogs.count()).toBe(3);
   });
 });

@@ -34,10 +34,23 @@ def build(path: str) -> Collection:
 
     col.media.write_data("tree.png", PNG)
     col.media.write_data("ki.mp3", MP3)
+    col.media.write_data("_fixture-font.woff2", b"wOF2 not a real font")
 
     basic = col.models.by_name("Basic")
     reversed_ = col.models.by_name("Basic (and reversed card)")
     cloze = col.models.by_name("Cloze")
+
+    # A note type with custom styling, like many shared decks: classes, night mode, a deck font.
+    styled = col.models.copy(basic)
+    styled["name"] = "Styled"
+    styled["css"] = """@font-face { font-family: FixtureFont; src: url("_fixture-font.woff2"); }
+.card { font-family: FixtureFont, sans-serif; }
+.reading { color: rgb(10, 20, 30); font-size: 30px; }
+.nightMode .reading { color: rgb(200, 210, 220); }
+"""
+    styled["tmpls"][0]["qfmt"] = '<div class="reading">{{Front}}</div>'
+    col.models.update_dict(styled)
+    styled = col.models.by_name("Styled")
 
     def add(model, deck, tags, **fields):
         note = col.new_note(model)
@@ -53,6 +66,7 @@ def build(path: str) -> Collection:
     add(basic, jp, ["furigana"], Front="年輪[ねんりん]", Back="tree rings")
     add(cloze, geo, ["capitals"], Text="{{c1::Paris}} is the capital of {{c2::France}}.")
     add(basic, geo, ["math"], Front="Area of a circle?", Back=r"\(\pi r^2\)")
+    add(styled, jp, ["styled"], Front="川", Back="river")
     suspended = add(basic, geo, ["suspended"], Front="Suspended card", Back="hidden")
     col.sched.suspend_cards(suspended.card_ids())
 

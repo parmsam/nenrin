@@ -89,7 +89,7 @@ Known gaps from Phase 1, now closed: browse/search and suspend shipped in Phase 
   The decks live in gitignored `ref/decks/`, because their media licenses vary. All five are the oldest package format (genanki-style `collection.anki2`); the committed fixtures cover the two newer formats.
 
 - [ ] Test a modern-format shared deck from AnkiWeb (needs a manual download)
-- [ ] Apply each note type's CSS, in a sandboxed iframe so deck styles and scripts can't touch the app
+- [x] Apply each note type's CSS, contained: native CSS `@scope` plus `contain: layout paint` (no iframe, so shortcuts and audio keep working); `@import`, remote `url()` and `image-set()` stripped; `@font-face` fonts load from deck media; Anki's stock CSS skipped so the theme applies; `.nightMode` class in dark mode, and automatic inversion for light-only deck styles. Toggle in Settings
 
 Known limits for now:
 
@@ -129,7 +129,7 @@ From the Anki manual ([importing](https://docs.ankiweb.net/manual/importing/intr
 - [ ] Stats: heatmap, true retention, review forecast, card counts
 - [ ] FSRS parameter optimization from your own review log (`fsrs-browser`)
 - [ ] Study reminders (Web Push / notifications where supported)
-- [ ] Audio: autoplay a card's audio when it's shown (front, then the answer side), like Anki, with a setting to turn it off; <kbd>R</kbd> replays. TTS fallback via the Web Speech API for `{{tts}}` fields
+- [x] Audio: autoplay the question's audio, then only the answer's new audio on reveal (like Anki), clips in sequence; <kbd>R</kbd> replays; toggle in Settings. (iOS may block autoplay after async loading; R and the player always work.) TTS for `{{tts}}` fields is still to do
 - [ ] Import CrowdAnki JSON decks (`deck.json` + `media/`). Popular open decks such as [Ultimate Geography](https://github.com/anki-geo/ultimate-geography) ship this way
 - [ ] Onboarding with sample decks; first-run "Import from Anki" flow
 - [ ] **Welcome splash** on launch: logo, 年輪 with furigana, the tagline, and today's due count, then straight into the app. Toggle it off in Settings → Appearance ("Show welcome screen"). Respect `prefers-reduced-motion`, and never show it on top of a deep link (e.g. `#/study/…`).

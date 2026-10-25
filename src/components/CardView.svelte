@@ -1,31 +1,156 @@
 <script lang="ts">
+  import { tick } from 'svelte';
   import { db } from '../lib/db';
   import { mediaUrls } from '../lib/db/media';
   import { mediaRefs, resolveMedia } from '../lib/render';
+  import { cssMediaRefs, isStockCss, scopeDeckCss } from '../lib/render/deck-css';
+  import { isDarkMode } from '../lib/theme';
 
-  /** Already-sanitized card HTML (from renderCard). */
-  let { html }: { html: string } = $props();
+  let {
+    html,
+    css = '',
+    side = 'question',
+    autoplay = false,
+  }: {
+    /** Already-sanitized card HTML (from renderCard). */
+    html: string;
+    /** The note type's CSS; applied scoped to this card, or ignored if it's Anki's stock CSS. */
+    css?: string;
+    /** Which side is showing. On the answer, only audio after <hr id="answer"> autoplays. */
+    side?: 'question' | 'answer';
+    /** Play the side's audio when it appears. */
+    autoplay?: boolean;
+  } = $props();
+
   let resolved = $state('');
+  let scopedCss = $state('');
+  let container: HTMLDivElement | undefined = $state();
+  let playRun = 0;
+
+  // Browsers without CSS @scope can't contain deck styles, so they just don't get them.
+  const supportsScope = 'CSSScopeRule' in globalThis;
+  const dark = isDarkMode();
+  // Deck styles written only for light mode (white card, dark text, no .nightMode rules) get
+  // inverted in dark mode, with images and video flipped back, instead of a glaring white box.
+  const autoDark = $derived(dark && !!scopedCss && !/night_?mode/i.test(css));
 
   $effect(() => {
     const source = html;
-    resolved = source;
-    const refs = mediaRefs(source);
-    if (refs.length === 0) return;
     let cancelled = false;
-    mediaUrls(db, refs).then((urls) => {
-      if (!cancelled) resolved = resolveMedia(source, urls);
+    const refs = mediaRefs(source);
+    const ready = refs.length
+      ? mediaUrls(db, refs).then((urls) => resolveMedia(source, urls))
+      : Promise.resolve(source);
+    resolved = source;
+    ready.then(async (final) => {
+      if (cancelled) return;
+      resolved = final;
+      if (autoplay) {
+        await tick();
+        if (!cancelled) play();
+      }
+    });
+    return () => {
+      cancelled = true;
+      stop();
+    };
+  });
+
+  $effect(() => {
+    const source = css;
+    scopedCss = '';
+    if (!source || !supportsScope || isStockCss(source)) return;
+    let cancelled = false;
+    mediaUrls(db, cssMediaRefs(source)).then((urls) => {
+      if (!cancelled) scopedCss = scopeDeckCss(source, { urls });
     });
     return () => (cancelled = true);
   });
+
+  function audios(): HTMLAudioElement[] {
+    if (!container) return [];
+    const all = [...container.querySelectorAll('audio')];
+    if (side !== 'answer') return all;
+    // The answer usually repeats the question ({{FrontSide}}): play only what's new.
+    const divider = container.querySelector('hr#answer');
+    return divider
+      ? all.filter((a) => divider.compareDocumentPosition(a) & Node.DOCUMENT_POSITION_FOLLOWING)
+      : all;
+  }
+
+  function stop() {
+    playRun++;
+    for (const a of container?.querySelectorAll('audio') ?? []) a.pause();
+  }
+
+  /** Plays this side's audio clips one after another. */
+  async function play() {
+    stop();
+    const run = playRun;
+    for (const audio of audios()) {
+      if (run !== playRun) return;
+      audio.currentTime = 0;
+      try {
+        await audio.play();
+        await new Promise<void>((done) => {
+          audio.addEventListener('ended', () => done(), { once: true });
+          audio.addEventListener('pause', () => done(), { once: true });
+          audio.addEventListener('error', () => done(), { once: true });
+        });
+      } catch {
+        // Autoplay blocked (e.g. iOS without a recent tap) or a broken file: R / the player work.
+        return;
+      }
+    }
+  }
+
+  /** Replays the current side's audio (the R shortcut). */
+  export function replay() {
+    play();
+  }
 </script>
 
-<div class="card-content">
-  <!-- eslint-disable-next-line svelte/no-at-html-tags -- sanitized by renderCard() -->
-  {@html resolved}
+{#if scopedCss}
+  <!-- eslint-disable-next-line svelte/no-at-html-tags -- scopeDeckCss escapes "<" and scopes rules -->
+  {@html `<style>${scopedCss}</style>`}
+{/if}
+<!-- .deck-scope is the @scope root; deck rules match only inside it, so the classes decks
+     target (.card, .nightMode) go on the inner element, as in Anki. -->
+<div class="deck-scope" bind:this={container}>
+  <div
+    class="deck-card card"
+    class:styled={!!scopedCss}
+    class:auto-dark={autoDark}
+    class:nightMode={dark}
+    class:night_mode={dark}
+  >
+    <div class="card-content">
+      <!-- eslint-disable-next-line svelte/no-at-html-tags -- sanitized by renderCard() -->
+      {@html resolved}
+    </div>
+  </div>
 </div>
 
 <style>
+  .deck-scope {
+    /* Deck CSS can't position or paint outside the card. */
+    contain: layout paint;
+    border-radius: 12px;
+  }
+  .deck-card {
+    border-radius: 12px;
+  }
+  .deck-card.styled {
+    padding: 0.5rem;
+  }
+  .deck-card.auto-dark {
+    background: transparent !important;
+    filter: invert(1) hue-rotate(180deg);
+  }
+  .deck-card.auto-dark :global(img),
+  .deck-card.auto-dark :global(video) {
+    filter: invert(1) hue-rotate(180deg);
+  }
   .card-content {
     font-size: 1.35rem;
     line-height: 1.55;
@@ -39,6 +164,10 @@
     max-width: 100%;
     height: auto;
     border-radius: 8px;
+  }
+  .card-content :global(audio) {
+    max-width: 100%;
+    margin: 0.4rem 0;
   }
   .card-content :global(hr#answer) {
     border: 0;
@@ -67,5 +196,9 @@
   .card-content :global(.katex-display) {
     overflow-x: auto;
     overflow-y: hidden;
+  }
+  .card-content :global(details.hint) {
+    display: inline-block;
+    font-size: 0.9em;
   }
 </style>
