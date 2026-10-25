@@ -2,14 +2,9 @@
   import { liveQuery } from 'dexie';
   import { onMount } from 'svelte';
   import { db } from '../lib/db';
-  import {
-    backupFilename,
-    createBackup,
-    InvalidBackupError,
-    parseBackup,
-    restoreBackup,
-  } from '../lib/db/backup';
+  import { InvalidBackupError, parseBackup, restoreBackup } from '../lib/db/backup';
   import { getPrefs, setPrefs } from '../lib/db/prefs';
+  import { exportBackup as exportBackupFile } from '../lib/actions';
   import { downloadFile } from '../lib/download';
   import { exportNotesText, textExportFilename } from '../lib/export/text';
   import { loadTheme, MODES, PALETTES, saveTheme } from '../lib/theme';
@@ -60,8 +55,7 @@
 
   async function exportBackup() {
     error = '';
-    downloadFile(JSON.stringify(await createBackup(db)), backupFilename(), 'application/json');
-    await db.settings.put({ key: 'lastBackupAt', value: Date.now() });
+    await exportBackupFile();
     status = 'Backup downloaded.';
   }
 

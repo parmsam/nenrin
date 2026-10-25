@@ -4,6 +4,8 @@ Nenrin follows [semantic versioning](https://semver.org/). Until 1.0, each roadm
 
 ## Unreleased
 
+- **Command palette** (<kbd>⌘K</kbd> / <kbd>Ctrl+K</kbd>): fuzzy-search every page, action, theme and deck ("Study …", "Open …"), or search notes for whatever you type. Recent commands come first.
+- **Fixed:** quickly reopening a dialog (palette, shortcuts, confirmation) could make it close by itself.
 - **Swipe to delete a deck**: swipe a deck left on the home screen to reveal Delete (or swipe all the way), then confirm. The dialog says how many cards and how much review history will go.
 
 ## 0.4.0 (2026-10-25): Stats, personal scheduling, audio, deck styling

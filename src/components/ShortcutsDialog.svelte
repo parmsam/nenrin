@@ -13,7 +13,10 @@
 <dialog
   bind:this={dialog}
   aria-labelledby="shortcuts-title"
-  onclose={() => (shortcutsDialog.open = false)}
+  onclose={() => {
+    // The close event arrives a task later; ignore it if the dialog was reopened since.
+    if (!dialog.open) shortcutsDialog.open = false;
+  }}
   onclick={(e) => {
     // Click on the backdrop (outside the content box) closes.
     if (e.target === dialog) dialog.close();

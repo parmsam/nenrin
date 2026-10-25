@@ -13,6 +13,7 @@ export const SHORTCUTS: { group: string; items: Shortcut[] }[] = [
   {
     group: 'Everywhere',
     items: [
+      { keys: [[MOD, 'K']], action: 'Command palette: jump anywhere, run anything' },
       { keys: [['?']], action: 'Show keyboard shortcuts' },
       { keys: [['Esc']], action: 'Close this dialog' },
     ],

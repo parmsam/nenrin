@@ -25,7 +25,10 @@
   bind:this={dialog}
   aria-labelledby="confirm-title"
   aria-describedby="confirm-message"
-  onclose={() => confirmState.current && finish(false)}
+  onclose={() => {
+    // The close event arrives a task later: never let it cancel a newer confirmation.
+    if (!dialog.open && confirmState.current) finish(false);
+  }}
 >
   {#if current}
     <h2 id="confirm-title">{current.title}</h2>

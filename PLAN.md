@@ -122,7 +122,7 @@ From the Anki manual ([importing](https://docs.ankiweb.net/manual/importing/intr
 
 - [x] Browser: Anki-style search (words, `"phrases"`, `-exclude`, `deck:` incl. sub-decks, `tag:`, `note:`, `is:new/learn/review/due/suspended`, `added:N`, `*` wildcards), sort, and bulk suspend / move / tag / delete; query kept in the URL; <kbd>/</kbd> focuses search
 - [x] Paste several cards at once: repeated Q/A pairs (numbered, bulleted, or split by `---` / headings), a Markdown table, or cloze paragraphs
-- [ ] **Command palette** (<kbd>⌘K</kbd> / <kbd>Ctrl+K</kbd>): fuzzy search across actions (study a deck, add cards, open settings, export backup, enable Typst), decks, and later notes.
+- [x] **Command palette** (<kbd>⌘K</kbd> / <kbd>Ctrl+K</kbd>): fuzzy search across actions (study a deck, add cards, open settings, export backup, enable Typst), decks, and later notes.
   - Built on the same registry as the shortcuts dialog (`src/lib/shortcuts.svelte.ts`), so each command shows its shortcut, and the shortcuts list and palette can never disagree.
   - Recent commands first; fully keyboard-driven (arrows, <kbd>Enter</kbd>, <kbd>Esc</kbd>); a native `<dialog>` like the shortcuts modal.
   - On touch devices, a search button in the header opens it.

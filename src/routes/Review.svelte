@@ -10,6 +10,7 @@
   import { createScheduler, GRADES, Rating, State, type Grade } from '../lib/scheduler';
   import { formatInterval } from '../lib/study/day';
   import { LEARN_AHEAD_MS, studyState, type StudyCounts } from '../lib/study/queue';
+  import { paletteState } from '../lib/palette.svelte';
   import { isTyping, shortcutsDialog } from '../lib/shortcuts.svelte';
 
   let { deckId }: { deckId: string } = $props();
@@ -126,7 +127,7 @@
   }
 
   function onKey(e: KeyboardEvent) {
-    if (isTyping(e) || shortcutsDialog.open) return;
+    if (isTyping(e) || shortcutsDialog.open || paletteState.open) return;
     // Z or Cmd/Ctrl+Z.
     if (e.key === 'z' && !e.altKey && !e.shiftKey) {
       e.preventDefault();

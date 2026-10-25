@@ -11,7 +11,9 @@
   import Review from './routes/Review.svelte';
   import Settings from './routes/Settings.svelte';
   import Stats from './routes/Stats.svelte';
+  import CommandPalette from './components/CommandPalette.svelte';
   import ConfirmDialog from './components/ConfirmDialog.svelte';
+  import { paletteState } from './lib/palette.svelte';
   import ShortcutsDialog from './components/ShortcutsDialog.svelte';
   import UpdatePrompt from './components/UpdatePrompt.svelte';
   import { isTyping, shortcutsDialog } from './lib/shortcuts.svelte';
@@ -20,6 +22,12 @@
   let ready = $state(false);
 
   function onKey(e: KeyboardEvent) {
+    // ⌘K / Ctrl+K toggles the command palette, even from inside a text field.
+    if (e.key.toLowerCase() === 'k' && (e.metaKey || e.ctrlKey) && !e.altKey && !e.shiftKey) {
+      e.preventDefault();
+      paletteState.open = !paletteState.open;
+      return;
+    }
     if (e.key === '?' && !isTyping(e) && !e.metaKey && !e.ctrlKey) {
       e.preventDefault();
       shortcutsDialog.open = true;
@@ -141,6 +149,7 @@
 
 <ShortcutsDialog />
 <ConfirmDialog />
+<CommandPalette />
 <UpdatePrompt />
 <svelte:window onkeydown={onKey} />
 
