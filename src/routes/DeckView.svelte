@@ -12,6 +12,7 @@
   } from '../lib/db/decks';
   import { downloadFile } from '../lib/download';
   import { exportNotesText, textExportFilename } from '../lib/export/text';
+  import { confirmAction } from '../lib/confirm.svelte';
   import { navigate } from '../lib/router.svelte';
   import { formatInterval } from '../lib/study/day';
   import { studyState } from '../lib/study/queue';
@@ -107,8 +108,17 @@
   async function remove() {
     const d = $data;
     if (!d) return;
-    const subs = d.children.length ? ' and its sub-decks' : '';
-    if (!confirm(`Delete “${d.deck.name}”${subs}, with all cards and review history?`)) return;
+    const ids = await deckSubtreeIds(db, id);
+    const cards = await db.cards.where('deckId').anyOf(ids).count();
+    const subs =
+      ids.length > 1 ? ` and its ${ids.length - 1} sub-deck${ids.length > 2 ? 's' : ''}` : '';
+    const ok = await confirmAction({
+      title: `Delete “${d.deck.name}”?`,
+      message: `This deletes the deck${subs}, ${cards.toLocaleString()} ${cards === 1 ? 'card' : 'cards'} and their review history. It can’t be undone.`,
+      confirmLabel: 'Delete deck',
+      danger: true,
+    });
+    if (!ok) return;
     await deleteDeck(db, id);
     navigate('/', { replace: true });
   }

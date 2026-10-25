@@ -2,6 +2,10 @@
 
 Nenrin follows [semantic versioning](https://semver.org/). Until 1.0, each roadmap phase in [PLAN.md](PLAN.md) bumps the minor version.
 
+## Unreleased
+
+- **Swipe to delete a deck**: swipe a deck left on the home screen to reveal Delete (or swipe all the way), then confirm. The dialog says how many cards and how much review history will go.
+
 ## 0.4.0 (2026-10-25): Stats, personal scheduling, audio, deck styling
 
 - **Stats**: review heatmap, 30-day retention, streaks, a 30-day review forecast and cards by stage, per deck or overall, with keyboard readouts and table views.

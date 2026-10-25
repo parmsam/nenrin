@@ -1,9 +1,11 @@
 <script lang="ts">
   import { liveQuery } from 'dexie';
   import Counts from '../components/Counts.svelte';
+  import SwipeRow from '../components/SwipeRow.svelte';
   import TodayRing from '../components/TodayRing.svelte';
+  import { confirmAction } from '../lib/confirm.svelte';
   import { db } from '../lib/db';
-  import { createDeck, deckTree } from '../lib/db/decks';
+  import { createDeck, deckSubtreeIds, deckTree, deleteDeck, type DeckNode } from '../lib/db/decks';
   import { createSampleDeck } from '../lib/db/sample';
   import { navigate } from '../lib/router.svelte';
   import { studyState } from '../lib/study/queue';
@@ -50,6 +52,22 @@
     } finally {
       busy = false;
     }
+  }
+
+  /** Swipe-to-delete: confirm with the real numbers first. */
+  async function confirmDelete(deck: DeckNode) {
+    const ids = await deckSubtreeIds(db, deck.id);
+    const cards = await db.cards.where('deckId').anyOf(ids).count();
+    const subs =
+      ids.length > 1 ? ` and its ${ids.length - 1} sub-deck${ids.length > 2 ? 's' : ''}` : '';
+    const ok = await confirmAction({
+      title: `Delete “${deck.name}”?`,
+      message: `This deletes the deck${subs}, ${cards.toLocaleString()} ${cards === 1 ? 'card' : 'cards'} and their review history. It can’t be undone.`,
+      confirmLabel: 'Delete deck',
+      danger: true,
+    });
+    if (ok) await deleteDeck(db, deck.id);
+    return ok;
   }
 
   async function addDeck(e: SubmitEvent) {
@@ -198,13 +216,17 @@
   <ul class="decks">
     {#each $decks as deck (deck.id)}
       <li style:--depth={deck.depth} class:done={dueOf(deck) === 0}>
-        <a class="deck-link" href="#/deck/{deck.id}">
-          <span class="name" id="deck-{deck.id}">{deck.name}</span>
-          <Counts counts={deck.counts} />
-        </a>
-        {#if dueOf(deck) > 0}
-          <a class="study" href="#/study/{deck.id}" aria-describedby="deck-{deck.id}">Study</a>
-        {/if}
+        <SwipeRow actionLabel="Delete {deck.name}" onAction={() => confirmDelete(deck)}>
+          <div class="deck-row">
+            <a class="deck-link" href="#/deck/{deck.id}">
+              <span class="name" id="deck-{deck.id}">{deck.name}</span>
+              <Counts counts={deck.counts} />
+            </a>
+            {#if dueOf(deck) > 0}
+              <a class="study" href="#/study/{deck.id}" aria-describedby="deck-{deck.id}">Study</a>
+            {/if}
+          </div>
+        </SwipeRow>
       </li>
     {/each}
   </ul>
@@ -374,6 +396,8 @@
   }
   .decks li {
     margin-left: calc(var(--depth) * 1.25rem);
+  }
+  .deck-row {
     display: flex;
     align-items: stretch;
     gap: 0.5rem;

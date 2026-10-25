@@ -11,6 +11,7 @@
   import Review from './routes/Review.svelte';
   import Settings from './routes/Settings.svelte';
   import Stats from './routes/Stats.svelte';
+  import ConfirmDialog from './components/ConfirmDialog.svelte';
   import ShortcutsDialog from './components/ShortcutsDialog.svelte';
   import UpdatePrompt from './components/UpdatePrompt.svelte';
   import { isTyping, shortcutsDialog } from './lib/shortcuts.svelte';
@@ -139,6 +140,7 @@
 </main>
 
 <ShortcutsDialog />
+<ConfirmDialog />
 <UpdatePrompt />
 <svelte:window onkeydown={onKey} />
 
