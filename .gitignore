@@ -1,0 +1,14 @@
+node_modules/
+dist/
+coverage/
+.DS_Store
+*.log
+.env*
+!.env.example
+src-tauri/target/
+
+# Local research notes (kept out of git)
+ref/
+dev-dist/
+playwright-report/
+test-results/

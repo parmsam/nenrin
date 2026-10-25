@@ -1,0 +1,114 @@
+# Nenrin Plan
+
+Last updated: 2026-10-25
+
+## Goals
+
+1. Give Anki users a modern, free, open alternative they can move to in five minutes, with decks and history imported.
+2. Give new learners a calm, beautiful app that works offline on any device without an account.
+3. Stay small and maintainable: a static site, no servers, MIT licensed.
+
+### Non-goals (for v1)
+
+- A hosted sync service or accounts
+- A shared-deck marketplace
+- Built-in AI card generation (maybe later as opt-in BYO-API-key; see Phase 5)
+- Anki add-on compatibility
+
+## Key decisions
+
+| Decision  | Choice                                                       | Why                                                                                                                                                                                                                                         |
+| --------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Platform  | **PWA first**, macOS via Tauri later                         | One codebase reaches iPhone, iPad, Android, Mac, Windows, and Linux. iOS 16.4+ supports installed PWAs with notifications. macOS Safari "Add to Dock" already gives an app-like window. Tauri adds a native `.app` without Electron's size. |
+| Hosting   | **GitHub Pages**                                             | It's free and static, deploys via Actions, and fits a no-backend design. A custom domain is optional.                                                                                                                                       |
+| Framework | Svelte 5 + Vite + TypeScript                                 | Small bundles and quick startup on phones. Easy to contribute to.                                                                                                                                                                           |
+| Scheduler | `ts-fsrs` (FSRS-6)                                           | Actively maintained, MIT, and widely used (see awesome-fsrs).                                                                                                                                                                               |
+| Optimizer | `fsrs-browser` (fsrs-rs → WASM), in a worker                 | Trains personal FSRS parameters on-device from review logs.                                                                                                                                                                                 |
+| Storage   | IndexedDB (Dexie) + `navigator.storage.persist()`            | Offline, handles large media, no server.                                                                                                                                                                                                    |
+| Sync      | **Not in v1.** File backup/restore first, then optional sync | Sync is the hardest and riskiest part, so ship the core first.                                                                                                                                                                              |
+
+### Open questions
+
+- [x] Name: Nenrin (年輪). Still check trademarks, domains, and app stores before launch
+- [ ] Should a sync option (Phase 4) target iCloud via Tauri, WebDAV, or a CRDT approach (Automerge/Yjs) over a user-supplied relay?
+- [ ] Do we want an iOS App Store presence (Tauri mobile or Capacitor), or is a PWA enough?
+
+## Roadmap
+
+### Phase 0: Foundation (week 1)
+
+- [x] Scaffold Vite + Svelte + TS, ESLint/Prettier, Vitest, Playwright
+- [x] `vite-plugin-pwa`: manifest, icons, offline caching
+- [x] GitHub Actions: lint + test on PR; deploy `main` to GitHub Pages
+- [x] Dexie schema v1 (see AGENTS.md data model)
+- [x] Add CONTRIBUTING, CODE_OF_CONDUCT, and issue templates
+- [x] Logo and brand guide (`docs/brand/`), screenshots script, branded empty state
+- [x] Scheduler wrapper (`src/lib/scheduler`) and `recordReview` transaction, with unit tests
+- [x] E2E tests: sample deck persists; app loads offline after first visit
+
+### Phase 1: MVP study loop (weeks 2–3)
+
+- [ ] Create, rename, and delete decks and sub-decks
+- [ ] Note types: Basic, Basic + Reverse, Cloze
+- [ ] Card editor with Markdown, KaTeX, and image paste
+- [ ] Review screen: flip, rate 1–4, undo, keyboard shortcuts, interval preview on buttons
+- [ ] FSRS scheduling via `ts-fsrs`; per-deck desired retention and daily new/review limits
+- [ ] Learning steps, day rollover hour, bury siblings
+- [ ] JSON backup export/import
+- [ ] Dark mode and responsive layout
+
+**Exit criteria:** you can study a hand-made deck daily on a phone, offline, for a week without data loss.
+
+### Phase 2: Anki migration (weeks 4–5)
+
+- [ ] `.apkg` / `.colpkg` import in a worker: legacy `collection.anki2`, `collection.anki21`, and zstd-compressed `collection.anki21b`
+- [ ] Map Anki note types, fields, templates (`{{Field}}`, `{{cloze:Text}}`, `{{FrontSide}}`), CSS, tags, and sub-decks
+- [ ] Import media, with sanitized HTML rendering
+- [ ] Import review history (`revlog`) and convert card state to FSRS memory state
+- [ ] CSV/TSV import with field mapping
+- [ ] Re-import with GUID-based dedupe and updates
+- [ ] Fixture tests built from small, self-made decks
+
+**Exit criteria:** popular shared decks (e.g., large language decks with audio) import and render correctly.
+
+### Phase 3: Polish and insights (weeks 6–7)
+
+- [ ] Browser: search (`tag:`, `deck:`, `is:due`, free text), bulk edit, suspend, move
+- [ ] Stats: heatmap, true retention, review forecast, card counts
+- [ ] FSRS parameter optimization from your own review log (`fsrs-browser`)
+- [ ] Study reminders (Web Push / notifications where supported)
+- [ ] Audio playback, TTS fallback via the Web Speech API
+- [ ] Onboarding with sample decks; first-run "Import from Anki" flow
+- [ ] Lighthouse PWA/a11y score ≥ 95
+
+**🚀 v1.0 release:** public on GitHub Pages and announced.
+
+### Phase 4: Desktop and sync (post-v1)
+
+- [ ] Tauri 2 macOS app: native menus, file associations for `.apkg`, signed and notarized DMG
+- [ ] Optional sync (design doc first): candidates are a file-based sync folder (iCloud Drive/Dropbox) via Tauri, WebDAV, or a CRDT log
+- [ ] `.apkg` export for round-tripping back to Anki
+
+### Phase 5: Maybe later
+
+- [ ] Opt-in AI card generation from text/PDF using the user's own API key (no Nenrin servers)
+- [ ] Image occlusion
+- [ ] Type-in-the-answer cards
+- [ ] Localization
+- [ ] iOS/Android store builds (Tauri mobile or Capacitor)
+
+## Risks
+
+| Risk                           | Mitigation                                                                                                                                           |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| iOS evicts PWA storage         | Request persistent storage, nag for regular backups, and suggest installing to the Home Screen (installed PWAs aren't subject to the 7-day eviction) |
+| Anki format variations         | Build a fixture corpus; fail gracefully with a per-note error report                                                                                 |
+| XSS from imported decks        | Use DOMPurify, isolate card rendering in a sandboxed iframe, and set a strict CSP                                                                    |
+| Copyleft contamination         | Keep the license rules in AGENTS.md; implement independently from format docs                                                                        |
+| Scope creep (AI, sync, social) | Hold to the non-goals list; Phase 4+ only after v1                                                                                                   |
+
+## Decision log
+
+- **2026-10-25:** Phase 0 shipped. The offline e2e test caught a real bug: globbing `manifest.webmanifest` duplicated a precache entry, and Workbox silently cached nothing. Playwright's `setOffline` bypasses service workers in Chromium, so the test stops a real server instead.
+- **2026-10-25:** Named the project Nenrin (年輪, "tree rings"). "Memora" was taken by the-memora.com and similar sites. Alternatives that had no flashcard-app hits: Hanpuku (反復), Fukushū (復習), Kurikaeshi (繰り返し).
+- **2026-10-25:** Chose PWA-first on GitHub Pages, Svelte + ts-fsrs + Dexie, MIT. Deferred macOS (Tauri) and sync until after v1.
