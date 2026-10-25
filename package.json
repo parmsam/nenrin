@@ -19,7 +19,8 @@
     "lint": "eslint . && prettier --check .",
     "format": "prettier --write .",
     "brand": "node scripts/generate-brand.mjs",
-    "screenshots": "vite build && node scripts/screenshots.mjs"
+    "screenshots": "vite build && node scripts/screenshots.mjs",
+    "check:decks": "node scripts/check-decks.mjs"
   },
   "dependencies": {
     "dexie": "^4.4.7",

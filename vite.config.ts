@@ -67,6 +67,9 @@ export default defineConfig({
       },
     }),
   ],
+  // Pre-bundle up front so the dev server doesn't reload mid-session when the import
+  // worker first pulls these in.
+  optimizeDeps: { include: ['sql.js', 'fflate', 'fzstd'] },
   // ES module workers, so the Anki import worker can share code chunks with the app.
   worker: { format: 'es' },
   test: {

@@ -16,6 +16,7 @@ npm test             # Vitest unit tests
 npm run test:e2e     # Playwright (review flow, import, offline)
 npm run lint         # ESLint + Prettier check
 npm run check        # svelte-check (types)
+npm run check:decks -- ref/decks   # import + render real Anki decks in Chromium (decks not committed)
 npm run brand        # regenerate logo SVGs from scripts/generate-brand.mjs
 npm run screenshots  # regenerate public/screenshots/ (do this after UI changes)
 ```
@@ -56,6 +57,7 @@ ref/             # GITIGNORED local research: competitor notes + page snapshots
 6. **Heavy work off the main thread.** Imports, optimization, and search indexing run in Web Workers.
 7. **Times.** Store UTC epoch milliseconds. Compute the "day" boundary from the user's configurable rollover hour (default 4 AM local, matching Anki).
 8. **Accessibility.** Every review action has a keyboard shortcut (Space/Enter to flip, 1–4 to rate, Z to undo). Use semantic HTML, visible focus, and work with `prefers-reduced-motion` and dark mode.
+   - Testing gotcha: jsdom/happy-dom leak memory on large card HTML. Judge performance and memory with `npm run check:decks` (real Chromium), not unit tests.
    - Svelte gotcha: never hand deep `$state` objects to IndexedDB (Proxies can't be cloned). Use `$state.raw` or `$state.snapshot()`.
 9. **Small diffs.** One concern per PR. Don't reformat unrelated code. Add or adjust tests for any behavior change.
 10. **Keep docs in sync.** When you finish a milestone item, tick it in `PLAN.md`. If you change a feature's status, update the Nenrin row in `COMPARISON.md`.
