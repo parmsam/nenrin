@@ -181,6 +181,11 @@ Math is already covered by KaTeX (`$…$`, `$$…$$`, and Anki's `\(…\)` / `\[
 - [x] Opt-in rewards, built around the tree rather than ratings (see [docs/gamification.md](docs/gamification.md)): session marks 木 → 林 → 森 (with an optional synthesized wood-block clack), a stamp book (御朱印帳) of finished days on Stats, milestones derived from the review log, and seasons for the home tree
 - [ ] More rewards, after real use of the first ones: a forest of decks, woods to unlock, a yearly 年輪 review image, rest days
 - [ ] iOS/Android store builds (Tauri mobile or Capacitor)
+- [ ] **Game controllers and remotes** for studying hands-free (on a couch, a treadmill, or with a TV):
+  - Game controllers through the browser's Gamepad API (works offline, no permissions): A shows the answer and then rates Good, B Again, X Hard, Y Easy, a bumper undoes, the d-pad scrolls long cards. Default to the face-button layout people expect, with the button names shown in the shortcuts dialog, and a short rumble on Again where supported
+  - Bluetooth page turners and presentation clickers, which send keys: map Page Down / Right / Enter to show-then-Good and Page Up / Left to Again, and media keys (play/pause, next) where the browser passes them through
+  - A small mapping screen in Settings to reassign buttons and keys, saved per device, and listed in the shortcuts dialog and `docs/guide/keyboard.md`
+  - Later, maybe: a phone as a remote for a desktop or TV session. That needs the two devices to talk (WebRTC with a QR code to pair, no server if possible), so it waits for the sync design
 
 ## Risks
 
