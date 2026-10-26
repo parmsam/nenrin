@@ -134,7 +134,7 @@ From the Anki manual ([importing](https://docs.ankiweb.net/manual/importing/intr
 - [ ] Onboarding with sample decks; first-run "Import from Anki" flow
 - [x] **Welcome splash** on launch: logo, 年輪 with furigana, the tagline, and today's due count, then straight into the app. Toggle it off in Settings → Appearance ("Show welcome screen"). Respect `prefers-reduced-motion`, and never show it on top of a deep link (e.g. `#/study/…`).
 - [x] Lazy-load KaTeX: math is a placeholder until a card needs it (main page JS 570 KB → 375 KB)
-- [ ] Lighthouse PWA/a11y score ≥ 95
+- [x] Lighthouse (mobile, 2026-10-25), all pages: Performance 98–100, Accessibility 100, Best Practices 100, SEO 100. Secondary screens are code-split (main JS 225 → 138 KB), the footer no longer causes layout shift, and robots.txt was added
 
 #### Rich content: diagrams and Typst
 

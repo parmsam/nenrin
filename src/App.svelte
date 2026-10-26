@@ -3,14 +3,19 @@
   import { db } from './lib/db';
   import { ensureBuiltins } from './lib/notes';
   import { match, navigate, router } from './lib/router.svelte';
-  import Browse from './routes/Browse.svelte';
   import DeckView from './routes/DeckView.svelte';
-  import Editor from './routes/Editor.svelte';
   import Home from './routes/Home.svelte';
-  import Import from './routes/Import.svelte';
   import Review from './routes/Review.svelte';
-  import Settings from './routes/Settings.svelte';
-  import Stats from './routes/Stats.svelte';
+
+  // Everyday screens ship in the main bundle; the rest load on first visit (and are
+  // precached by the service worker, so they still open offline).
+  const lazy = {
+    editor: () => import('./routes/Editor.svelte'),
+    stats: () => import('./routes/Stats.svelte'),
+    browse: () => import('./routes/Browse.svelte'),
+    import: () => import('./routes/Import.svelte'),
+    settings: () => import('./routes/Settings.svelte'),
+  };
   import CommandPalette from './components/CommandPalette.svelte';
   import ConfirmDialog from './components/ConfirmDialog.svelte';
   import { paletteState } from './lib/palette.svelte';
@@ -131,18 +136,16 @@
     {#key route.id}<DeckView id={route.id} />{/key}
   {:else if route.name === 'study'}
     {#key route.id}<Review deckId={route.id} />{/key}
-  {:else if route.name === 'edit'}
-    {#key route.id}<Editor noteId={route.id} />{/key}
-  {:else if route.name === 'add'}
-    <Editor />
-  {:else if route.name === 'stats'}
-    <Stats />
-  {:else if route.name === 'browse'}
-    <Browse />
-  {:else if route.name === 'import'}
-    <Import />
-  {:else if route.name === 'settings'}
-    <Settings />
+  {:else if route.name === 'edit' || route.name === 'add'}
+    {#await lazy.editor() then m}
+      {#key route.name === 'edit' ? route.id : 'add'}
+        <m.default noteId={route.name === 'edit' ? route.id : undefined} />
+      {/key}
+    {/await}
+  {:else if route.name === 'stats' || route.name === 'browse' || route.name === 'import' || route.name === 'settings'}
+    {#await lazy[route.name]() then m}<m.default />{:catch}
+      <p class="error">Couldn’t load this screen. Check your connection and reload.</p>
+    {/await}
   {:else}
     <Home />
   {/if}
@@ -155,7 +158,8 @@
 <UpdatePrompt />
 <svelte:window onkeydown={onKey} />
 
-{#if route.name !== 'study'}
+<!-- Rendered once the app is ready, so it doesn't jump down as content loads (CLS). -->
+{#if ready && route.name !== 'study'}
   <footer class="muted">
     Nenrin v{__APP_VERSION__} (pre-alpha) · Local-first · works offline ·
     <a href="https://github.com/parmsam/nenrin">Source (MIT)</a>
