@@ -16,18 +16,50 @@ import { renderTemplate } from './template';
 
 export { clozeNumbers, isEmptyFront, renderTemplate, stripHtml } from './template';
 
-// $$…$$, \[…\], $…$ (no space just inside), \(…\). Same delimiters Anki and Markdown editors use.
+// Anki's older [$$]…[/$$], [latex]…[/latex] and [$]…[/$] (it renders them as images; we use
+// KaTeX), then $$…$$, \[…\], $…$ (no space just inside), \(…\): the delimiters Anki and
+// Markdown editors use. The bracket forms come first, as `[$]` itself contains a `$`.
 const MATH_RE =
-  /\$\$([\s\S]+?)\$\$|\\\[([\s\S]+?)\\\]|\$(?!\s)((?:\\\$|[^$\n])+?)(?<!\s)\$|\\\(([\s\S]+?)\\\)/g;
+  /\[\$\$\]([\s\S]+?)\[\/\$\$\]|\[latex\]([\s\S]+?)\[\/latex\]|\[\$\]([\s\S]+?)\[\/\$\]|\$\$([\s\S]+?)\$\$|\\\[([\s\S]+?)\\\]|\$(?!\s)((?:\\\$|[^$\n])+?)(?<!\s)\$|\\\(([\s\S]+?)\\\)/g;
+
+/** Which MATH_RE groups are display math: [$$], [latex], $$ and \[. */
+const DISPLAY_GROUPS = [true, true, false, true, true, false, false];
+
+const ENTITIES: Record<string, string> = {
+  amp: '&',
+  lt: '<',
+  gt: '>',
+  quot: '"',
+  apos: "'",
+  nbsp: ' ',
+};
+
+/** TeX from an HTML field: line breaks and tags out, entities decoded, as Anki's editor stores it. */
+function texFromHtml(html: string): string {
+  return html
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<[^>]*>/g, '')
+    .replace(/&(#x?[0-9a-f]+|\w+);/gi, (whole, name: string) => {
+      if (name[0] !== '#') return ENTITIES[name.toLowerCase()] ?? whole;
+      const code = /^#x/i.test(name) ? parseInt(name.slice(2), 16) : Number(name.slice(1));
+      return Number.isFinite(code) ? String.fromCodePoint(code) : whole;
+    });
+}
+
+/** The TeX and display flag of a MATH_RE match. */
+function mathMatch(groups: (string | undefined)[], format: Note['format']) {
+  const i = groups.findIndex((g) => g !== undefined);
+  const tex = groups[i] ?? '';
+  return { display: DISPLAY_GROUPS[i], tex: format === 'html' ? texFromHtml(tex) : tex };
+}
 
 const escapeText = (s: string) =>
   s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-function renderMath(src: string): { text: string; math: string[] } {
+function renderMath(src: string, format: Note['format']): { text: string; math: string[] } {
   const math: string[] = [];
-  const text = src.replace(MATH_RE, (_, block1, block2, inline1, inline2) => {
-    const display = block1 !== undefined || block2 !== undefined;
-    const tex = block1 ?? block2 ?? inline1 ?? inline2;
+  const text = src.replace(MATH_RE, (_, ...groups: (string | undefined)[]) => {
+    const { display, tex } = mathMatch(groups.slice(0, DISPLAY_GROUPS.length), format);
     math.push(`<span class="nenrin-math" data-display="${display}">${escapeText(tex)}</span>`);
     return `@@MATH${math.length - 1}@@`;
   });
@@ -62,7 +94,7 @@ function renderSounds(html: string): string {
 export function fieldToHtml(value: string, format: Note['format'] = 'markdown'): string {
   const { text: rest, diagrams } =
     format === 'html' ? { text: value, diagrams: [] } : extractDiagrams(value);
-  const { text, math } = renderMath(rest);
+  const { text, math } = renderMath(rest, format);
   const html =
     format === 'html' ? text : (marked.parse(text, { async: false, breaks: true }) as string);
   return renderSounds(
@@ -155,10 +187,10 @@ export function resolveMedia(html: string, urls: Map<string, string>): string {
 export function fieldToAnkiHtml(value: string, format: Note['format'] = 'markdown'): string {
   if (format === 'html') return value;
   const math: string[] = [];
-  const text = value.replace(MATH_RE, (_, block1, block2, inline1, inline2) => {
-    const display = block1 !== undefined || block2 !== undefined;
-    const tex = escapeText(block1 ?? block2 ?? inline1 ?? inline2);
-    math.push(display ? `\\[${tex}\\]` : `\\(${tex}\\)`);
+  const text = value.replace(MATH_RE, (_, ...groups: (string | undefined)[]) => {
+    const match = mathMatch(groups.slice(0, DISPLAY_GROUPS.length), format);
+    const tex = escapeText(match.tex);
+    math.push(match.display ? `\\[${tex}\\]` : `\\(${tex}\\)`);
     return `@@MATH${math.length - 1}@@`;
   });
   const html = (marked.parse(text, { async: false, breaks: true }) as string).trim();

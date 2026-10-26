@@ -2,6 +2,11 @@
 
 Nenrin follows [semantic versioning](https://semver.org/). Until 1.0, each roadmap phase in [PLAN.md](PLAN.md) bumps the minor version.
 
+## Unreleased
+
+- **Math from older Anki decks**: `[$]…[/$]`, `[$$]…[/$$]` and `[latex]…[/latex]` now render as math instead of showing as text. Math in imported cards that contains `<`, `&` or line breaks now renders correctly too.
+- **Fixed:** a formula could show garbled, with its digits repeated around it (√108a⁶ as "108a6 √108a⁶ 108a6"), when a card or the editor preview redrew while math was still loading.
+
 ## 0.8.0 (2026-10-26): Note types, rewards
 
 - **Fixed:** two settings changed at the same moment could overwrite each other, so one change was lost.

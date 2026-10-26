@@ -44,7 +44,7 @@ On the answer side, the mask you guessed turns into a dashed outline so you can 
 
 Fields use [Markdown](https://commonmark.org/help/): `**bold**`, `*italic*`, lists, `` `code` ``, tables and links.
 
-- **Math:** `$E = mc^2$` inline, or `$$…$$` on its own line, written in LaTeX. Anki's `\(…\)` and `\[…\]` work too.
+- **Math:** `$E = mc^2$` inline, or `$$…$$` on its own line, written in LaTeX. Anki's `\(…\)` and `\[…\]` work too, and so do its older `[$]…[/$]`, `[$$]…[/$$]` and `[latex]…[/latex]`, common in imported decks.
 - **Diagrams:** a [Mermaid](https://mermaid.js.org/intro/syntax-reference.html) code block draws a diagram that follows your theme:
 
   ````markdown

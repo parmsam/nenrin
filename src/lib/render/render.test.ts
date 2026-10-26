@@ -160,6 +160,33 @@ describe('Anki template features', () => {
 });
 
 describe('diagrams', () => {
+  it('reads Anki’s [$]…[/$], [$$]…[/$$] and [latex]…[/latex] math', () => {
+    const html = fieldToHtml(
+      '<div>Remove all perfect squares. Assume the answer is positive.</div><div>[$]\\sqrt{108a^6}[/$]</div>',
+      'html',
+    );
+    expect(html).toBe(
+      '<div>Remove all perfect squares. Assume the answer is positive.</div><div><span class="nenrin-math" data-display="false">\\sqrt{108a^6}</span></div>',
+    );
+    const back = fieldToHtml(
+      '<div>[$]108 = 2 x 2 x 3 x 3 x 3[/$]</div><div>[$]a^6 = (a^3)^2[/$]</div><div>[$]6a^3 \\sqrt{3}[/$]</div>',
+      'html',
+    );
+    expect(back.match(/class="nenrin-math"/g)).toHaveLength(3);
+    expect(back).toContain('data-display="false">6a^3 \\sqrt{3}</span>');
+    expect(fieldToHtml('[$$]x^2[/$$] and [latex]\\int f[/latex]', 'html')).toBe(
+      '<span class="nenrin-math" data-display="true">x^2</span> and <span class="nenrin-math" data-display="true">\\int f</span>',
+    );
+  });
+
+  it('decodes HTML inside math from HTML fields, so KaTeX sees plain TeX', () => {
+    // Anki stores "a < b" as "a &lt; b", with <br> for line breaks.
+    expect(fieldToHtml('[$]a &lt; b &amp;&amp; c[/$]', 'html')).toBe(
+      '<span class="nenrin-math" data-display="false">a &lt; b &amp;&amp; c</span>',
+    );
+    expect(fieldToHtml('\\[a \\\\<br>b\\]', 'html')).toContain('>a \\\\\nb</span>');
+  });
+
   it('turns a ```mermaid fence into a placeholder, untouched by Markdown or math', () => {
     const html = fieldToHtml(
       'Before\n\n```mermaid\nflowchart LR\n  A[$5] --> B["**b**"]\n```\n\nAfter',
