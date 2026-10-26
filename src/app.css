@@ -44,9 +44,9 @@
   --accent: var(--accent-l);
   --accent-text: #ffffff;
   --accent-soft: var(--accent-soft-l);
-  --hero: #2b2520;
-  --hero-text: #f4e2c2;
-  --hero-accent: var(--accent-d);
+  --hero: #ecd3a8;
+  --hero-text: #2b2520;
+  --hero-accent: var(--accent-l);
   --shadow: 0 1px 2px rgb(43 37 32 / 6%), 0 8px 24px rgb(43 37 32 / 6%);
   --again: #b8322a;
   /* Image occlusion masks: opaque, so they hide what's under them. */
@@ -56,9 +56,9 @@
   --stamp: #c2371f;
   --stamp-text: #fff;
   --season-spring: #c95f80;
-  --season-summer: #8cc277;
-  --season-autumn: #e8773f;
-  --season-winter: #f4f8fb;
+  --season-summer: #4f8a3e;
+  --season-autumn: #b8441c;
+  --season-winter: #6f93b3;
   --hard: #8a6a2f;
   --good: #2f7a4a;
   --easy: #2c6a9a;
