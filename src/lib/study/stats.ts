@@ -13,7 +13,12 @@ export interface TodaySummary {
   /** Consecutive study days ending today (or yesterday, if today isn't studied yet). */
   streak: number;
   studiedToday: boolean;
+  /** Reviews per study day before today, oldest first, for the last GROWTH_DAYS days (the rings). */
+  growth: number[];
 }
+
+/** How far back the home screen's growth rings look. */
+export const GROWTH_DAYS = 60;
 
 /** Counts consecutive days with reviews, given each review's day start. */
 export function streakFrom(days: Set<number>, today: number): number {
@@ -40,11 +45,24 @@ export async function todaySummary(db: NenrinDB, now = Date.now()): Promise<Toda
     .where('ts')
     .aboveOrEqual(now - 400 * DAY)
     .toArray();
-  const days = new Set(logs.map((l) => dayStart(l.ts, rolloverHour)));
+  const perDay = new Map<number, number>();
+  for (const l of logs) {
+    const d = dayStart(l.ts, rolloverHour);
+    perDay.set(d, (perDay.get(d) ?? 0) + 1);
+  }
+  const days = new Set(perDay.keys());
+  // Day starts going back from yesterday, by calendar (DST-safe), then oldest first.
+  const growth: number[] = [];
+  const d = new Date(today);
+  for (let i = 0; i < GROWTH_DAYS; i++) {
+    d.setDate(d.getDate() - 1);
+    growth.unshift(perDay.get(d.getTime()) ?? 0);
+  }
   return {
-    reviewedToday: logs.filter((l) => l.ts >= today).length,
+    reviewedToday: perDay.get(today) ?? 0,
     streak: streakFrom(days, today),
     studiedToday: days.has(today),
+    growth,
   };
 }
 

@@ -4,6 +4,7 @@ Nenrin follows [semantic versioning](https://semver.org/). Until 1.0, each roadm
 
 ## Unreleased
 
+- **Your tree** (年輪): the home screen's progress ring is now a tree cross-section of your studying. Each ring is a day you studied in recent weeks, wider on days with more reviews; today's ring closes around the outside as you finish today's cards. Rings grow out from the center when you open the app (not with reduced motion).
 - **Help button** in the header (a ? in a circle) opens the user guide. Hide it in Settings → Appearance if you don't need it. On the smallest phones the version badge makes room for it.
 
 ## 0.5.0 (2026-10-25): Custom study, rich cards, CrowdAnki, reminders

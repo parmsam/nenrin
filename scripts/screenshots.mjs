@@ -16,6 +16,44 @@ const addSample = async (page) => {
   await page.getByRole('button', { name: 'Add a sample deck' }).click();
   await page.getByRole('link', { name: /Japanese: Nature/ }).waitFor();
 };
+// A few weeks of demo review history, so the home screen's tree has rings to show.
+const DEMO_DAYS = [12, 30, 0, 45, 8, 60, 22, 0, 35, 90, 15, 40, 5, 70, 28, 0, 50, 33, 18, 64, 12];
+const withHistory = async (page) => {
+  await addSample(page);
+  await page.evaluate(
+    (days) =>
+      new Promise((resolve) => {
+        const open = indexedDB.open('nenrin');
+        open.onsuccess = () => {
+          const tx = open.result.transaction('reviewLogs', 'readwrite');
+          const store = tx.objectStore('reviewLogs');
+          const now = Date.now();
+          days.forEach((n, k) => {
+            for (let j = 0; j < n; j++) {
+              store.add({
+                id: `demo-${k}-${j}`,
+                cardId: 'demo',
+                ts: now - (days.length - k) * 86_400_000 + j * 1000,
+                rating: 3,
+                state: 2,
+                elapsedDays: 1,
+                scheduledDays: 1,
+                stability: 1,
+                difficulty: 5,
+                durationMs: 4000,
+              });
+            }
+          });
+          tx.oncomplete = resolve;
+        };
+      }),
+    DEMO_DAYS,
+  );
+  // Reload so the home screen reads the history, and let the rings finish growing.
+  await page.reload();
+  await page.getByRole('link', { name: /Japanese: Nature/ }).waitFor();
+  await page.waitForTimeout(1800);
+};
 const openDeck = async (page) => {
   await addSample(page);
   await page.getByRole('link', { name: /Japanese: Nature/ }).click();
@@ -39,15 +77,15 @@ const addCloze = async (page) => {
 
 const shots = [
   { name: 'mobile-empty-light', ...phone, scheme: 'light', setup: async () => {} },
-  { name: 'mobile-decks-light', ...phone, scheme: 'light', setup: addSample },
-  { name: 'mobile-decks-dark', ...phone, scheme: 'dark', setup: addSample },
+  { name: 'mobile-decks-light', ...phone, scheme: 'light', setup: withHistory },
+  { name: 'mobile-decks-dark', ...phone, scheme: 'dark', setup: withHistory },
   { name: 'mobile-review-light', ...phone, scheme: 'light', setup: reviewAnswer },
   { name: 'mobile-review-dark', ...phone, scheme: 'dark', setup: reviewAnswer },
   { name: 'mobile-deck-light', ...phone, scheme: 'light', setup: openDeck },
   { name: 'mobile-deck-dark', ...phone, scheme: 'dark', setup: openDeck },
   { name: 'mobile-add-light', ...phone, scheme: 'light', setup: addCloze },
   { name: 'mobile-add-dark', ...phone, scheme: 'dark', setup: addCloze },
-  { name: 'desktop-decks-light', ...desktop, scheme: 'light', setup: addSample },
+  { name: 'desktop-decks-light', ...desktop, scheme: 'light', setup: withHistory },
   { name: 'desktop-review-light', ...desktop, scheme: 'light', setup: reviewAnswer },
 ];
 

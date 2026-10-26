@@ -26,7 +26,7 @@
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="public/screenshots/readme-dark.png">
-    <img src="public/screenshots/readme-light.png" width="860" alt="Nenrin on a phone: the home screen with today’s progress ring and decks; reviewing a card with Again, Hard, Good and Easy and their next intervals; adding a cloze card with Markdown; and a deck with Study now, Preview and Custom study">
+    <img src="public/screenshots/readme-light.png" width="860" alt="Nenrin on a phone: the home screen with your tree rings (one per study day) and decks; reviewing a card with Again, Hard, Good and Easy and their next intervals; adding a cloze card with Markdown; and a deck with Study now, Preview and Custom study">
   </picture>
 </p>
 

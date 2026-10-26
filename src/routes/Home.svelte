@@ -2,7 +2,7 @@
   import { liveQuery } from 'dexie';
   import Counts from '../components/Counts.svelte';
   import SwipeRow from '../components/SwipeRow.svelte';
-  import TodayRing from '../components/TodayRing.svelte';
+  import GrowthRings from '../components/GrowthRings.svelte';
   import { confirmAction } from '../lib/confirm.svelte';
   import { db } from '../lib/db';
   import { createDeck, deckSubtreeIds, deckTree, deleteDeck, type DeckNode } from '../lib/db/decks';
@@ -179,7 +179,11 @@
   </section>
 {:else}
   <section class="today" aria-label="Today">
-    <TodayRing done={$today?.reviewedToday ?? 0} remaining={totalDue} />
+    <GrowthRings
+      done={$today?.reviewedToday ?? 0}
+      remaining={totalDue}
+      growth={$today?.growth ?? []}
+    />
     <div class="today-text">
       <p class="eyebrow">{greeting}</p>
       <h2>
