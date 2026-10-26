@@ -178,6 +178,7 @@ Math is already covered by KaTeX (`$…$`, `$$…$$`, and Anki's `\(…\)` / `\[
 - [ ] Image occlusion: an editor that masks parts of an image (one card per mask; hide one or all), and rendering for Anki's image occlusion notes on import
 - [ ] Note type editor: add, rename and reorder fields, edit card templates and CSS with a live preview, and clone a built-in or imported type
 - [ ] Localization
+- [ ] Opt-in rewards, built around the tree rather than ratings (see [docs/gamification.md](docs/gamification.md)): session marks 木 → 林 → 森, a stamp book (御朱印帳) of finished days, milestones, seasons for the tree, a forest of decks, woods to unlock, a yearly 年輪 review image, rest days
 - [ ] iOS/Android store builds (Tauri mobile or Capacitor)
 
 ## Risks
