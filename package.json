@@ -1,7 +1,7 @@
 {
   "name": "nenrin",
   "private": true,
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Local-first, open-source flashcard app with FSRS spaced repetition. An MIT alternative to Anki.",
   "license": "MIT",
   "type": "module",
