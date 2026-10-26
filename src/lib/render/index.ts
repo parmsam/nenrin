@@ -1,9 +1,11 @@
 /**
- * Turns a note into card HTML: per-field Markdown + KaTeX, then the note type's template,
- * then DOMPurify. Imported Anki content is untrusted; everything goes through sanitize().
+ * Turns a note into card HTML: per-field Markdown, then the note type's template, then
+ * DOMPurify. Imported Anki content is untrusted; everything goes through sanitize().
+ *
+ * Math becomes `<span class="nenrin-math">TeX</span>` placeholders; CardView renders them with
+ * KaTeX, which is loaded only when a card has math (see ./math.ts). Keeps the main bundle small.
  */
 import DOMPurify from 'dompurify';
-import katex from 'katex';
 import { marked } from 'marked';
 import type { Note, NoteType } from '../db/types';
 import { renderTemplate } from './template';
@@ -14,12 +16,15 @@ export { clozeNumbers, isEmptyFront, renderTemplate, stripHtml } from './templat
 const MATH_RE =
   /\$\$([\s\S]+?)\$\$|\\\[([\s\S]+?)\\\]|\$(?!\s)((?:\\\$|[^$\n])+?)(?<!\s)\$|\\\(([\s\S]+?)\\\)/g;
 
+const escapeText = (s: string) =>
+  s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
 function renderMath(src: string): { text: string; math: string[] } {
   const math: string[] = [];
   const text = src.replace(MATH_RE, (_, block1, block2, inline1, inline2) => {
     const display = block1 !== undefined || block2 !== undefined;
     const tex = block1 ?? block2 ?? inline1 ?? inline2;
-    math.push(katex.renderToString(tex, { displayMode: display, throwOnError: false }));
+    math.push(`<span class="nenrin-math" data-display="${display}">${escapeText(tex)}</span>`);
     return `@@MATH${math.length - 1}@@`;
   });
   return { text, math };
@@ -105,9 +110,6 @@ export function resolveMedia(html: string, urls: Map<string, string>): string {
   });
 }
 
-const escapeHtml = (s: string) =>
-  s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-
 /**
  * Field source → HTML for Anki: Markdown is rendered, but math stays as TeX in Anki's
  * MathJax delimiters, \(…\) and \[…\], so it keeps rendering after export.
@@ -117,7 +119,7 @@ export function fieldToAnkiHtml(value: string, format: Note['format'] = 'markdow
   const math: string[] = [];
   const text = value.replace(MATH_RE, (_, block1, block2, inline1, inline2) => {
     const display = block1 !== undefined || block2 !== undefined;
-    const tex = escapeHtml(block1 ?? block2 ?? inline1 ?? inline2);
+    const tex = escapeText(block1 ?? block2 ?? inline1 ?? inline2);
     math.push(display ? `\\[${tex}\\]` : `\\(${tex}\\)`);
     return `@@MATH${math.length - 1}@@`;
   });

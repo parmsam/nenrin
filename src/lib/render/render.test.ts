@@ -46,8 +46,14 @@ describe('rendering', () => {
   it('renders Markdown and math in fields', () => {
     const html = fieldToHtml('**bold** and $x^2$');
     expect(html).toContain('<strong>bold</strong>');
-    expect(html).toContain('class="katex"');
-    expect(fieldToHtml('costs $5 and $6')).not.toContain('katex');
+    // Math is a placeholder that CardView typesets with KaTeX, loaded on demand.
+    expect(html).toContain('<span class="nenrin-math" data-display="false">x^2</span>');
+    expect(fieldToHtml('$$\\sum_i a_i$$')).toContain('data-display="true"');
+    expect(fieldToHtml('costs $5 and $6')).not.toContain('nenrin-math');
+    // TeX is escaped as text, and the placeholder survives sanitizing.
+    expect(sanitize(fieldToHtml('$a<b$'))).toContain(
+      '<span class="nenrin-math" data-display="false">a&lt;b</span>',
+    );
   });
 
   it('leaves HTML fields as HTML', () => {

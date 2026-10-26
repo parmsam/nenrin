@@ -110,3 +110,22 @@ test('keyboard shortcuts dialog opens with ? and closes with Esc', async ({ page
   await expect(dialog).toBeHidden();
   await expect(page.getByRole('button', { name: /Show answer/ })).toBeVisible();
 });
+
+test('math renders with KaTeX, loaded only when a card has math', async ({ page }) => {
+  const katexRequests: string[] = [];
+  page.on('request', (r) => {
+    if (/katex/i.test(r.url())) katexRequests.push(r.url());
+  });
+  await page.goto('./');
+  await page.getByLabel('Deck name').fill('Math');
+  await page.getByRole('button', { name: 'Create' }).click();
+  await page.getByRole('link', { name: '+ Add cards' }).click();
+  expect(katexRequests).toEqual([]);
+
+  await page.getByLabel('Front').fill('Area of a circle: $\\pi r^2$');
+  await page.getByLabel('Back').fill('$$\\int_0^1 x\\,dx = \\tfrac12$$');
+  await expect(page.locator('.preview .katex')).toBeVisible();
+  expect(katexRequests.length).toBeGreaterThan(0);
+  await page.getByRole('tab', { name: 'Back' }).click();
+  await expect(page.locator('.preview .katex-display')).toBeVisible();
+});

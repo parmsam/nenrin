@@ -4,6 +4,7 @@ Nenrin follows [semantic versioning](https://semver.org/). Until 1.0, each roadm
 
 ## Unreleased
 
+- **Faster start**: math rendering (KaTeX) now loads only when a card has math, so the app downloads about a third less up front.
 - **Welcome splash** for returning users: the logo, 年輪, and today's due count, for a moment. Tap to skip; off in Settings → Appearance. Not shown over deep links or more than once per session.
 - **Command palette** (<kbd>⌘K</kbd> / <kbd>Ctrl+K</kbd>): fuzzy-search every page, action, theme and deck ("Study …", "Open …"), or search notes for whatever you type. Recent commands come first.
 - **Fixed:** quickly reopening a dialog (palette, shortcuts, confirmation) could make it close by itself.

@@ -4,6 +4,7 @@
   import { mediaUrls } from '../lib/db/media';
   import { mediaRefs, resolveMedia } from '../lib/render';
   import { cssMediaRefs, isStockCss, scopeDeckCss } from '../lib/render/deck-css';
+  import { renderMathIn } from '../lib/render/math';
   import { isDarkMode } from '../lib/theme';
 
   let {
@@ -45,10 +46,10 @@
     ready.then(async (final) => {
       if (cancelled) return;
       resolved = final;
-      if (autoplay) {
-        await tick();
-        if (!cancelled) play();
-      }
+      await tick();
+      if (cancelled) return;
+      if (container) renderMathIn(container);
+      if (autoplay) play();
     });
     return () => {
       cancelled = true;

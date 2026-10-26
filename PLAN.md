@@ -133,7 +133,8 @@ From the Anki manual ([importing](https://docs.ankiweb.net/manual/importing/intr
 - [ ] Import CrowdAnki JSON decks (`deck.json` + `media/`). Popular open decks such as [Ultimate Geography](https://github.com/anki-geo/ultimate-geography) ship this way
 - [ ] Onboarding with sample decks; first-run "Import from Anki" flow
 - [x] **Welcome splash** on launch: logo, 年輪 with furigana, the tagline, and today's due count, then straight into the app. Toggle it off in Settings → Appearance ("Show welcome screen"). Respect `prefers-reduced-motion`, and never show it on top of a deep link (e.g. `#/study/…`).
-- [ ] Lighthouse PWA/a11y score ≥ 95 (lazy-load KaTeX: it is most of the 540 KB bundle)
+- [x] Lazy-load KaTeX: math is a placeholder until a card needs it (main page JS 570 KB → 375 KB)
+- [ ] Lighthouse PWA/a11y score ≥ 95
 
 #### Rich content: diagrams and Typst
 
