@@ -6,7 +6,7 @@
   import { confirmAction } from '../lib/confirm.svelte';
   import { db } from '../lib/db';
   import { createDeck, deckSubtreeIds, deckTree, deleteDeck, type DeckNode } from '../lib/db/decks';
-  import { createSampleDeck } from '../lib/db/sample';
+  import { createSampleDeck, createTourDeck } from '../lib/db/sample';
   import { navigate } from '../lib/router.svelte';
   import { plainKey } from '../lib/shortcuts.svelte';
   import { studyState } from '../lib/study/queue';
@@ -43,6 +43,18 @@
     return h < 5 ? 'Up late' : h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
   });
   let showNewDeck = $state(false);
+
+  /** Adds the tour deck and starts studying it straight away. */
+  async function takeTour() {
+    busy = true;
+    try {
+      const id = await createTourDeck(db);
+      await navigator.storage?.persist?.();
+      navigate(`/study/${id}`);
+    } finally {
+      busy = false;
+    }
+  }
 
   async function addSample() {
     busy = true;
@@ -136,18 +148,33 @@
         >
       </p>
     </details>
-    <div class="row center">
-      <button onclick={addSample} disabled={busy}>Add a sample deck</button>
-      <a class="button secondary" href="#/import">Import a file</a>
+    <div class="paths">
+      <div class="path panel">
+        <h3>Coming from Anki?</h3>
+        <p class="muted">Bring your decks, media and review history (.apkg or .colpkg).</p>
+        <a class="button" href="#/import">Import from Anki</a>
+      </div>
+      <div class="path panel">
+        <h3>New here?</h3>
+        <p class="muted">A short deck that shows you around while you study it.</p>
+        <button onclick={takeTour} disabled={busy}>Take the tour</button>
+        <p class="small">
+          <button class="link" onclick={addSample} disabled={busy}>Add a sample deck</button>
+          <span class="muted">of Japanese words instead</span>
+        </p>
+      </div>
+      <div class="path panel">
+        <h3>Start from scratch</h3>
+        <form class="row nowrap" onsubmit={addDeck}>
+          <input bind:value={newDeckName} placeholder="Deck name" aria-label="Deck name" />
+          <button class="secondary" type="submit">Create</button>
+        </form>
+        <p class="muted small">
+          Or let an LLM write cards for you: <a href="#/help/llm">here’s how</a>.
+        </p>
+      </div>
     </div>
-    <form class="row center new-deck" onsubmit={addDeck}>
-      <input
-        bind:value={newDeckName}
-        placeholder="Or name your first deck"
-        aria-label="Deck name"
-      />
-      <button class="secondary" type="submit">Create</button>
-    </form>
+    <p class="muted small help-link">New to all this? Read the <a href="#/help">user guide</a>.</p>
     {#if error}<p class="error">{error}</p>{/if}
   </section>
 {:else}
@@ -280,16 +307,53 @@
     max-width: none;
     color: var(--muted);
   }
-  .center {
-    justify-content: center;
-  }
   .new-deck {
     margin-top: 1rem;
     flex-wrap: nowrap;
   }
-  .empty .new-deck {
-    max-width: 24rem;
-    margin: 1.25rem auto 0;
+  .paths {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.9rem;
+    margin-top: 1.5rem;
+    text-align: left;
+  }
+  @media (min-width: 36rem) {
+    .paths {
+      grid-template-columns: 1fr 1fr;
+    }
+    /* Two paths side by side, "start from scratch" across the bottom. */
+    .path:last-child {
+      grid-column: 1 / -1;
+    }
+    .path:last-child form {
+      max-width: 24rem;
+    }
+  }
+  .path {
+    display: grid;
+    align-content: start;
+    justify-items: start;
+    gap: 0.6rem;
+  }
+  .path h3 {
+    margin: 0;
+    font-size: 1.05rem;
+  }
+  .path p {
+    margin: 0;
+  }
+  .path form {
+    width: 100%;
+  }
+  .nowrap {
+    flex-wrap: nowrap;
+  }
+  .small {
+    font-size: 0.85rem;
+  }
+  .help-link {
+    margin-top: 1.25rem;
   }
   .today {
     display: flex;

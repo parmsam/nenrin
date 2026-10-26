@@ -77,6 +77,13 @@
         run: go('/settings'),
       },
       {
+        id: 'help',
+        label: 'Help: user guide',
+        group: 'Go to',
+        keywords: 'docs documentation how manual faq guide',
+        run: go('/help'),
+      },
+      {
         id: 'optimize',
         label: 'Optimize scheduling',
         group: 'Go to',

@@ -30,6 +30,7 @@
     settings: once(() => import('./routes/Settings.svelte')),
     custom: once(() => import('./routes/Custom.svelte')),
     session: once(() => import('./routes/Session.svelte')),
+    help: once(() => import('./routes/Help.svelte')),
   };
   import CommandPalette from './components/CommandPalette.svelte';
   import ConfirmDialog from './components/ConfirmDialog.svelte';
@@ -110,6 +111,8 @@
     if (p === '/browse') return { name: 'browse' } as const;
     if (p === '/stats') return { name: 'stats' } as const;
     if (p === '/settings') return { name: 'settings' } as const;
+    if (p === '/help') return { name: 'help', id: '' } as const;
+    if ((m = match('/help/:id', p))) return { name: 'help', id: m.id } as const;
     return { name: 'home' } as const;
   });
 </script>
@@ -182,6 +185,10 @@
     {:catch}
       <p class="error">Couldn’t load this screen. Check your connection and reload.</p>
     {/await}
+  {:else if route.name === 'help'}
+    {#await lazy.help() then m}<m.default slug={route.id} />{:catch}
+      <p class="error">Couldn’t load this screen. Check your connection and reload.</p>
+    {/await}
   {:else if route.name === 'edit' || route.name === 'add'}
     {#await lazy.editor() then m}
       {#key route.name === 'edit' ? route.id : 'add'}
@@ -208,6 +215,7 @@
 {#if ready && route.name !== 'study' && route.name !== 'session'}
   <footer class="muted">
     Nenrin v{__APP_VERSION__} (pre-alpha) · Local-first · works offline ·
+    <a href="#/help">Help</a> ·
     <a href="https://github.com/parmsam/nenrin">Source (MIT)</a>
   </footer>
 {/if}

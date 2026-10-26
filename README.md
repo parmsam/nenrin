@@ -56,14 +56,18 @@ See [COMPARISON.md](COMPARISON.md) for how this stacks up against Anki, RemNote,
 
 ## What works today
 
+New here? Read the **[user guide](docs/guide/README.md)** (also built into the app under Help).
+
 - **Decks and sub-decks**: create, rename, delete, and per-deck settings (new cards per day, reviews per day, desired retention)
 - **Browse and search**: find any note with Anki-style search (`deck:`, `tag:`, `is:due`, `-exclude`, `\"phrases\"` …), then suspend, move, tag or delete in bulk
 - **Card types**: Basic, Basic (and reversed card), and Cloze (`{{c1::answer::hint}}`), with Anki-compatible templates
 - **Paste from an LLM**: switch the editor to _Paste Markdown_ and paste what ChatGPT, Claude and the like give you. One card is split into front and back (at `---`, `Q:`/`A:` labels, a heading, or the first paragraph); a whole set becomes many cards (numbered Q/A pairs, a Markdown table, or cloze paragraphs). Clozes are detected, and a final `Tags:` line adds tags
-- **Rich cards**: Markdown, LaTeX math (`$x^2$`, `$$…$$`) via KaTeX, and pasted images, with a live preview
+- **Rich cards**: Markdown, LaTeX math (`$x^2$`, `$$…$$`) via KaTeX, Mermaid diagrams, and pasted images, with a live preview
+- **Make cards with an LLM**: copy a ready-made prompt (or download it as an Agent Skill for Claude), and paste the reply back as cards
+- **Preview and custom study**: flip through a deck without scheduling, raise today's limits, or study forgotten cards, cards due soon, or a tag
 - **Review**: FSRS-6 scheduling, learning steps, interval previews on each button, sibling burying, and undo
-- **Keyboard-first**: <kbd>Space</kbd> to show the answer or rate Good, <kbd>1</kbd>–<kbd>4</kbd> to rate, <kbd>Z</kbd> to undo, <kbd>E</kbd> to edit, <kbd>Esc</kbd> to leave; press <kbd>?</kbd> for the full list, and <kbd>⌘K</kbd> for the command palette
-- **Import from Anki**: `.apkg` decks and `.colpkg` collections (modern and legacy formats) with images, audio, sub-decks and, optionally, your review history and FSRS memory. Re-importing an updated deck updates notes without touching your progress. Deck styling is applied safely inside each card (with automatic dark mode), and card audio autoplays (<kbd>R</kbd> replays)
+- **Keyboard-first**: <kbd>Space</kbd> to show the answer or rate Good, <kbd>1</kbd>–<kbd>4</kbd> to rate, <kbd>Z</kbd> to undo, Anki's keys to bury and suspend, and <kbd>D</kbd>/<kbd>A</kbd>/<kbd>B</kbd>/<kbd>T</kbd> to get around; press <kbd>?</kbd> for the full list, and <kbd>⌘K</kbd> for the command palette
+- **Import from Anki**: `.apkg` decks, `.colpkg` collections and CrowdAnki decks (modern and legacy formats) with images, audio, sub-decks and, optionally, your review history and FSRS memory. Re-importing an updated deck updates notes without touching your progress. Deck styling is applied safely inside each card (with automatic dark mode), and card audio autoplays (<kbd>R</kbd> replays)
 - **Anki-compatible text import/export**: `.txt` / `.csv` / `.tsv` with Anki's file headers (`#separator`, `#html`, `#deck column`, `#guid column` …), column mapping, and update/skip/duplicate handling. Export as Anki's "Notes in Plain Text"
 - **Stats**: review heatmap, retention, streaks, a 30-day forecast and cards by stage, per deck or overall
 - **Personal scheduling**: optimize FSRS to your own review history with the official optimizer (WASM, on your device)
@@ -88,7 +92,7 @@ After the first visit, it works fully offline.
 | Study         | FSRS-6 scheduling, Again/Hard/Good/Easy, undo, daily limits, desired-retention setting |
 | Cards         | Basic, Basic + reverse, Cloze; Markdown + LaTeX (KaTeX); images and audio              |
 | Organize      | Decks, sub-decks, tags, search, browse/edit                                            |
-| Import/Export | Anki text files (done), `.apkg`/`.colpkg`, full JSON backup (done)                     |
+| Import/Export | Anki text files, `.apkg`/`.colpkg`, CrowdAnki, full JSON backup (all done)             |
 | Insights      | Review heatmap, retention, forecast                                                    |
 | Platform      | Offline PWA, GitHub Pages hosting, macOS app (Tauri)                                   |
 

@@ -269,6 +269,14 @@
   </p>
 </div>
 
+<h3 class="section-title">Help</h3>
+<div class="panel stack">
+  <p>
+    The <a href="#/help">user guide</a> covers getting started, studying, making cards, moving from Anki,
+    keyboard shortcuts and backups. It works offline.
+  </p>
+</div>
+
 <h3 class="section-title">About</h3>
 <div class="panel stack">
   <p>

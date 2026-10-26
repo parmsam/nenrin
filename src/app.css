@@ -194,6 +194,15 @@ a.button {
   text-decoration: none;
 }
 
+/* A button that looks like a link, for secondary actions inside text. */
+button.link {
+  padding: 0;
+  background: none;
+  color: var(--accent);
+  font-weight: inherit;
+  text-decoration: underline;
+}
+
 button:disabled {
   opacity: 0.6;
   cursor: default;

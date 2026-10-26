@@ -43,6 +43,7 @@ public/          # favicon.svg, logo.svg, screenshots/, sw-custom.js (imported i
 optimize.html    # separate cross-origin isolated page for the FSRS optimizer (see PLAN decision log)
 scripts/         # generate-brand.mjs (logo), screenshots.mjs
 docs/brand/      # logo files + palette; see docs/brand/README.md
+docs/guide/      # user guide (Markdown); also bundled as the in-app Help screen (src/lib/help.ts)
 tests/e2e/       # Playwright specs; unit tests sit next to the code as *.test.ts
 fixtures/        # real Anki packages made by fixtures/generate.py (self-written content only)
 ref/             # GITIGNORED local research: competitor notes + page snapshots
@@ -62,7 +63,7 @@ ref/             # GITIGNORED local research: competitor notes + page snapshots
    - Isolation gotcha: only `optimize.html` (and `optimize.worker`) get COOP/COEP, from `public/sw-custom.js` in production and a Vite plugin in dev/preview. Don't isolate the main app: it would break remote images and OAuth popups.
    - Svelte gotcha: never hand deep `$state` objects to IndexedDB (Proxies can't be cloned). Use `$state.raw` or `$state.snapshot()`.
 9. **Small diffs.** One concern per PR. Don't reformat unrelated code. Add or adjust tests for any behavior change.
-10. **Keep docs in sync.** When you finish a milestone item, tick it in `PLAN.md`. If you change a feature's status, update the Nenrin row in `COMPARISON.md`.
+10. **Keep docs in sync.** When you finish a milestone item, tick it in `PLAN.md`. If you change a feature's status, update the Nenrin row in `COMPARISON.md`. If you change something users see or do, update `docs/guide/` (it is also the in-app Help). New shortcuts go in `src/lib/shortcuts.svelte.ts` and `docs/guide/keyboard.md` (a test checks they match).
 
 ## Code style
 

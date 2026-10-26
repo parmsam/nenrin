@@ -530,11 +530,4 @@
     margin: 0.25rem 0 0;
     font-size: 0.85rem;
   }
-  button.link {
-    padding: 0;
-    background: none;
-    color: var(--accent);
-    font-weight: inherit;
-    text-decoration: underline;
-  }
 </style>
