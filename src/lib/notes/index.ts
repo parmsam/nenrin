@@ -5,7 +5,7 @@ import { fieldToHtml } from '../render';
 import { clozeNumbers, isEmptyFront, renderTemplate } from '../render/template';
 import { BUILTIN_NOTE_TYPES } from './builtins';
 
-export { BASIC, BASIC_REVERSED, CLOZE, BUILTIN_NOTE_TYPES } from './builtins';
+export { BASIC, BASIC_REVERSED, BASIC_TYPE, CLOZE, BUILTIN_NOTE_TYPES } from './builtins';
 
 /** Writes the built-in note types. Safe to call on every start. */
 export async function ensureBuiltins(db: NenrinDB): Promise<void> {

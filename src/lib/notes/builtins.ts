@@ -23,6 +23,21 @@ export const BASIC_REVERSED: NoteType = {
   css: '',
 };
 
+export const BASIC_TYPE: NoteType = {
+  id: 'basic-type',
+  name: 'Basic (type in the answer)',
+  kind: 'basic',
+  fields: ['Front', 'Back'],
+  templates: [
+    {
+      name: 'Card 1',
+      front: '{{Front}}\n\n{{type:Back}}',
+      back: `{{Front}}${ANSWER}{{type:Back}}`,
+    },
+  ],
+  css: '',
+};
+
 export const CLOZE: NoteType = {
   id: 'cloze',
   name: 'Cloze',
@@ -38,4 +53,4 @@ export const CLOZE: NoteType = {
   css: '',
 };
 
-export const BUILTIN_NOTE_TYPES: readonly NoteType[] = [BASIC, BASIC_REVERSED, CLOZE];
+export const BUILTIN_NOTE_TYPES: readonly NoteType[] = [BASIC, BASIC_REVERSED, BASIC_TYPE, CLOZE];

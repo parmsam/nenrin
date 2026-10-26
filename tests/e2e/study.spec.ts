@@ -52,6 +52,35 @@ test('add cards, study with the keyboard, and undo', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Done for now' })).toBeVisible();
 });
 
+test('type in the answer: the box takes Enter, then the answer is compared', async ({ page }) => {
+  await createDeck(page, 'Typing');
+  await page.getByRole('link', { name: '+ Add cards' }).click();
+  await page.getByLabel('Type').selectOption('basic-type');
+  await addBasic(page, 'Capital of Japan?', 'Tokyo');
+  await page.getByRole('link', { name: '← Back' }).click();
+  await page.getByRole('link', { name: /Typing/ }).click();
+  await page.getByRole('link', { name: 'Study now' }).click();
+
+  // The box has focus, and Space types a space instead of showing the answer.
+  const box = page.getByRole('textbox', { name: 'Type the answer' });
+  await expect(box).toBeFocused();
+  await page.keyboard.type('Tok io');
+  await expect(page.getByRole('button', { name: /Again/ })).toBeHidden();
+  await page.keyboard.press('Enter');
+
+  const result = page.locator('.nenrin-type-answer');
+  // " i" is one run of wrong characters; toHaveText trims the space.
+  await expect(result.locator('.typed-bad')).toHaveText('i');
+  await expect(result.locator('.typed-missing')).toHaveText('y');
+  await expect(box).toBeHidden();
+  // Enter again rates Good, as Space does. The card is still learning, so it comes back
+  // right away with an empty box.
+  await page.keyboard.press('Enter');
+  await expect(box).toBeVisible();
+  await expect(box).toHaveValue('');
+  await expect(box).toBeFocused();
+});
+
 test('optional progress bar while reviewing', async ({ page }) => {
   await createDeck(page, 'Rivers');
   await page.getByRole('link', { name: '+ Add cards' }).click();

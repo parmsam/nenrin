@@ -6,6 +6,7 @@
   import { cssMediaRefs, isStockCss, scopeDeckCss } from '../lib/render/deck-css';
   import { renderDiagramsIn } from '../lib/render/diagram';
   import { renderMathIn } from '../lib/render/math';
+  import { compareTyped } from '../lib/study/typing';
   import { isDarkMode } from '../lib/theme';
 
   let {
@@ -13,6 +14,8 @@
     css = '',
     side = 'question',
     autoplay = false,
+    typed = $bindable(''),
+    onsubmit,
   }: {
     /** Already-sanitized card HTML (from renderCard). */
     html: string;
@@ -22,6 +25,10 @@
     side?: 'question' | 'answer';
     /** Play the side's audio when it appears. */
     autoplay?: boolean;
+    /** Type-in-the-answer: the text typed on the front, compared on the back. */
+    typed?: string;
+    /** Enter in the answer box (show the answer). */
+    onsubmit?: () => void;
   } = $props();
 
   let resolved = $state('');
@@ -52,6 +59,7 @@
       if (container) {
         renderMathIn(container);
         renderDiagramsIn(container);
+        mountTyping(container);
       }
       if (autoplay) play();
     });
@@ -71,6 +79,58 @@
     });
     return () => (cancelled = true);
   });
+
+  const span = (text: string, cls: string) =>
+    Object.assign(document.createElement('span'), { textContent: text, className: cls });
+
+  /** Fills the template's type-in placeholders: a text box on the front, the comparison on the back. */
+  function mountTyping(root: HTMLElement) {
+    // Anki allows one answer box per card.
+    root.querySelectorAll('.nenrin-type').forEach((box, i) => {
+      if (i > 0) return box.remove();
+      const input = Object.assign(document.createElement('input'), {
+        type: 'text',
+        className: 'type-answer',
+        value: typed,
+        autocomplete: 'off',
+        spellcheck: false,
+        enterKeyHint: 'done',
+      });
+      input.setAttribute('aria-label', 'Type the answer');
+      input.setAttribute('autocapitalize', 'off');
+      input.setAttribute('autocorrect', 'off');
+      input.addEventListener('input', () => (typed = input.value));
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.isComposing) {
+          e.preventDefault();
+          onsubmit?.();
+        }
+      });
+      box.replaceChildren(input);
+      // Only while studying; previews (editor, browse) show the box without taking focus.
+      if (onsubmit) input.focus({ preventScroll: true });
+      else input.disabled = true;
+    });
+    for (const el of root.querySelectorAll<HTMLElement>('.nenrin-type-answer')) {
+      const result = compareTyped(typed, el.dataset.expected ?? '');
+      const line = (parts: { text: string; kind: string }[]) => {
+        const div = document.createElement('div');
+        div.append(...parts.map((p) => span(p.text, `typed-${p.kind}`)));
+        return div;
+      };
+      const nodes: Node[] = [];
+      if (result.correct) nodes.push(line(result.expected));
+      else {
+        if (typed.trim()) nodes.push(line(result.typed), span('↓', 'typed-arrow'));
+        nodes.push(line(result.expected));
+      }
+      el.replaceChildren(...nodes);
+      el.setAttribute(
+        'aria-label',
+        result.correct ? 'Your answer is correct' : 'Your answer compared with the correct one',
+      );
+    }
+  }
 
   function audios(): HTMLAudioElement[] {
     if (!container) return [];
@@ -137,6 +197,40 @@
 </div>
 
 <style>
+  /* Type-in-the-answer: the box, and the comparison (Anki's colors: right, wrong, missing). */
+  .card-content :global(.type-answer) {
+    display: block;
+    width: min(100%, 24rem);
+    margin: 1rem auto 0;
+    font: inherit;
+    text-align: center;
+  }
+  /* The card clips outlines drawn outside it, so draw the focus ring inside the box. */
+  .card-content :global(.type-answer:focus-visible) {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+  }
+  .card-content :global(.nenrin-type-answer) {
+    display: block;
+    margin: 0.75rem auto 0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    overflow-wrap: anywhere;
+  }
+  .card-content :global(.typed-good) {
+    color: var(--good);
+  }
+  .card-content :global(.typed-bad) {
+    color: var(--again);
+    text-decoration: line-through;
+  }
+  .card-content :global(.typed-missing) {
+    color: var(--muted);
+    text-decoration: underline;
+  }
+  .card-content :global(.typed-arrow) {
+    display: block;
+    color: var(--muted);
+  }
   .deck-scope {
     /* Deck CSS can't position or paint outside the card. */
     contain: layout paint;

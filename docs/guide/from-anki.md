@@ -25,7 +25,6 @@ Shared decks kept on GitHub in **CrowdAnki** format (for example [Ultimate Geogr
 
 - **No add-ons, and no sync yet.** Nenrin keeps your cards on one device; see [Backups and your data](backups.md).
 - **Filtered decks** become [custom study](custom-study.md) sessions; their cards return to their home decks on import.
-- **Type-in-the-answer** fields show as blank for now.
 - Imported learning cards restart their learning steps (their due time is kept).
 
 ## Going back

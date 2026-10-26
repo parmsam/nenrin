@@ -44,6 +44,8 @@
   let content = $state<CardContent | null>(null);
   let intervals = $state<Record<Grade, string> | null>(null);
   let revealed = $state(false);
+  /** Type-in-the-answer text for the current card. */
+  let typed = $state('');
   let loading = $state(true);
   let history = $state.raw<Step[]>([]);
   let cardView: CardView | undefined = $state();
@@ -86,6 +88,7 @@
     const token = ++showToken;
     navigate(here(), { replace: true });
     revealed = false;
+    typed = '';
     if (pos >= queue.length) {
       card = null;
       return;
@@ -282,6 +285,8 @@
         css={content.css}
         side={revealed ? 'answer' : 'question'}
         autoplay={prefs.autoplayAudio}
+        bind:typed
+        onsubmit={() => (revealed = true)}
       />
     </section>
 

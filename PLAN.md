@@ -173,7 +173,7 @@ Math is already covered by KaTeX (`$…$`, `$$…$$`, and Anki's `\(…\)` / `\[
 ### Phase 5: Maybe later
 
 - [ ] Opt-in AI card generation from text/PDF using the user's own API key (no Nenrin servers)
-- [ ] Type-in-the-answer cards: render Anki's `{{type:Field}}` as an input and compare the typed answer on the back (imported decks show nothing there today), plus a built-in **Basic (type in the answer)** note type
+- [x] Type-in-the-answer cards: `{{type:Field}}` (and `type:cloze:`, `type:nc:`) render as a text box on the front (Enter shows the answer) and a character diff on the back, as Anki does; plus a built-in **Basic (type in the answer)** note type. The template only emits placeholders, so card HTML still never contains inputs
 - [ ] Built-in **Basic (optional reversed card)** note type: the reverse card is made only when the note's "Add Reverse" field has text
 - [ ] Image occlusion: an editor that masks parts of an image (one card per mask; hide one or all), and rendering for Anki's image occlusion notes on import
 - [ ] Note type editor: add, rename and reorder fields, edit card templates and CSS with a live preview, and clone a built-in or imported type

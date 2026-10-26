@@ -6,6 +6,8 @@ Nenrin follows [semantic versioning](https://semver.org/). Until 1.0, each roadm
 
 - **Your tree keeps growing**: the trunk now gets bigger with every day you study, quickly at first and then more slowly, so a year of study looks like a year. A huge day no longer makes the rest of your rings look thin. Older days darken into heartwood at the center, and a break of more than a week leaves a dark scar line, as a hard year does in a real tree.
 
+- **Type in the answer**: a new **Basic (type in the answer)** note type, and Anki cards with `{{type:…}}` now work too. Type your answer and press Enter; the back shows what you got right, wrong and missed.
+
 - **Export to Anki (.apkg)**: **Export…** on a deck, or in Settings, now makes an Anki package with notes, sub-decks and media, and, if you choose, your progress (due dates, FSRS memory and review history), so Anki picks up where you left off. Exporting again updates the notes in Anki instead of duplicating them. Text export moved into the same dialog.
 
 - **Screenshots in the user guide**, in light or dark to match your theme, in the app (offline too) and on GitHub.

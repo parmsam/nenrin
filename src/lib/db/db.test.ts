@@ -22,7 +22,7 @@ describe('db', () => {
     const deckId = await createSampleDeck(db, T0);
     expect(await db.decks.get(deckId)).toMatchObject({ name: 'Japanese: Nature' });
     expect(await db.cards.where('[deckId+state]').equals([deckId, State.New]).count()).toBe(5);
-    expect(await db.noteTypes.count()).toBe(3);
+    expect(await db.noteTypes.count()).toBe(4);
   });
 
   it('records a review and can undo it exactly', async () => {

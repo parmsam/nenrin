@@ -52,6 +52,8 @@
   let cardView: CardView | undefined = $state();
   let intervals = $state<Record<Grade, string> | null>(null);
   let revealed = $state(false);
+  /** Type-in-the-answer text for the current card. */
+  let typed = $state('');
   let finished = $state(false);
   let waitUntil = $state<number | undefined>();
   // Raw (not deep-proxied): these snapshots go back into IndexedDB, which can't clone Proxies.
@@ -111,6 +113,7 @@
     card = next;
     finished = false;
     revealed = false;
+    typed = '';
     shownAt = now;
   }
 
@@ -297,6 +300,8 @@
         css={cardCss}
         side={revealed ? 'answer' : 'question'}
         autoplay={prefs.autoplayAudio}
+        bind:typed
+        onsubmit={() => (revealed = true)}
       />
     </section>
 

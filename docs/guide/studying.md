@@ -17,6 +17,10 @@ After you reveal the answer, rate how well you remembered it:
 
 The small times above the buttons (like `10m`, `3d`, `1.2mo`) say when you'd see the card next with each choice.
 
+## Typing the answer
+
+Some cards ask you to type the answer (the **Basic (type in the answer)** note type, or Anki cards with `{{type:…}}`). Type it and press <kbd>Enter</kbd> to show the answer: what you typed appears above the correct answer, with wrong letters struck through in red and missed ones underlined. Case and accents count; extra spaces don't. Then rate yourself as usual: the comparison is a hint, the rating is your call.
+
 ## New, learning and review cards
 
 The three numbers on a deck count today's cards:

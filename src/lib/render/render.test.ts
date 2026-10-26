@@ -1,11 +1,10 @@
 // @vitest-environment jsdom
 import { describe, expect, it } from 'vitest';
-import { BUILTIN_NOTE_TYPES } from '../notes/builtins';
+import { BASIC as basic, CLOZE as cloze } from '../notes/builtins';
 import type { Note } from '../db/types';
 import { fieldToHtml, mediaRefs, renderCard, resolveMedia, sanitize } from '.';
 import { clozeNumbers, isEmptyFront, renderCloze, renderTemplate } from './template';
 
-const [basic, , cloze] = BUILTIN_NOTE_TYPES;
 const note = (fields: Record<string, string>, format?: Note['format']): Note => ({
   id: 'n',
   noteTypeId: 'x',
@@ -112,10 +111,31 @@ describe('Anki template features', () => {
     expect(renderTemplate('{{kanji:Reading}}', f, ctx)).toBe('年輪を見る');
     expect(renderTemplate('{{text:Html}}', f, ctx)).toBe('bold');
     expect(renderTemplate('{{text:cloze:Text}}', f, { side: 'back', cloze: 1 })).toBe('a');
-    expect(renderTemplate('{{type:Html}}|{{tts en_US:Html}}', f, ctx)).toBe('|<b>bold</b>');
+    expect(renderTemplate('{{tts en_US:Html}}', f, ctx)).toBe('<b>bold</b>');
     expect(renderTemplate('{{hint:Html}}', f, ctx)).toBe(
       '<details class="hint"><summary>Html</summary><b>bold</b></details>',
     );
+  });
+
+  it('turns {{type:…}} into a text box on the front and the expected answer on the back', () => {
+    const f = {
+      Back: '<b>Tokyo</b> &amp; "Kyoto"',
+      Text: '{{c1::年輪}} and {{c1::ring}} {{c2::x}}',
+    };
+    expect(renderTemplate('{{type:Back}}', f, ctx)).toBe('<span class="nenrin-type"></span>');
+    const front = renderTemplate('Q {{type:Back}}', f, ctx);
+    expect(
+      renderTemplate('{{FrontSide}}<hr id="answer">{{type:Back}}', f, {
+        side: 'back',
+        frontSide: front,
+      }),
+    ).toBe(
+      'Q <hr id="answer"><span class="nenrin-type-answer" data-expected="Tokyo &amp; &quot;Kyoto&quot;"></span>',
+    );
+    expect(renderTemplate('{{type:cloze:Text}}', f, { side: 'back', cloze: 1 })).toBe(
+      '<span class="nenrin-type-answer" data-expected="年輪, ring"></span>',
+    );
+    expect(renderTemplate('{{type:nc:Back}}', f, ctx)).toBe('<span class="nenrin-type"></span>');
   });
 
   it('fills special fields', () => {
