@@ -1,6 +1,7 @@
 <script lang="ts">
   import { liveQuery } from 'dexie';
   import Counts from '../components/Counts.svelte';
+  import ExportDialog from '../components/ExportDialog.svelte';
   import { db } from '../lib/db';
   import {
     createDeck,
@@ -10,8 +11,6 @@
     renameDeck,
     updateDeckConfig,
   } from '../lib/db/decks';
-  import { downloadFile } from '../lib/download';
-  import { exportNotesText, textExportFilename } from '../lib/export/text';
   import { confirmAction } from '../lib/confirm.svelte';
   import { navigate } from '../lib/router.svelte';
   import { plainKey } from '../lib/shortcuts.svelte';
@@ -84,15 +83,7 @@
     setTimeout(() => (saved = false), 1500);
   }
 
-  async function exportText() {
-    const d = $data;
-    if (!d) return;
-    downloadFile(
-      await exportNotesText(db, id),
-      textExportFilename(d.deck.name),
-      'text/plain;charset=utf-8',
-    );
-  }
+  let exporting = $state(false);
 
   /** Drops personal FSRS parameters for this deck and its sub-decks. */
   async function useDefaultParams() {
@@ -204,8 +195,8 @@
       <a class="button secondary" href="#/stats?deck={id}">Stats</a>
       <button
         class="secondary"
-        onclick={exportText}
-        disabled={cardCount === 0 && children.length === 0}>Export notes (.txt)</button
+        onclick={() => (exporting = true)}
+        disabled={cardCount === 0 && children.length === 0}>Export…</button
       >
     </div>
   </section>
@@ -269,6 +260,8 @@
 
   <h3 class="section-title">Danger zone</h3>
   <button class="danger" onclick={remove}>Delete deck</button>
+
+  <ExportDialog bind:open={exporting} deckId={id} name={deck.name} />
 {/if}
 
 <style>

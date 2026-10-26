@@ -65,6 +65,7 @@ New here? Read the **[user guide](docs/guide/README.md)** (also built into the a
 - **Review**: FSRS-6 scheduling, learning steps, interval previews on each button, sibling burying, and undo
 - **Keyboard-first**: <kbd>Space</kbd> to show the answer or rate Good, <kbd>1</kbd>–<kbd>4</kbd> to rate, <kbd>Z</kbd> to undo, Anki's keys to bury and suspend, and <kbd>D</kbd>/<kbd>A</kbd>/<kbd>B</kbd>/<kbd>T</kbd> to get around; press <kbd>?</kbd> for the full list, and <kbd>⌘K</kbd> for the command palette
 - **Import from Anki**: `.apkg` decks, `.colpkg` collections and CrowdAnki decks (modern and legacy formats) with images, audio, sub-decks and, optionally, your review history and FSRS memory. Re-importing an updated deck updates notes without touching your progress. Deck styling is applied safely inside each card (with automatic dark mode), and card audio autoplays (<kbd>R</kbd> replays)
+- **Export to Anki (`.apkg`)**: notes, sub-decks, media and (optionally) progress: due dates, FSRS memory and review history
 - **Anki-compatible text import/export**: `.txt` / `.csv` / `.tsv` with Anki's file headers (`#separator`, `#html`, `#deck column`, `#guid column` …), column mapping, and update/skip/duplicate handling. Export as Anki's "Notes in Plain Text"
 - **Stats**: review heatmap, retention, streaks, a 30-day forecast and cards by stage, per deck or overall
 - **Personal scheduling**: optimize FSRS to your own review history with the official optimizer (WASM, on your device)

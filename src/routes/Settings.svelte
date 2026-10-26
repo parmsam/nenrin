@@ -20,7 +20,7 @@
     scheduleReminder,
   } from '../lib/reminder';
   import { downloadFile } from '../lib/download';
-  import { exportNotesText, textExportFilename } from '../lib/export/text';
+  import ExportDialog from '../components/ExportDialog.svelte';
   import { headerPrefs, setHelpButton } from '../lib/header.svelte';
   import { setSplashEnabled, splashEnabled } from '../lib/splash';
   import { loadTheme, MODES, PALETTES, saveTheme } from '../lib/theme';
@@ -148,10 +148,7 @@
     status = 'Backup downloaded.';
   }
 
-  async function exportAllText() {
-    downloadFile(await exportNotesText(db), textExportFilename(), 'text/plain;charset=utf-8');
-    status = 'Notes exported.';
-  }
+  let exporting = $state(false);
 
   async function importBackup(e: Event) {
     const input = e.currentTarget as HTMLInputElement;
@@ -333,14 +330,15 @@
 <h3 class="section-title">Import and export</h3>
 <div class="panel stack">
   <p>
-    Move notes in and out as text files that Anki also reads and writes (tab-separated, with note
-    type, deck, tags and GUID columns).
+    Move notes to and from Anki: as Anki packages (.apkg, with media and, if you like, your
+    progress), or as text files that Anki also reads and writes.
   </p>
   <div class="row">
-    <a class="button secondary" href="#/import">Import .txt / .csv…</a>
-    <button class="secondary" onclick={exportAllText}>Export all notes (.txt)</button>
+    <a class="button secondary" href="#/import">Import…</a>
+    <button class="secondary" onclick={() => (exporting = true)}>Export…</button>
   </div>
 </div>
+<ExportDialog bind:open={exporting} ondone={(message) => (status = message)} />
 
 <h3 class="section-title" id="typst">Typst</h3>
 <div class="panel stack">

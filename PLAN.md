@@ -168,7 +168,7 @@ Math is already covered by KaTeX (`$…$`, `$$…$$`, and Anki's `\(…\)` / `\[
 
 - [ ] Tauri 2 macOS app: native menus, file associations for `.apkg`, signed and notarized DMG
 - [ ] Optional sync (design doc first): candidates are a file-based sync folder (iCloud Drive/Dropbox) via Tauri, WebDAV, or a CRDT log
-- [ ] `.apkg` export for round-tripping back to Anki
+- [x] `.apkg` export for round-tripping back to Anki: legacy layout (schema 11, which every Anki 2.1+ imports), built with sql.js in the import worker. Optional progress: due dates, FSRS memory (`card.data`) and the review log. Stable ids for decks and note types (imported types keep Anki's), GUIDs kept, so re-exports update. Checked by importing into real Anki 26.09 (dev-only, like the fixtures)
 
 ### Phase 5: Maybe later
 

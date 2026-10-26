@@ -29,3 +29,36 @@ export async function downloadCardSkill(): Promise<void> {
   const zip = zipSync({ [SKILL_NAME]: { 'SKILL.md': strToU8(skillMarkdown()) } });
   downloadFile(zip, `${SKILL_NAME}.zip`, 'application/zip');
 }
+
+export type ExportFormat = 'apkg' | 'txt';
+
+/**
+ * Downloads notes from one deck (and its sub-decks) or all decks: as an Anki package, built in
+ * a worker, or as Anki-compatible text.
+ */
+export async function exportNotes(options: {
+  deckId?: string;
+  name?: string;
+  format: ExportFormat;
+  scheduling: boolean;
+}): Promise<void> {
+  if (options.format === 'txt') {
+    const { exportNotesText, textExportFilename } = await import('./export/text');
+    downloadFile(
+      await exportNotesText(db, options.deckId),
+      textExportFilename(options.name),
+      'text/plain;charset=utf-8',
+    );
+    return;
+  }
+  const [{ collectApkg, apkgFilename }, { writePackageInWorker }] = await Promise.all([
+    import('./export/apkg'),
+    import('./anki/parse-in-worker'),
+  ]);
+  const input = await collectApkg(db, { deckId: options.deckId, scheduling: options.scheduling });
+  downloadFile(
+    await writePackageInWorker(input),
+    apkgFilename(options.name),
+    'application/octet-stream',
+  );
+}

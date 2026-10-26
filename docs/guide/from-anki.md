@@ -30,4 +30,9 @@ Shared decks kept on GitHub in **CrowdAnki** format (for example [Ultimate Geogr
 
 ## Going back
 
-**Export notes (.txt)** on a deck (or **Settings → Export all notes**) writes a file Anki imports with _File → Import_, with note types, decks, tags and IDs. Exporting `.apkg` is planned.
+Choose **Export…** on a deck (or **Settings → Import and export → Export…** for every deck), then:
+
+- **Anki package (.apkg):** notes, cards, sub-decks and media. Open it in Anki with _File → Import_. With **Include my progress** on, due dates, FSRS memory states and your review history come along, so Anki carries on where Nenrin left off. Turn it off to share a deck with someone else: every card starts as new.
+- **Notes as text (.txt):** Anki's _Notes in Plain Text_, with note types, decks, tags and IDs.
+
+Markdown becomes HTML and math becomes Anki's `\(…\)` and `\[…\]`. Notes keep their IDs, so exporting again updates the notes in Anki instead of duplicating them. Nenrin's built-in note types may show up in Anki as _Basic+_ or _Cloze+_ next to Anki's own.
