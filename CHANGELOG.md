@@ -4,6 +4,8 @@ Nenrin follows [semantic versioning](https://semver.org/). Until 1.0, each roadm
 
 ## Unreleased
 
+- **Note types you can edit**: Settings → _Manage note types_. Clone a built-in type (or edit an imported one) to rename, reorder, add and remove fields, change the card templates and styling with a live preview, and add or remove card types. Nenrin warns before anything would delete cards or text.
+
 - **Basic (optional reversed card)**: a new note type whose back → front card is made only when you put something in _Add Reverse_, as in Anki.
 
 ## 0.7.0 (2026-10-26): Back to Anki, image occlusion, AI cards

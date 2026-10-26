@@ -83,8 +83,10 @@ export const IMAGE_OCCLUSION: NoteType = {
   templates: [
     {
       name: 'Image Occlusion',
-      front: '{{#Header}}<div>{{Header}}</div>{{/Header}}{{cloze:Occlusion}}{{Image}}',
-      back: `{{#Header}}<div>{{Header}}</div>{{/Header}}{{cloze:Occlusion}}{{Image}}${ANSWER}{{Back Extra}}`,
+      // The image-occlusion class also marks clones of this type as image occlusion.
+      front:
+        '{{#Header}}<div>{{Header}}</div>{{/Header}}<div class="image-occlusion">{{cloze:Occlusion}}{{Image}}</div>',
+      back: `{{#Header}}<div>{{Header}}</div>{{/Header}}<div class="image-occlusion">{{cloze:Occlusion}}{{Image}}</div>${ANSWER}{{Back Extra}}`,
     },
   ],
   css: '',

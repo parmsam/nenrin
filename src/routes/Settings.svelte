@@ -328,6 +328,15 @@
   </div>
 </div>
 
+<h3 class="section-title">Note types</h3>
+<div class="panel stack">
+  <p>
+    Add, rename and reorder fields, and change card templates and styling. Clone a built-in type to
+    make your own.
+  </p>
+  <div class="row"><a class="button secondary" href="#/note-types">Manage note types</a></div>
+</div>
+
 <h3 class="section-title">Import and export</h3>
 <div class="panel stack">
   <p>

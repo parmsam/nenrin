@@ -77,6 +77,13 @@
         run: go('/settings'),
       },
       {
+        id: 'note-types',
+        label: 'Note types',
+        group: 'Go to',
+        keywords: 'fields templates card types css models',
+        run: go('/note-types'),
+      },
+      {
         id: 'help',
         label: 'Help: user guide',
         group: 'Go to',

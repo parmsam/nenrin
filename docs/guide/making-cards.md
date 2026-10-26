@@ -14,6 +14,18 @@ Open a deck and choose **Add cards** (or press <kbd>A</kbd> anywhere). Pick the 
 
   `The {{c1::mitochondria}} produce most of the cell's {{c2::ATP}}.` makes two cards.
 
+## Your own note types
+
+**Settings → Manage note types** (or _Note types_ in the command palette) lists every note type, with how many notes use it. Built-in types can't be changed; **Clone** one to make your own, then:
+
+- **Fields:** rename, reorder (↑ ↓), add or remove them. Renaming a field keeps every note's text and updates the templates that use it.
+- **Cards:** each card type has a front and back template. Fields go in double braces, like `{{Front}}`; `{{FrontSide}}` repeats the front on the back; `{{#Field}}…{{/Field}}` shows something only when the field has text. Add a card type to make another card from every note, or remove one to delete those cards.
+- **Styling:** CSS for the cards, applied only inside them.
+
+The preview shows your first note of that type with the changes. **Save** applies everything at once. If saving would delete cards (and their review history) or text in removed fields, Nenrin says how much and asks first. A note type with no notes can be deleted.
+
+Imported Anki note types can be edited directly.
+
 ## Image occlusion
 
 Hide parts of a picture and test yourself on them: labels on a diagram, bones, countries on a map.

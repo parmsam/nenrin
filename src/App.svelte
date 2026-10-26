@@ -33,6 +33,7 @@
     custom: once(() => import('./routes/Custom.svelte')),
     session: once(() => import('./routes/Session.svelte')),
     help: once(() => import('./routes/Help.svelte')),
+    noteTypes: once(() => import('./routes/NoteTypes.svelte')),
   };
   import CommandPalette from './components/CommandPalette.svelte';
   import ConfirmDialog from './components/ConfirmDialog.svelte';
@@ -118,6 +119,8 @@
     if (p === '/settings') return { name: 'settings' } as const;
     if (p === '/help') return { name: 'help', id: '' } as const;
     if ((m = match('/help/:id', p))) return { name: 'help', id: m.id } as const;
+    if (p === '/note-types') return { name: 'noteTypes', id: '' } as const;
+    if ((m = match('/note-types/:id', p))) return { name: 'noteTypes', id: m.id } as const;
     return { name: 'home' } as const;
   });
 </script>
@@ -213,6 +216,12 @@
     {/await}
   {:else if route.name === 'help'}
     {#await lazy.help() then m}<m.default slug={route.id} />{:catch}
+      <p class="error">Couldn’t load this screen. Check your connection and reload.</p>
+    {/await}
+  {:else if route.name === 'noteTypes'}
+    {#await lazy.noteTypes() then m}
+      {#key route.id}<m.default id={route.id} />{/key}
+    {:catch}
       <p class="error">Couldn’t load this screen. Check your connection and reload.</p>
     {/await}
   {:else if route.name === 'edit' || route.name === 'add'}
