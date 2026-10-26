@@ -30,7 +30,7 @@ Be honest: if you didn't remember, press **Again**. The scheduler learns from yo
 
 ## Come back tomorrow
 
-A few minutes a day is the whole trick. The home screen shows how many cards are waiting and your streak, next to your tree: a cross-section where each ring is a day you studied, wider on days with more reviews. Today's ring closes around the outside as you finish today's cards. New days start at 4 AM by default; you can change that in **Settings → Studying**.
+A few minutes a day is the whole trick. The home screen shows how many cards are waiting and your streak, next to your tree: a cross-section where each ring is a day you studied, wider on days with more reviews. The trunk grows as the days add up; older days darken into heartwood at the center, and a break of more than a week leaves a dark scar. Today's ring closes around the outside as you finish today's cards. New days start at 4 AM by default; you can change that in **Settings → Studying**.
 
 ## Get a daily reminder
 

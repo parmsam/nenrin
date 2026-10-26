@@ -16,8 +16,9 @@ const addSample = async (page) => {
   await page.getByRole('button', { name: 'Add a sample deck' }).click();
   await page.getByRole('link', { name: /Japanese: Nature/ }).waitFor();
 };
-// A few weeks of demo review history, so the home screen's tree has rings to show.
-const DEMO_DAYS = [12, 30, 0, 45, 8, 60, 22, 0, 35, 90, 15, 40, 5, 70, 28, 0, 50, 33, 18, 64, 12];
+// A few months of demo review history, so the home screen's tree has rings to show.
+const DEMO_WEEKS = [12, 30, 0, 45, 8, 60, 22, 0, 35, 90, 15, 40, 5, 70, 28, 0, 50, 33, 18, 64, 12];
+const DEMO_DAYS = Array.from({ length: 6 }, () => DEMO_WEEKS).flat();
 const withHistory = async (page) => {
   await addSample(page);
   await page.evaluate(

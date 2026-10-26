@@ -146,7 +146,7 @@ describe('today summary', () => {
     const summary = await todaySummary(db, at(10, 18));
     expect(summary).toMatchObject({ reviewedToday: 1, streak: 4, studiedToday: true });
     // The growth rings: one review on each of the three days before today, oldest first.
-    expect(summary.growth).toHaveLength(60);
+    expect(summary.growth).toHaveLength(365);
     expect(summary.growth.slice(-4)).toEqual([0, 1, 1, 1]);
     // Next day, before studying: the streak is still alive.
     expect(await todaySummary(db, at(11, 9))).toMatchObject({ streak: 4, studiedToday: false });

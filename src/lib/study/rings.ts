@@ -1,37 +1,88 @@
 /**
  * The home screen's tree cross-section (年輪, "tree rings"): one ring per day you studied,
- * wider for days with more reviews, the way real rings are wide in good years. Pure
- * geometry here; GrowthRings.svelte draws it.
+ * wider for days with more reviews, the way real rings are wide in good years. The trunk
+ * grows with every study day; older days darken into heartwood, and long breaks leave a
+ * scar. Pure geometry here; GrowthRings.svelte draws it.
  */
 
 /** Ring geometry in a 120×120 viewBox centered at (60, 60). */
 export const CENTER = 60;
 /** The pith, before the first ring. */
 export const PITH = 2.5;
-/** Past rings fit inside this radius; today's ring sits outside it. */
+/** The trunk grows to this radius; today's ring sits outside it. */
 export const HISTORY_MAX = 44;
 /** Today's ring (the progress arc) radius. */
 export const TODAY_R = 51;
-/** At most this many past rings; older ones fall off the inside. */
-export const MAX_RINGS = 18;
+/** At most this many rings are drawn one by one; older days merge into the heartwood. */
+export const MAX_RINGS = 16;
+/** The trunk reaches full size after this many study days. */
+export const FULL_GROWN = 365;
+/** A gap of at least this many days between study days leaves a scar line. */
+export const BREAK_DAYS = 7;
 
-const MIN_WIDTH = 1.2;
-const MAX_WIDTH = 5;
+/** A typical day's ring width before scaling, and its limits for light and heavy days. */
+const TYPICAL_WIDTH = 2.2;
+const MIN_WIDTH = 0.8;
+const MAX_WIDTH = 4.5;
+/** Rings are never scaled thinner than this, so they stay legible; the rest becomes heartwood. */
+const MIN_SCALE = 0.85;
+/** The heartwood, when there is one, is at least this much wider than the pith. */
+const MIN_HEARTWOOD = 1.5;
+
+export interface Ring {
+  inner: number;
+  outer: number;
+}
+
+export interface TreeLayout {
+  /** Outer radius of the trunk (0 before the first study day). */
+  radius: number;
+  /** Radius of the dark core of older days, or 0 if every day has its own ring. */
+  heartwood: number;
+  /** Drawn rings, oldest first. */
+  rings: Ring[];
+  /** Radii where a long break left a scar. */
+  scars: number[];
+}
+
+function median(values: number[]): number {
+  const v = [...values].sort((a, b) => a - b);
+  const m = v.length >> 1;
+  return v.length % 2 ? v[m] : (v[m - 1] + v[m]) / 2;
+}
 
 /**
- * Outer radius of each past ring, oldest first, for days with reviews (`counts`, oldest
- * first, zeros skipped). Width grows with the square root of the day's reviews, so a
- * 300-review day doesn't dwarf the rest; the whole set is scaled to fit.
+ * Lays out the trunk from reviews per day (`counts`, oldest first, zeros for days off).
+ * The trunk's size follows the number of study days, growing quickly at first and slowing
+ * down, so a year of study looks bigger than a month. Ring width follows the day's reviews
+ * against a typical (median) day, square-rooted and clamped, so one huge day doesn't make
+ * the rest look thin. The newest rings are drawn outward-in; whatever doesn't fit is heartwood.
  */
-export function ringRadii(counts: number[]): number[] {
-  const days = counts.filter((c) => c > 0).slice(-MAX_RINGS);
-  if (days.length === 0) return [];
-  const peak = Math.sqrt(Math.max(...days));
-  const widths = days.map((c) => MIN_WIDTH + (MAX_WIDTH - MIN_WIDTH) * (Math.sqrt(c) / peak));
+export function treeLayout(counts: number[]): TreeLayout {
+  const days = counts.flatMap((c, i) => (c > 0 ? [{ c, i }] : []));
+  if (days.length === 0) return { radius: 0, heartwood: 0, rings: [], scars: [] };
+  const grown = Math.min(1, Math.log1p(days.length) / Math.log1p(FULL_GROWN));
+  const radius = PITH + (HISTORY_MAX - PITH) * grown;
+  const typical = median(days.map((d) => d.c));
+  const widths = days.map((d) =>
+    Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, TYPICAL_WIDTH * Math.sqrt(d.c / typical))),
+  );
   const total = widths.reduce((a, b) => a + b, 0);
-  const scale = Math.min(1, (HISTORY_MAX - PITH) / total);
-  let r = PITH;
-  return widths.map((w) => (r += w * scale));
+  const scale = Math.max(MIN_SCALE, (radius - PITH) / total);
+
+  const rings: Ring[] = [];
+  const scars: number[] = [];
+  let r = radius;
+  let k = days.length - 1;
+  for (; k >= 0 && rings.length < MAX_RINGS; k--) {
+    const inner = k === 0 ? PITH : r - widths[k] * scale;
+    // Leave room for the heartwood if older days remain.
+    if (k > 0 && inner < PITH + MIN_HEARTWOOD) break;
+    rings.unshift({ inner: Math.max(PITH, inner), outer: r });
+    if (k > 0 && days[k].i - days[k - 1].i > BREAK_DAYS) scars.push(Math.max(PITH, inner));
+    r = inner;
+  }
+  return { radius, heartwood: k >= 0 ? r : 0, rings, scars };
 }
 
 /**
@@ -74,7 +125,7 @@ export function ringsDescription(counts: number[], done: number, remaining: numb
   const past =
     days === 0
       ? 'No rings yet: each day you study adds one.'
-      : `${days} ${days === 1 ? 'ring' : 'rings'}, one for each day you studied recently; wider rings are days with more reviews.`;
+      : `${days} ${days === 1 ? 'ring' : 'rings'}, one for each day you studied in the past year; wider rings are days with more reviews.`;
   const total = done + remaining;
   const today =
     total === 0

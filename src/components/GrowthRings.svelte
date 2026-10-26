@@ -1,9 +1,17 @@
 <script lang="ts">
   /**
    * 年輪: a tree cross-section of your studying. Each past ring is a day you studied (wider for
-   * more reviews); the outer arc is today's ring, closing as you finish today's cards.
+   * more reviews), older days darken into heartwood, and long breaks leave a scar; the outer
+   * arc is today's ring, closing as you finish today's cards.
    */
-  import { CENTER, PITH, TODAY_R, ringPath, ringRadii, ringsDescription } from '../lib/study/rings';
+  import {
+    CENTER,
+    PITH,
+    TODAY_R,
+    ringPath,
+    ringsDescription,
+    treeLayout,
+  } from '../lib/study/rings';
 
   let {
     done,
@@ -16,7 +24,7 @@
     growth?: number[];
   } = $props();
 
-  const radii = $derived(ringRadii(growth));
+  const tree = $derived(treeLayout(growth));
   const total = $derived(done + remaining);
   const fraction = $derived(total === 0 ? 0 : done / total);
   const complete = $derived(total > 0 && remaining === 0);
@@ -27,16 +35,22 @@
 <div class="rings" role="img" aria-label={description} title={description}>
   <svg viewBox="0 0 120 120" aria-hidden="true">
     <!-- Each band is its own annulus (outer outline minus inner), so tones don't stack. -->
-    {#each radii as r, i (i)}
-      <g class="ring" style="--i: {i}">
+    {#if tree.heartwood > 0}
+      <path d={ringPath(tree.heartwood)} class="heartwood grow" style="--i: 0" />
+    {/if}
+    {#each tree.rings as ring, i (i)}
+      <g class="grow" style="--i: {i + 1}">
         <path
-          d="{ringPath(r)} {ringPath(i === 0 ? PITH : radii[i - 1])}"
+          d="{ringPath(ring.outer)} {ringPath(ring.inner)}"
           fill-rule="evenodd"
           class="band"
           class:late={i % 2 === 1}
         />
-        <path d={ringPath(r)} class="line" />
+        <path d={ringPath(ring.outer)} class="line" />
       </g>
+    {/each}
+    {#each tree.scars as r (r)}
+      <path d={ringPath(r)} class="scar grow" style="--i: {tree.rings.length}" />
     {/each}
     <circle cx={CENTER} cy={CENTER} r={PITH} class="pith" />
 
@@ -50,7 +64,7 @@
         pathLength="1"
         stroke-dasharray="1"
         stroke-dashoffset={1 - fraction}
-        style="--rings: {radii.length}"
+        style="--rings: {tree.rings.length + 1}"
       />
     {/if}
   </svg>
@@ -82,6 +96,18 @@
     stroke-opacity: 0.5;
     stroke-width: 0.7;
   }
+  /* Older days, merged into a darker core, as in a real trunk. */
+  .heartwood {
+    fill: currentColor;
+    fill-opacity: 0.32;
+  }
+  /* A long break: a dark, tight line, like a hard year. */
+  .scar {
+    fill: none;
+    stroke: currentColor;
+    stroke-opacity: 0.85;
+    stroke-width: 1.3;
+  }
   .pith {
     fill: currentColor;
     fill-opacity: 0.6;
@@ -107,7 +133,7 @@
 
   @media (prefers-reduced-motion: no-preference) {
     /* Rings grow outward from the pith, oldest first, then today's arc draws in. */
-    .ring {
+    .grow {
       transform-box: view-box;
       transform-origin: 60px 60px;
       animation: grow 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;

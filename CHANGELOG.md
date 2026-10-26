@@ -2,6 +2,10 @@
 
 Nenrin follows [semantic versioning](https://semver.org/). Until 1.0, each roadmap phase in [PLAN.md](PLAN.md) bumps the minor version.
 
+## Unreleased
+
+- **Your tree keeps growing**: the trunk now gets bigger with every day you study, quickly at first and then more slowly, so a year of study looks like a year. A huge day no longer makes the rest of your rings look thin. Older days darken into heartwood at the center, and a break of more than a week leaves a dark scar line, as a hard year does in a real tree.
+
 ## 0.6.0 (2026-10-25): Your tree, Help button
 
 - **Your tree** (年輪): the home screen's progress ring is now a tree cross-section of your studying. Each ring is a day you studied in recent weeks, wider on days with more reviews; today's ring closes around the outside as you finish today's cards. Rings grow out from the center when you open the app (not with reduced motion).

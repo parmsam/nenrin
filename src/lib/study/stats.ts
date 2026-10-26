@@ -18,7 +18,7 @@ export interface TodaySummary {
 }
 
 /** How far back the home screen's growth rings look. */
-export const GROWTH_DAYS = 60;
+export const GROWTH_DAYS = 365;
 
 /** Counts consecutive days with reviews, given each review's day start. */
 export function streakFrom(days: Set<number>, today: number): number {
