@@ -3,6 +3,12 @@ import { DEFAULT_PREFS, type Prefs } from './types';
 
 const KEY = 'prefs';
 
+/** The AI provider, model and the user's API key (see lib/llm/generate.ts). */
+export const AI_CONFIG_KEY = 'aiConfig';
+
+/** Settings that hold secrets: never written to backups, and kept on this device by a restore. */
+export const SECRET_SETTINGS: readonly string[] = [AI_CONFIG_KEY];
+
 export async function getPrefs(db: NenrinDB): Promise<Prefs> {
   const row = await db.settings.get(KEY);
   return { ...DEFAULT_PREFS, ...(row?.value as Partial<Prefs> | undefined) };

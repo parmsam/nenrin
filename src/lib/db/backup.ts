@@ -1,5 +1,6 @@
 import type { NenrinDB } from '.';
 import { ensureBuiltins } from '../notes';
+import { SECRET_SETTINGS } from './prefs';
 import type { Card, Deck, Note, NoteType, ReviewLog, Setting } from './types';
 
 export interface Backup {
@@ -42,7 +43,8 @@ export async function createBackup(db: NenrinDB, now = new Date()): Promise<Back
       notes: await db.notes.toArray(),
       cards: await db.cards.toArray(),
       reviewLogs: await db.reviewLogs.toArray(),
-      settings: await db.settings.toArray(),
+      // API keys stay on this device.
+      settings: (await db.settings.toArray()).filter((s) => !SECRET_SETTINGS.includes(s.key)),
     },
     media: await Promise.all(
       (await db.media.toArray()).map(async (m) => ({
@@ -79,13 +81,18 @@ export function parseBackup(text: string): Backup {
 export async function restoreBackup(db: NenrinDB, backup: Backup): Promise<void> {
   const { data } = backup;
   await db.transaction('rw', db.tables, async () => {
+    // Keep this device's secrets; a backup never carries them (or shouldn't).
+    const secrets = (await db.settings.bulkGet([...SECRET_SETTINGS])).filter((s) => !!s);
     await Promise.all(db.tables.map((t) => t.clear()));
     await db.decks.bulkAdd(data.decks ?? []);
     await db.noteTypes.bulkAdd(data.noteTypes ?? []);
     await db.notes.bulkAdd(data.notes ?? []);
     await db.cards.bulkAdd(data.cards ?? []);
     await db.reviewLogs.bulkAdd(data.reviewLogs ?? []);
-    await db.settings.bulkAdd(data.settings ?? []);
+    await db.settings.bulkAdd(
+      (data.settings ?? []).filter((s) => !SECRET_SETTINGS.includes(s.key)),
+    );
+    await db.settings.bulkPut(secrets);
     await db.media.bulkAdd(
       (backup.media ?? []).map((m) => ({
         filename: m.filename,

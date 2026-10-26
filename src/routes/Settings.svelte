@@ -20,6 +20,7 @@
     scheduleReminder,
   } from '../lib/reminder';
   import { downloadFile } from '../lib/download';
+  import AiSettings from '../components/AiSettings.svelte';
   import ExportDialog from '../components/ExportDialog.svelte';
   import { headerPrefs, setHelpButton } from '../lib/header.svelte';
   import { setSplashEnabled, splashEnabled } from '../lib/splash';
@@ -367,7 +368,7 @@
     Ask ChatGPT, Claude, Gemini or any other LLM to write cards in a format Nenrin reads. Copy the
     prompt, add your notes or a topic at the end, then paste the reply into <a href="#/add"
       >Add cards → Paste</a
-    >. Nenrin itself never sends anything to an AI.
+    >. This way, Nenrin itself never sends anything to an AI.
   </p>
   <div class="row">
     <button onclick={copyPrompt}>Copy prompt</button>
@@ -389,6 +390,9 @@
       value={cardPrompt()}></textarea>
   </details>
 </div>
+
+<h3 class="section-title" id="ai">AI card generation (optional)</h3>
+<AiSettings />
 
 <h3 class="section-title">Storage</h3>
 <div class="panel stack">

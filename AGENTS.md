@@ -52,7 +52,7 @@ ref/             # GITIGNORED local research: competitor notes + page snapshots
 ## Rules
 
 1. **License hygiene.** Every dependency must be MIT, Apache-2.0, BSD, ISC, or similarly permissive. **Never copy code from Anki (AGPL-3.0), AnkiDroid (GPL-3.0), or other copyleft projects.** You may read their file-format docs and behavior, but write the implementation independently.
-2. **Local-first.** Don't add network calls, telemetry, analytics, or third-party fonts/CDNs at runtime. The app must work with the network disabled after the first load.
+2. **Local-first.** Don't add network calls, telemetry, analytics, or third-party fonts/CDNs at runtime. The app must work with the network disabled after the first load. The one exception is opt-in AI card generation (`src/lib/llm/generate.ts`): it calls only the provider the user set up, with their key, when they press Generate.
 3. **Never lose user data.** All schema changes go through versioned Dexie migrations, with a test. Write review logs append-only. Any destructive action needs confirmation or undo.
 4. **Scheduler isolation.** Only `src/lib/scheduler/` touches `ts-fsrs`. Store the full review log (card id, timestamp, rating, elapsed time, state before and after) so FSRS parameters can be re-optimized later.
 5. **Sanitize card HTML.** Imported Anki cards contain arbitrary HTML and JS. Render through DOMPurify and strip scripts. Never `eval` template code.

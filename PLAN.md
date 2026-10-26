@@ -172,7 +172,7 @@ Math is already covered by KaTeX (`$…$`, `$$…$$`, and Anki's `\(…\)` / `\[
 
 ### Phase 5: Maybe later
 
-- [ ] Opt-in AI card generation from text/PDF using the user's own API key (no Nenrin servers)
+- [x] Opt-in AI card generation from text using the user's own API key (no Nenrin servers): Anthropic via the official SDK (lazy, streamed, refusal fallbacks), or any OpenAI-compatible server (OpenAI, OpenRouter, Ollama). The reply fills Add cards → Paste for review. Keys stay on the device and out of backups. PDF input is still to do
 - [x] Type-in-the-answer cards: `{{type:Field}}` (and `type:cloze:`, `type:nc:`) render as a text box on the front (Enter shows the answer) and a character diff on the back, as Anki does; plus a built-in **Basic (type in the answer)** note type. The template only emits placeholders, so card HTML still never contains inputs
 - [ ] Built-in **Basic (optional reversed card)** note type: the reverse card is made only when the note's "Add Reverse" field has text
 - [ ] Image occlusion: an editor that masks parts of an image (one card per mask; hide one or all), and rendering for Anki's image occlusion notes on import
@@ -192,6 +192,10 @@ Math is already covered by KaTeX (`$…$`, `$$…$$`, and Anki's `\(…\)` / `\[
 | Scope creep (AI, sync, social) | Hold to the non-goals list; Phase 4+ only after v1                                                                                                   |
 
 ## Decision log
+
+- **2026-10-26:** Opt-in AI card generation is the one runtime network call (an exception to rule 2). It runs only after the user enters their own key and presses Generate, and goes straight to the provider they chose; there is still no Nenrin server. Claude goes through the official `@anthropic-ai/sdk` (Apache-2.0) in browser mode, loaded only on Generate and kept out of the service worker's precache (~340 KB, useless offline). Other providers use the OpenAI chat-completions shape, which covers OpenAI, OpenRouter and local servers like Ollama. The reply is plain text in the paste format, not structured output, so it lands in the existing paste preview and the user reviews every card before adding. Keys are a "secret setting": never written to backups, and kept on the device across restores.
+
+- **2026-10-26:** `.apkg` export writes the legacy layout (`collection.anki21`, schema 11, JSON media map), not the latest zstd/protobuf one: every Anki since 2.1 imports it, and it needs no compressor or protobuf writer. Exports were checked by importing them into real Anki 26.09 (the AGPL library as a dev-only tool, as for the fixtures). Note types keep Anki's id when they came from Anki and otherwise get a stable hash, and notes keep their GUID, so exporting again updates notes in Anki instead of duplicating them.
 
 - **2026-10-25:** The home screen's tree grows with the number of study days (log curve, full size at 365), not with the window it shows. The first version filled its space after about two weeks and then only thinned its rings, so month 1 and month 3 looked the same; it also measured widths against the busiest day, so one 300-review day thinned everything else, and skipped days left no trace. Now widths are relative to the median day (square root, clamped), at most 16 rings are drawn and older days merge into heartwood, and gaps of more than 7 days leave a scar.
 

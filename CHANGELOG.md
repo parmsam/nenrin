@@ -6,6 +6,8 @@ Nenrin follows [semantic versioning](https://semver.org/). Until 1.0, each roadm
 
 - **Your tree keeps growing**: the trunk now gets bigger with every day you study, quickly at first and then more slowly, so a year of study looks like a year. A huge day no longer makes the rest of your rings look thin. Older days darken into heartwood at the center, and a break of more than a week leaves a dark scar line, as a hard year does in a real tree.
 
+- **Make cards with AI, using your own key** (optional): set up Claude, OpenAI or a local model in Settings → _AI card generation_, then in _Add cards → Paste_ choose _Generate from text with AI_, paste your notes, and review the cards before adding them. The text goes straight from your device to the provider you chose; your key stays on this device and out of backups.
+
 - **Type in the answer**: a new **Basic (type in the answer)** note type, and Anki cards with `{{type:…}}` now work too. Type your answer and press Enter; the back shows what you got right, wrong and missed.
 
 - **Export to Anki (.apkg)**: **Export…** on a deck, or in Settings, now makes an Anki package with notes, sub-decks and media, and, if you choose, your progress (due dates, FSRS memory and review history), so Anki picks up where you left off. Exporting again updates the notes in Anki instead of duplicating them. Text export moved into the same dialog.

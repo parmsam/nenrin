@@ -1,4 +1,5 @@
 <script lang="ts">
+  import GenerateCards from '../components/GenerateCards.svelte';
   import { onMount, tick } from 'svelte';
   import CardView from '../components/CardView.svelte';
   import { db, type Note, type NoteType } from '../lib/db';
@@ -320,6 +321,12 @@
     </div>
 
     {#if mode === 'paste' && !note}
+      <GenerateCards
+        onresult={(text) => {
+          pasteText = text;
+          pasteArea?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        }}
+      />
       <div class="field">
         <label for="paste-md">Markdown</label>
         <textarea

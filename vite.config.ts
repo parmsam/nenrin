@@ -97,7 +97,8 @@ export default defineConfig({
         // conflicting duplicate entry, and Workbox then silently precaches nothing.
         globPatterns: ['**/*.{js,css,html,svg,png,webp,ico,wasm,woff2}'],
         // Typst (~29 MB) is opt-in: downloaded into its own cache from Settings, never precached.
-        globIgnores: ['screenshots/**', '**/typst_ts_*.wasm', 'typst/**'],
+        // The Anthropic SDK (~340 KB) only runs online, for opt-in AI card generation.
+        globIgnores: ['screenshots/**', '**/typst_ts_*.wasm', 'typst/**', '**/anthropic-sdk-*.js'],
         // Control the page on first install; later updates still wait for the prompt.
         clientsClaim: true,
         // Update-prompt rescue + isolation headers for optimize.html (see public/sw-custom.js).
@@ -108,6 +109,14 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: { main: 'index.html', optimize: 'optimize.html' },
+      // A stable name for the lazy Anthropic SDK chunk, so the precache can leave it out
+      // (see globIgnores). Only renames; chunk contents stay as Vite splits them.
+      output: {
+        chunkFileNames: (chunk) =>
+          chunk.moduleIds.some((id) => id.includes('/@anthropic-ai/sdk/'))
+            ? 'assets/anthropic-sdk-[hash].js'
+            : 'assets/[name]-[hash].js',
+      },
     },
   },
   // Pre-bundle up front so the dev server doesn't reload mid-session when the import
