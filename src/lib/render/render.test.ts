@@ -39,6 +39,18 @@ describe('templates', () => {
   it('treats a front with only an image as non-empty', () => {
     expect(isEmptyFront('<p> </p>')).toBe(true);
     expect(isEmptyFront('<img src="a.png">')).toBe(false);
+    expect(isEmptyFront('[sound:a.mp3]')).toBe(false);
+    // A field with only an image or audio still opens its {{#section}}.
+    const tpl = '{{#Flag}}Flag: {{Flag}}{{/Flag}}';
+    expect(renderTemplate(tpl, { Flag: '<img src="f.svg">' }, { side: 'front' })).toContain(
+      'Flag:',
+    );
+    expect(renderTemplate(tpl, { Flag: '<br>' }, { side: 'front' })).toBe('');
+    // Nested sections resolve at every level.
+    const nested = '{{#A}}a{{#B}}b{{/B}}{{^C}}!c{{/C}}{{/A}}';
+    expect(renderTemplate(nested, { A: '1', B: '1', C: '' }, { side: 'front' })).toBe('ab!c');
+    expect(renderTemplate(nested, { A: '1', B: '', C: '1' }, { side: 'front' })).toBe('a');
+    expect(renderTemplate(nested, { A: '', B: '1' }, { side: 'front' })).toBe('');
   });
 });
 

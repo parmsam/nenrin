@@ -71,7 +71,12 @@ function applyFilter(
   }
 }
 
-const isBlank = (html: string | undefined) => !html || stripHtml(html).trim() === '';
+/** No visible text and no media. An image-only field isn't empty (Anki agrees). */
+const isBlank = (html: string | undefined) =>
+  !html ||
+  stripHtml(
+    html.replace(/<(?:img|audio|video)\b/gi, 'x$&').replace(/\[sound:[^\]]+\]/g, 'x'),
+  ).trim() === '';
 
 export function stripHtml(html: string): string {
   return html.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ');
@@ -83,11 +88,16 @@ export function renderTemplate(
   ctx: TemplateContext,
 ): string {
   // Sections first: {{#Field}}shown if non-empty{{/Field}}, {{^Field}}shown if empty{{/Field}}.
-  const withSections = template.replace(
-    /\{\{([#^])\s*([^}]+?)\s*\}\}([\s\S]*?)\{\{\/\s*\2\s*\}\}/g,
-    (_, kind: string, name: string, inner: string) =>
+  // Each pass resolves the outermost sections; repeat for sections nested inside them.
+  const section = /\{\{([#^])\s*([^}]+?)\s*\}\}([\s\S]*?)\{\{\/\s*\2\s*\}\}/g;
+  let withSections = template;
+  for (let depth = 0; depth < 10; depth++) {
+    const next = withSections.replace(section, (_, kind: string, name: string, inner: string) =>
       (kind === '#') !== isBlank(fields[name]) ? inner : '',
-  );
+    );
+    if (next === withSections) break;
+    withSections = next;
+  }
   return withSections.replace(/\{\{\s*([^#^/}][^}]*?)\s*\}\}/g, (_, tag: string) => {
     if (tag === 'FrontSide') return ctx.frontSide ?? '';
     const parts = tag.split(':');
@@ -103,5 +113,5 @@ export function renderTemplate(
 
 /** True if a rendered front has no visible content (Anki doesn't create such cards). */
 export function isEmptyFront(html: string): boolean {
-  return isBlank(html.replace(/<img\b/gi, 'x<img'));
+  return isBlank(html);
 }
