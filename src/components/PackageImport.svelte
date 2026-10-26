@@ -3,11 +3,14 @@
   import { importAnkiPackage, type AnkiImportResult } from '../lib/anki/import';
   import { InvalidPackageError } from '../lib/anki/errors';
   import type { AnkiPackage } from '../lib/anki/package';
+  import { isCrowdAnkiFile } from '../lib/anki/crowdanki';
   import { parsePackageInWorker } from '../lib/anki/parse-in-worker';
 
   let { file }: { file: File } = $props();
 
   const isCollection = $derived(/\.colpkg$/i.test(file.name));
+  // CrowdAnki exports carry no scheduling, so there's nothing to choose.
+  const isCrowdAnki = $derived(isCrowdAnkiFile(file.name));
   let pkg = $state.raw<AnkiPackage | null>(null);
   let reading = $state(true);
   let busy = $state(false);
@@ -47,6 +50,8 @@
       .sort();
   });
 
+  const count = (n: number, noun: string) => `${n.toLocaleString()} ${noun}${n === 1 ? '' : 's'}`;
+
   async function run() {
     if (!pkg) return;
     if (
@@ -75,7 +80,9 @@
 {:else if error}
   <p class="error" role="alert">{error}</p>
 {:else if pkg}
-  <h3 class="section-title">{isCollection ? 'Anki collection' : 'Anki deck package'}</h3>
+  <h3 class="section-title">
+    {isCollection ? 'Anki collection' : isCrowdAnki ? 'CrowdAnki deck' : 'Anki deck package'}
+  </h3>
   <div class="panel stack">
     <dl class="facts">
       <div>
@@ -86,10 +93,12 @@
         <dt>Cards</dt>
         <dd>{pkg.cards.length}</dd>
       </div>
-      <div>
-        <dt>Reviews</dt>
-        <dd>{pkg.revlog.length}</dd>
-      </div>
+      {#if !isCrowdAnki}
+        <div>
+          <dt>Reviews</dt>
+          <dd>{pkg.revlog.length}</dd>
+        </div>
+      {/if}
       <div>
         <dt>Media files</dt>
         <dd>{pkg.media.length}</dd>
@@ -103,12 +112,17 @@
         </ul>
       </div>
     {/if}
-    <label class="check">
-      <input type="checkbox" bind:checked={scheduling} disabled={isCollection} />
-      Import review history and scheduling
-    </label>
+    {#if !isCrowdAnki}
+      <label class="check">
+        <input type="checkbox" bind:checked={scheduling} disabled={isCollection} />
+        Import review history and scheduling
+      </label>
+    {/if}
     <p class="muted small">
-      {#if scheduling}
+      {#if isCrowdAnki}
+        Every card arrives as new. Importing a newer version of the deck later updates its notes and
+        keeps your progress.
+      {:else if scheduling}
         Cards keep their due dates and FSRS memory; history is rebuilt from Anki’s review log when
         needed.
       {:else}
@@ -120,7 +134,7 @@
         A collection package replaces all decks, cards and review history on this device (your
         images and settings are kept). Export a backup first if you might want them back.
       </p>
-    {:else}
+    {:else if !isCrowdAnki}
       <p class="muted small">
         Notes you already imported are matched by Anki’s note id: newer versions update the note,
         and your scheduling is kept.
@@ -141,13 +155,15 @@
       <p>
         <strong>Done.</strong>
         {[
-          `${result.notesAdded} notes added`,
+          `${count(result.notesAdded, 'note')} added`,
           `${result.notesUpdated} updated`,
           `${result.notesUnchanged} unchanged`,
-          `${result.cardsAdded} cards`,
-          `${result.reviewsImported} reviews`,
-          `${result.mediaImported} media files`,
-        ].join(' · ')}
+          count(result.cardsAdded, 'card'),
+          !isCrowdAnki && count(result.reviewsImported, 'review'),
+          count(result.mediaImported, 'media file'),
+        ]
+          .filter(Boolean)
+          .join(' · ')}
       </p>
       <div><a class="button" href="#/">Go to decks</a></div>
     </div>

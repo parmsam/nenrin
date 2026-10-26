@@ -4,6 +4,10 @@ Nenrin follows [semantic versioning](https://semver.org/). Until 1.0, each roadm
 
 ## Unreleased
 
+- **Import CrowdAnki decks**: the JSON format that shared decks on GitHub use, such as [Ultimate Geography](https://github.com/anki-geo/ultimate-geography). Choose the release `.zip` (or a bare `deck.json`) in Import. Media, sub-decks and the deck's styling come along; importing a newer release updates notes and keeps your progress.
+- **Fixed: Anki templates with nested sections** (`{{#A}}…{{#B}}…{{/B}}…{{/A}}`) showed raw `{{#B}}` tags.
+- **Fixed: image-only fields counted as empty**, so cards whose front is just an image (such as a flag) weren't created, and `{{#Field}}` sections around them were hidden.
+- **Fixed:** the import summary said "1 notes" and "1 cards".
 - **Make cards with an LLM**: Settings → _Make cards with an LLM_ copies a ready-made prompt for ChatGPT, Claude, Gemini or any other LLM, with rules for good cards and the exact format to paste back into _Add cards → Paste_. Also as a downloadable Agent Skill (`nenrin-cards.zip`) for Claude and Claude Code, from the command palette, and next to the Paste box. Paste now also unwraps replies fenced with four backticks, which LLMs use when a card contains a diagram.
 - **Mermaid diagrams** in cards: a ` ```mermaid ` block renders as a diagram that follows your theme and accent, light or dark. The renderer ([Pele](https://github.com/obsidianmd/pele), MIT) downloads only when a card has a diagram. Bad syntax shows the source and the error.
 - **Consistent breadcrumbs**: Browse, Stats, Import and Settings use the same "Decks / Page" trail as deck pages, instead of an underlined "← Decks" link.

@@ -1,6 +1,6 @@
 // Compatibility check against real-world Anki decks, in real Chromium.
 //
-//   npm run check:decks -- ref/decks            (a folder of .apkg / .colpkg files)
+//   npm run check:decks -- ref/decks            (a folder of .apkg / .colpkg / CrowdAnki .zip files)
 //
 // Runs the app's own code through the Vite dev server: parses each package in the import
 // worker, imports it into a fresh IndexedDB database, and renders every card with the real
@@ -14,10 +14,10 @@ import { chromium } from '@playwright/test';
 const dir = resolve(process.argv[2] ?? 'ref/decks');
 const reportPath = process.argv[3];
 const files = readdirSync(dir)
-  .filter((f) => /\.(apkg|colpkg)$/i.test(f))
+  .filter((f) => /\.(apkg|colpkg|zip)$/i.test(f))
   .sort();
 if (files.length === 0) {
-  console.error(`No .apkg/.colpkg files in ${dir}`);
+  console.error(`No .apkg/.colpkg/.zip files in ${dir}`);
   process.exit(1);
 }
 
@@ -53,7 +53,8 @@ try {
 
       const r = { leftoverTags: {}, missingMedia: [], emptyFronts: 0, errors: [], samples: [] };
       let t = performance.now();
-      const pkg = await parsePackageInWorker(await (await fetch(url)).blob());
+      const blob = await (await fetch(url)).blob();
+      const pkg = await parsePackageInWorker(new File([blob], url.split('/').pop()));
       r.parseMs = Math.round(performance.now() - t);
       Object.assign(r, {
         format: pkg.format,

@@ -17,7 +17,7 @@
   let noteTypes = $state<NoteType[]>([]);
   let decks = $state<DeckNode[]>([]);
   let fileName = $state('');
-  /** An .apkg / .colpkg goes to PackageImport; text files are handled here. */
+  /** Packages (.apkg / .colpkg, CrowdAnki .zip / deck.json) go to PackageImport; text files are handled here. */
   let packageFile = $state.raw<File | null>(null);
   let source = '';
   let file = $state.raw<TextFile | null>(null);
@@ -86,7 +86,7 @@
     const f = input.files?.[0];
     if (!f) return;
     fileName = f.name;
-    if (/\.(apkg|colpkg)$/i.test(f.name)) {
+    if (/\.(apkg|colpkg|zip|json)$/i.test(f.name)) {
       file = null;
       error = '';
       packageFile = f;
@@ -137,6 +137,13 @@
     <strong>.colpkg</strong> collection) with its media and, optionally, your review history.
   </p>
   <p>
+    Or a <strong>CrowdAnki</strong> deck (a <strong>.zip</strong> of its folder, or just
+    <strong>deck.json</strong>), the format of shared decks kept on GitHub such as
+    <a href="https://github.com/anki-geo/ultimate-geography" target="_blank" rel="noreferrer"
+      >Ultimate Geography</a
+    >.
+  </p>
+  <p>
     Or a <strong>text file</strong> (<strong>.txt</strong>, <strong>.csv</strong>,
     <strong>.tsv</strong>) with fields separated by tabs, commas, semicolons or pipes. Files
     exported from Anki (“Notes in Plain Text”) keep their note types, decks, tags and GUIDs.
@@ -148,7 +155,7 @@
     {fileName ? `Chosen: ${fileName}` : 'Choose a file…'}
     <input
       type="file"
-      accept=".apkg,.colpkg,.txt,.csv,.tsv,text/plain,text/csv,text/tab-separated-values"
+      accept=".apkg,.colpkg,.zip,.json,.txt,.csv,.tsv,text/plain,text/csv,text/tab-separated-values"
       onchange={pick}
     />
   </label>

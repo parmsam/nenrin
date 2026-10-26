@@ -1,7 +1,9 @@
 /// <reference lib="webworker" />
-// Parses Anki packages off the main thread: unzip, zstd and SQLite (sql.js) are all heavy.
+// Parses Anki packages (and CrowdAnki exports) off the main thread: unzip, zstd and SQLite
+// (sql.js) are all heavy.
 import initSqlJs, { type SqlJsStatic } from 'sql.js';
 import wasmUrl from 'sql.js/dist/sql-wasm.wasm?url';
+import { readCrowdAnki } from '../lib/anki/crowdanki';
 import { InvalidPackageError, readAnkiPackage } from '../lib/anki/package';
 
 export type WorkerResponse =
@@ -11,10 +13,15 @@ export type WorkerResponse =
 const scope = self as unknown as DedicatedWorkerGlobalScope;
 let sql: Promise<SqlJsStatic> | undefined;
 
-scope.onmessage = async (e: MessageEvent<{ bytes: ArrayBuffer }>) => {
+scope.onmessage = async (e: MessageEvent<{ bytes: ArrayBuffer; crowdAnki?: boolean }>) => {
   try {
-    sql ??= initSqlJs({ locateFile: () => wasmUrl });
-    const pkg = readAnkiPackage(new Uint8Array(e.data.bytes), await sql);
+    const bytes = new Uint8Array(e.data.bytes);
+    let pkg;
+    if (e.data.crowdAnki) pkg = readCrowdAnki(bytes);
+    else {
+      sql ??= initSqlJs({ locateFile: () => wasmUrl });
+      pkg = readAnkiPackage(bytes, await sql);
+    }
     // Hand media buffers over instead of copying them.
     const buffers = [...new Set(pkg.media.map((m) => m.data.buffer as ArrayBuffer))];
     scope.postMessage({ ok: true, pkg } satisfies WorkerResponse, buffers);
