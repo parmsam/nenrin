@@ -1,6 +1,6 @@
 <script lang="ts">
   import { tick } from 'svelte';
-  import { exportBackup } from '../lib/actions';
+  import { copyCardPrompt, exportBackup } from '../lib/actions';
   import { db } from '../lib/db';
   import { deckTree, type DeckNode } from '../lib/db/decks';
   import {
@@ -100,6 +100,17 @@
           note = 'Backup downloaded.';
         },
       },
+      {
+        id: 'llm-prompt',
+        label: 'Copy LLM prompt for making cards',
+        group: 'Action',
+        keywords: 'ai chatgpt claude gemini generate flashcards skill',
+        run: async () => {
+          note = (await copyCardPrompt())
+            ? 'Prompt copied. Paste it into your LLM, then add your notes.'
+            : 'Couldn’t copy. Open Settings → Make cards with an LLM.';
+        },
+      },
       ...MODES.map((m) => ({
         id: `theme-${m.id}`,
         label: `Theme: ${m.label}`,
@@ -171,7 +182,7 @@
   async function choose(cmd: Command | undefined) {
     if (!cmd) return;
     if (cmd.id !== 'search-notes') rememberRecent(cmd.id);
-    const keepOpen = cmd.id === 'backup';
+    const keepOpen = cmd.id === 'backup' || cmd.id === 'llm-prompt';
     if (!keepOpen) paletteState.open = false;
     await cmd.run();
   }

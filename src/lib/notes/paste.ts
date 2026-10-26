@@ -5,7 +5,7 @@
  *   3. labels     — Q:/A:, Question:/Answer:, Front:/Back: (bold markers like **Q:** are fine)
  *   4. heading    — a first `# Heading` is the front, the rest is the back
  *   5. paragraph  — the first paragraph is the front, the rest is the back
- * A wrapping ``` fence is removed, and a last line `Tags: a b` becomes tags.
+ * A wrapping ``` (or ````) fence is removed, and a last line `Tags: a b` becomes tags.
  *
  * parsePastedCards() also recognises several cards in one block: repeated Q/A pairs (numbered,
  * bulleted, or separated by --- or headings), a Markdown table, or several cloze paragraphs.
@@ -46,9 +46,10 @@ const A_LABEL = label('a|answer|back');
 const Q_LABEL_ALL = label('q|question|front', 'img');
 
 function unwrapFence(text: string): string {
-  const m = text.match(/^\s*```([\w-]*)[ \t]*\n([\s\S]*?)\n```\s*$/);
+  // 3+ backticks: LLMs use ```` to wrap Markdown that has ``` blocks (e.g. diagrams) inside.
+  const m = text.match(/^\s*(`{3,})([\w-]*)[ \t]*\n([\s\S]*?)\n\1\s*$/);
   // A lone diagram is content, not a wrapper.
-  return m && !/^(mermaid|typst)$/i.test(m[1]) ? m[2] : text;
+  return m && !/^(mermaid|typst)$/i.test(m[2]) ? m[3] : text;
 }
 
 function takeTags(text: string): { text: string; tags: string[] } {

@@ -74,6 +74,13 @@ describe('parsePastedCard', () => {
     });
   });
 
+  it('unwraps a 4-backtick fence that has a diagram inside', () => {
+    const text =
+      '````markdown\nQ: Flow?\nA: See:\n\n```mermaid\nflowchart LR\n  A --> B\n```\n````';
+    expect(parsePastedCard(text)).toMatchObject({ front: 'Flow?' });
+    expect(parsePastedCard(text)?.back).toContain('```mermaid');
+  });
+
   it('keeps a lone diagram fence as content', () => {
     const text = '```mermaid\nflowchart LR\n  A --> B\n```';
     expect(parsePastedCard(text)?.front).toContain('```mermaid');

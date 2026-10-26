@@ -8,6 +8,7 @@
   import { addNote, cardOrdinals, deleteNote, parseTags, updateNote } from '../lib/notes';
   import { renderCard } from '../lib/render';
   import { clozeNumbers } from '../lib/render/template';
+  import { copyCardPrompt } from '../lib/actions';
   import { parsePastedCards, SPLIT_LABELS, type PastedCard } from '../lib/notes/paste';
   import { navigate, router } from '../lib/router.svelte';
 
@@ -32,6 +33,12 @@
   let mode = $state<'fields' | 'paste'>('fields');
   let pasteText = $state('');
   let pasteArea: HTMLTextAreaElement | undefined = $state();
+  let promptCopied = $state(false);
+
+  async function copyPrompt() {
+    promptCopied = await copyCardPrompt();
+    if (!promptCopied) navigate('/settings');
+  }
   let deckStyling = $state(true);
 
   const noteType = $derived(noteTypes.find((t) => t.id === typeId));
@@ -349,6 +356,13 @@
             >
           {/if}
         </p>
+        <p class="llm-hint muted">
+          Using an LLM?
+          <button type="button" class="link" onclick={copyPrompt}>Copy a prompt</button>
+          that asks for cards in this format{#if promptCopied}<span role="status">
+              · copied</span
+            >{/if}. <a href="#/settings">More in Settings</a>.
+        </p>
       </div>
     {/if}
 
@@ -511,5 +525,16 @@
   }
   .preview p {
     text-align: center;
+  }
+  .llm-hint {
+    margin: 0.25rem 0 0;
+    font-size: 0.85rem;
+  }
+  button.link {
+    padding: 0;
+    background: none;
+    color: var(--accent);
+    font-weight: inherit;
+    text-decoration: underline;
   }
 </style>

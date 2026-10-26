@@ -4,7 +4,12 @@
   import { db } from '../lib/db';
   import { InvalidBackupError, parseBackup, restoreBackup } from '../lib/db/backup';
   import { getPrefs, setPrefs } from '../lib/db/prefs';
-  import { exportBackup as exportBackupFile } from '../lib/actions';
+  import {
+    copyCardPrompt,
+    downloadCardSkill,
+    exportBackup as exportBackupFile,
+  } from '../lib/actions';
+  import { cardPrompt } from '../lib/llm/prompt';
   import { downloadFile } from '../lib/download';
   import { exportNotesText, textExportFilename } from '../lib/export/text';
   import { setSplashEnabled, splashEnabled } from '../lib/splash';
@@ -20,6 +25,18 @@
   let persisted = $state<boolean | null>(null);
   let usage = $state('');
   let status = $state('');
+  let promptNote = $state('');
+  let promptBox: HTMLTextAreaElement | undefined = $state();
+
+  async function copyPrompt() {
+    if (await copyCardPrompt()) promptNote = 'Prompt copied. Paste it into your LLM.';
+    else {
+      // Clipboard blocked: select the text so ⌘C / Ctrl+C works.
+      promptBox?.closest('details')?.setAttribute('open', '');
+      promptBox?.select();
+      promptNote = 'Copy the selected text.';
+    }
+  }
   let error = $state('');
 
   const lastBackup = liveQuery(
@@ -203,6 +220,35 @@
   </div>
 </div>
 
+<h3 class="section-title" id="llm">Make cards with an LLM</h3>
+<div class="panel stack">
+  <p>
+    Ask ChatGPT, Claude, Gemini or any other LLM to write cards in a format Nenrin reads. Copy the
+    prompt, add your notes or a topic at the end, then paste the reply into <a href="#/add"
+      >Add cards → Paste</a
+    >. Nenrin itself never sends anything to an AI.
+  </p>
+  <div class="row">
+    <button onclick={copyPrompt}>Copy prompt</button>
+    <button class="secondary" onclick={downloadCardSkill}>Download skill (.zip)</button>
+    {#if promptNote}<span class="muted" role="status">{promptNote}</span>{/if}
+  </div>
+  <p class="hint muted">
+    The skill holds the same instructions for tools that load
+    <a href="https://agentskills.io" rel="noopener">Agent Skills</a>: upload the zip in Claude’s
+    settings, or unzip it into <code>~/.claude/skills/</code> for Claude Code. Then just ask for flashcards.
+  </p>
+  <details>
+    <summary>Show the prompt</summary>
+    <textarea
+      bind:this={promptBox}
+      readonly
+      rows="14"
+      aria-label="Prompt for an LLM"
+      value={cardPrompt()}></textarea>
+  </details>
+</div>
+
 <h3 class="section-title">Storage</h3>
 <div class="panel stack">
   <p>
@@ -369,5 +415,11 @@
     width: 1px;
     height: 1px;
     opacity: 0;
+  }
+  textarea[readonly] {
+    margin-top: 0.5rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.8rem;
+    line-height: 1.45;
   }
 </style>
