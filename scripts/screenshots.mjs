@@ -1,7 +1,8 @@
-// Captures app screenshots for the README and the PWA install dialog.
+// Captures app screenshots for the README and the PWA install dialog, then composes the
+// README's row of phones (readme-light.png / readme-dark.png, one per GitHub theme).
 // Usage: npm run screenshots (builds first). Output: public/screenshots/*.png
 import { spawn } from 'node:child_process';
-import { mkdirSync } from 'node:fs';
+import { mkdirSync, readFileSync } from 'node:fs';
 import { chromium, devices } from '@playwright/test';
 
 const port = 4180;
@@ -43,10 +44,39 @@ const shots = [
   { name: 'mobile-review-light', ...phone, scheme: 'light', setup: reviewAnswer },
   { name: 'mobile-review-dark', ...phone, scheme: 'dark', setup: reviewAnswer },
   { name: 'mobile-deck-light', ...phone, scheme: 'light', setup: openDeck },
+  { name: 'mobile-deck-dark', ...phone, scheme: 'dark', setup: openDeck },
   { name: 'mobile-add-light', ...phone, scheme: 'light', setup: addCloze },
+  { name: 'mobile-add-dark', ...phone, scheme: 'dark', setup: addCloze },
   { name: 'desktop-decks-light', ...desktop, scheme: 'light', setup: addSample },
   { name: 'desktop-review-light', ...desktop, scheme: 'light', setup: reviewAnswer },
 ];
+
+/** Lays four phone screenshots side by side, same size, with rounded corners. */
+async function composeReadme(browser) {
+  for (const scheme of ['light', 'dark']) {
+    const names = ['decks', 'review', 'add', 'deck'].map((n) => `mobile-${n}-${scheme}`);
+    const imgs = names
+      .map((n) => readFileSync(`${out}/${n}.png`).toString('base64'))
+      .map((b64) => `<img src="data:image/png;base64,${b64}">`)
+      .join('');
+    const border = scheme === 'light' ? '#e8dccb' : '#3a332c';
+    const page = await browser.newPage({
+      deviceScaleFactor: 2,
+      viewport: { width: 1280, height: 700 },
+    });
+    await page.setContent(`<style>
+      body { margin: 0; background: transparent; }
+      .row { display: flex; gap: 28px; padding: 24px; width: max-content; }
+      img { width: 280px; border-radius: 30px; border: 1px solid ${border};
+            box-shadow: 0 10px 30px rgb(0 0 0 / 18%); }
+    </style><div class="row">${imgs}</div>`);
+    await page
+      .locator('.row')
+      .screenshot({ path: `${out}/readme-${scheme}.png`, omitBackground: true });
+    console.log(`${out}/readme-${scheme}.png`);
+    await page.close();
+  }
+}
 
 const server = spawn('npx', ['vite', 'preview', '--port', String(port), '--strictPort'], {
   stdio: 'ignore',
@@ -72,10 +102,17 @@ try {
     await page.goto(url);
     await page.getByRole('heading', { name: 'Nenrin' }).waitFor();
     await shot.setup(page);
+    // Start at the top, with no focus ring left from the clicks that got here.
+    await page.evaluate(() => {
+      document.activeElement?.blur();
+      scrollTo(0, 0);
+    });
+    await page.waitForTimeout(150);
     await page.screenshot({ path: `${out}/${shot.name}.png` });
     console.log(`${out}/${shot.name}.png`);
     await context.close();
   }
+  await composeReadme(browser);
   await browser.close();
 } finally {
   process.kill(-server.pid);
