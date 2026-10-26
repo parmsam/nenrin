@@ -86,7 +86,9 @@
   <p>This deck doesn’t exist. <a href="#/">Back to decks</a></p>
 {:else}
   {@const { deck, tags, extra } = $data}
-  <nav class="crumbs muted"><a href="#/">Decks</a> / <a href="#/deck/{deckId}">{deck.name}</a></nav>
+  <nav class="crumbs muted" aria-label="Breadcrumb">
+    <a href="#/">Decks</a> / <a href="#/deck/{deckId}">{deck.name}</a>
+  </nav>
   <h2>Custom study</h2>
 
   <section class="panel">
@@ -211,10 +213,6 @@
 {/if}
 
 <style>
-  .crumbs {
-    font-size: 0.875rem;
-    margin-bottom: 0.25rem;
-  }
   h2 {
     margin: 0 0 1rem;
   }

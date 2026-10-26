@@ -228,6 +228,19 @@ label {
   font-size: 0.9rem;
 }
 
+/* Breadcrumb above a screen's title: "Decks / Settings". Same on every screen. */
+.crumbs {
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
+}
+.crumbs a {
+  text-decoration: none;
+}
+.crumbs a:hover,
+.crumbs a:focus-visible {
+  text-decoration: underline;
+}
+
 .panel {
   background: var(--surface);
   border: 1px solid var(--border);

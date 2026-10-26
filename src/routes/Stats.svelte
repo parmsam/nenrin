@@ -28,7 +28,9 @@
   });
 </script>
 
-<nav class="crumbs muted"><a href="#/">← Decks</a></nav>
+<nav class="crumbs muted" aria-label="Breadcrumb">
+  <a href="#/">Decks</a> / <span aria-current="page">Stats</span>
+</nav>
 <h2>Stats</h2>
 
 <div class="filters">
@@ -116,9 +118,6 @@
 {/if}
 
 <style>
-  .crumbs {
-    font-size: 0.875rem;
-  }
   h2 {
     margin: 0.25rem 0 1rem;
   }

@@ -96,7 +96,9 @@
   }
 </script>
 
-<nav class="crumbs muted"><a href="#/">← Decks</a></nav>
+<nav class="crumbs muted" aria-label="Breadcrumb">
+  <a href="#/">Decks</a> / <span aria-current="page">Settings</span>
+</nav>
 <h2>Settings</h2>
 
 {#if status}<p class="ok" role="status">{status}</p>{/if}
@@ -253,9 +255,6 @@
 </div>
 
 <style>
-  .crumbs {
-    font-size: 0.875rem;
-  }
   h2 {
     margin: 0.25rem 0 0.5rem;
   }

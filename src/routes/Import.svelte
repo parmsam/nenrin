@@ -126,7 +126,9 @@
   const columnName = (i: number) => file?.headers.columns?.[i] || `Column ${i + 1}`;
 </script>
 
-<nav class="crumbs muted"><a href="#/">← Decks</a></nav>
+<nav class="crumbs muted" aria-label="Breadcrumb">
+  <a href="#/">Decks</a> / <span aria-current="page">Import</span>
+</nav>
 <h2>Import</h2>
 
 <section class="panel stack">
@@ -280,9 +282,6 @@
 {/if}
 
 <style>
-  .crumbs {
-    font-size: 0.875rem;
-  }
   h2 {
     margin: 0.25rem 0 1rem;
   }

@@ -145,7 +145,7 @@
   <p>This deck doesn’t exist. <a href="#/">Back to decks</a></p>
 {:else}
   {@const { deck, node, children, study, cardCount } = $data}
-  <nav class="crumbs muted"><a href="#/">Decks</a> / {node.path}</nav>
+  <nav class="crumbs muted" aria-label="Breadcrumb"><a href="#/">Decks</a> / {node.path}</nav>
 
   {#if renaming}
     <form class="row title-form" onsubmit={saveName}>
@@ -272,10 +272,6 @@
 {/if}
 
 <style>
-  .crumbs {
-    font-size: 0.875rem;
-    margin-bottom: 0.25rem;
-  }
   .title-row h2 {
     margin: 0;
     font-size: 1.6rem;

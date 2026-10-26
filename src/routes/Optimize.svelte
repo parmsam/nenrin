@@ -222,9 +222,6 @@
   main {
     flex: 1;
   }
-  .crumbs {
-    font-size: 0.875rem;
-  }
   h1 {
     font-size: 1.6rem;
     margin: 0.25rem 0 0.5rem;

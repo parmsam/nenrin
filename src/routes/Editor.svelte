@@ -436,9 +436,6 @@
 {/if}
 
 <style>
-  .crumbs {
-    font-size: 0.875rem;
-  }
   h2 {
     margin: 0.25rem 0 1rem;
   }
