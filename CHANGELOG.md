@@ -2,7 +2,9 @@
 
 Nenrin follows [semantic versioning](https://semver.org/). Until 1.0, each roadmap phase in [PLAN.md](PLAN.md) bumps the minor version.
 
-## Unreleased
+## 0.8.0 (2026-10-26): Note types, rewards
+
+- **Fixed:** two settings changed at the same moment could overwrite each other, so one change was lost.
 
 - **Rewards, built around the tree** (optional, Settings → Appearance → _Rewards_): a mark that grows as a session does (<span lang="ja">木 → 林 → 森</span>), with an optional wood-block sound; a **stamp book** (<span lang="ja">御朱印帳</span>) in Stats with a red seal for each day you finished everything due; **milestones** such as your first heartwood or a year of study; and a home-screen tree that follows the **seasons**. None of it depends on which button you press, and nothing is ever taken away.
 
