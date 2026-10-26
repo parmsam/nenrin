@@ -21,6 +21,7 @@
   } from '../lib/reminder';
   import { downloadFile } from '../lib/download';
   import { exportNotesText, textExportFilename } from '../lib/export/text';
+  import { headerPrefs, setHelpButton } from '../lib/header.svelte';
   import { setSplashEnabled, splashEnabled } from '../lib/splash';
   import { loadTheme, MODES, PALETTES, saveTheme } from '../lib/theme';
 
@@ -220,6 +221,18 @@
       onchange={() => setSplashEnabled(showSplash)}
     />
     <span class="label-text">Show welcome screen when opening Nenrin</span>
+  </label>
+  <label class="check">
+    <input
+      type="checkbox"
+      checked={headerPrefs.helpButton}
+      onchange={(e) => setHelpButton(e.currentTarget.checked)}
+    />
+    <span class="label-text"
+      >Show the Help button in the header
+      <span class="muted small">(the guide is also in the footer and the command palette)</span
+      ></span
+    >
   </label>
 </div>
 

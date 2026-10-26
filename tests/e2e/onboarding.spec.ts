@@ -27,3 +27,19 @@ test('the user guide works in the app, with links between pages', async ({ page 
   await page.goto('./#/help/faq');
   await expect(page.getByRole('link', { name: 'open source' })).toHaveAttribute('target', '_blank');
 });
+
+test('the header Help button opens the guide, and can be turned off in Settings', async ({
+  page,
+}) => {
+  await page.goto('./');
+  const help = page.getByRole('banner').getByRole('link', { name: 'Help: user guide' });
+  await help.click();
+  await expect(page.getByRole('heading', { name: 'Nenrin user guide' })).toBeVisible();
+
+  await page.goto('./#/settings');
+  await page.getByLabel(/Show the Help button/).uncheck();
+  await expect(help).toHaveCount(0);
+  await page.reload();
+  await expect(page.getByLabel(/Show the Help button/)).not.toBeChecked();
+  await expect(help).toHaveCount(0);
+});

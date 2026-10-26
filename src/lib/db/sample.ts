@@ -44,7 +44,7 @@ const TOUR: TourCard[] = [
   },
   {
     front: 'Where can you learn more?',
-    back: 'Open **Help** from Settings or the command palette (**⌘K** / **Ctrl+K**). Press **?** for keyboard shortcuts. Delete this deck whenever you like.',
+    back: 'Tap the **?** in the circle at the top for **Help**, or use the command palette (**⌘K** / **Ctrl+K**). Press **?** for keyboard shortcuts. Delete this deck whenever you like.',
   },
 ];
 

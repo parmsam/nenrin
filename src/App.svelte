@@ -40,6 +40,7 @@
   import ShortcutsDialog from './components/ShortcutsDialog.svelte';
   import Splash from './components/Splash.svelte';
   import UpdatePrompt from './components/UpdatePrompt.svelte';
+  import { headerPrefs } from './lib/header.svelte';
   import { plainKey, shortcutsDialog } from './lib/shortcuts.svelte';
 
   const GO_KEYS: Record<string, string> = {
@@ -140,6 +141,27 @@
         /></svg
       >
     </a>
+    {#if headerPrefs.helpButton}
+      <a
+        class="icon-link"
+        class:active={route.name === 'help'}
+        href="#/help"
+        aria-label="Help: user guide"
+        aria-current={route.name === 'help' ? 'page' : undefined}
+        title="Help: user guide"
+      >
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"
+          ><path
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM9.6 9.3a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2.2-2.4 3.6M12 17h.01"
+          /></svg
+        >
+      </a>
+    {/if}
     <button
       class="icon-link kbd-button"
       onclick={() => (shortcutsDialog.open = true)}
@@ -276,6 +298,14 @@
   button.icon-link {
     padding: 0;
     background: transparent;
+  }
+  /* The smallest phones (320 px) can't fit every icon; the version is also in the footer. */
+  @media (max-width: 360px) {
+    .badge {
+      visibility: hidden;
+      width: 0;
+      padding: 0;
+    }
   }
   /* Touch-only devices have no keyboard to need shortcuts for. */
   @media (hover: none) {

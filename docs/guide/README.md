@@ -2,7 +2,7 @@
 
 Nenrin (年輪, "tree rings") is a free flashcard app that schedules your reviews with FSRS, a modern spaced-repetition algorithm. It runs in your browser, works offline, and keeps everything on your device. You don't need an account.
 
-The same guide is built into the app: open **Help** from Settings or the command palette (<kbd>⌘K</kbd> / <kbd>Ctrl+K</kbd>).
+The same guide is built into the app: open **Help** with the ? button in the header (or from the footer, Settings, or the command palette, <kbd>⌘K</kbd> / <kbd>Ctrl+K</kbd>).
 
 1. [Getting started](getting-started.md): install the app, make your first deck, study for the first time
 2. [Studying](studying.md): the four buttons, learning cards, daily limits, bury and suspend
