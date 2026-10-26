@@ -16,7 +16,9 @@ export async function renderMathIn(root: HTMLElement): Promise<void> {
   if (nodes.length === 0) return;
   const k = await load();
   for (const el of nodes) {
-    if (!el.isConnected) continue;
+    // Another call may have typeset it while KaTeX loaded; its text is now KaTeX's output, not
+    // TeX, and typesetting that again garbles the formula.
+    if (!el.isConnected || el.dataset.rendered) continue;
     k.render(el.textContent ?? '', el, {
       displayMode: el.dataset.display === 'true',
       throwOnError: false,
