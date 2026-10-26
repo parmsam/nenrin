@@ -129,3 +129,31 @@ test('math renders with KaTeX, loaded only when a card has math', async ({ page 
   await page.getByRole('tab', { name: 'Back' }).click();
   await expect(page.locator('.preview .katex-display')).toBeVisible();
 });
+
+test('Mermaid diagrams render with Pele, loaded only when a card has one', async ({ page }) => {
+  const peleRequests: string[] = [];
+  page.on('request', (r) => {
+    if (/pele|lazy-/i.test(r.url())) peleRequests.push(r.url());
+  });
+  await page.goto('./');
+  await page.getByLabel('Deck name').fill('Diagrams');
+  await page.getByRole('button', { name: 'Create' }).click();
+  await page.getByRole('link', { name: '+ Add cards' }).click();
+  await page.getByLabel('Front').fill('Plain front');
+  await expect(page.locator('.preview')).toContainText('Plain front');
+  expect(peleRequests).toEqual([]);
+
+  await page.getByLabel('Front').fill('```mermaid\nflowchart LR\n  Q[Question] --> A[Answer]\n```');
+  const svg = page.locator('.preview .nenrin-diagram svg');
+  await expect(svg).toBeVisible();
+  await expect(svg).toContainText('Question');
+  // Themed from the app's tokens, not Pele's defaults.
+  const fg = await page
+    .locator('.preview .nenrin-diagram')
+    .evaluate((el) => getComputedStyle(el).getPropertyValue('--pele-fg').trim());
+  expect(fg).not.toBe('');
+
+  // Bad syntax shows the source and an error, never a blank card.
+  await page.getByLabel('Front').fill('```mermaid\nflowchart LR\n  A -->\n```');
+  await expect(page.locator('.preview .diagram-error')).toBeVisible();
+});

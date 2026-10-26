@@ -74,6 +74,11 @@ describe('parsePastedCard', () => {
     });
   });
 
+  it('keeps a lone diagram fence as content', () => {
+    const text = '```mermaid\nflowchart LR\n  A --> B\n```';
+    expect(parsePastedCard(text)?.front).toContain('```mermaid');
+  });
+
   it('returns null when there is no answer', () => {
     expect(parsePastedCard('Just one line')).toBeNull();
     expect(parsePastedCard('Q: only a question\nA:   ')).toBeNull();

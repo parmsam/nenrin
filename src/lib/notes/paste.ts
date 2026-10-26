@@ -46,8 +46,9 @@ const A_LABEL = label('a|answer|back');
 const Q_LABEL_ALL = label('q|question|front', 'img');
 
 function unwrapFence(text: string): string {
-  const m = text.match(/^\s*```[\w-]*[ \t]*\n([\s\S]*?)\n```\s*$/);
-  return m ? m[1] : text;
+  const m = text.match(/^\s*```([\w-]*)[ \t]*\n([\s\S]*?)\n```\s*$/);
+  // A lone diagram is content, not a wrapper.
+  return m && !/^(mermaid|typst)$/i.test(m[1]) ? m[2] : text;
 }
 
 function takeTags(text: string): { text: string; tags: string[] } {

@@ -4,6 +4,8 @@ Nenrin follows [semantic versioning](https://semver.org/). Until 1.0, each roadm
 
 ## Unreleased
 
+- **Mermaid diagrams** in cards: a ` ```mermaid ` block renders as a diagram that follows your theme and accent, light or dark. The renderer ([Pele](https://github.com/obsidianmd/pele), MIT) downloads only when a card has a diagram. Bad syntax shows the source and the error.
+- **Consistent breadcrumbs**: Browse, Stats, Import and Settings use the same "Decks / Page" trail as deck pages, instead of an underlined "← Decks" link.
 - **Preview a deck**: flip through every card (<kbd>P</kbd> on a deck, or the Preview button) with <kbd>←</kbd> <kbd>→</kbd>, without scheduling anything.
 - **Custom study** (<kbd>C</kbd> on a deck, or after finishing one): add extra new cards or reviews for today only, or start a one-off session: preview new cards, review forgotten cards, review ahead, or study by tag. Choose the order and size, and whether answers count as reviews or are practice only.
 - **Bury and suspend while reviewing**, with the same keys as Anki: <kbd>-</kbd> bury card, <kbd>=</kbd> bury note (until tomorrow), <kbd>@</kbd> suspend card, <kbd>!</kbd> suspend note. <kbd>Z</kbd> undoes them, and a ⋯ menu offers the same for mouse and touch.

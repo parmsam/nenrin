@@ -142,10 +142,11 @@ From the Anki manual ([importing](https://docs.ankiweb.net/manual/importing/intr
 
 Math is already covered by KaTeX (`$…$`, `$$…$$`, and Anki's `\(…\)` / `\[…\]`).
 
-- [ ] **Mermaid diagrams** via [Pele](https://github.com/obsidianmd/pele) (MIT, from the Obsidian team). Fenced ` ```mermaid ` blocks in Markdown fields render to SVG.
+- [x] **Mermaid diagrams** via [Pele](https://github.com/obsidianmd/pele) (MIT, from the Obsidian team). Fenced ` ```mermaid ` blocks in Markdown fields render to SVG.
   - Load it on demand with `pele/lazy` so cards without diagrams pay nothing.
   - Map Pele's CSS variables (`--pele-bg`, `--pele-fg`, `--pele-accent` …) to our tokens, so diagrams follow light/dark mode without re-rendering.
   - Pass the SVG through DOMPurify (SVG profile) like everything else.
+  - Done: links and remote images are off in diagrams; bad syntax shows the source and Pele's error. The editor preview renders diagrams too (it uses the same CardView), which covers most of the live-preview item below.
 - [ ] **Typst** for fenced ` ```typst ` blocks (math and layouts that KaTeX can't do).
   - There's no official Typst JS/WASM package. Use [typst.ts](https://github.com/Myriad-Dreamin/typst.ts) (Apache-2.0, the most mature), and benchmark [typst-wasm](https://github.com/typst-wasm/typst-wasm) (MIT, worker/JSPI backends) as a lighter option. ([typst.js](https://github.com/typst-community/typst.js) wraps the CLI and is Node-only, so it's out.)
   - The compiler is ~25 MB of WASM plus fonts, so make it **opt-in**: Settings → "Enable Typst (one-time download)". The service worker caches it at runtime, not in the precache.

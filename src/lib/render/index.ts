@@ -3,7 +3,9 @@
  * DOMPurify. Imported Anki content is untrusted; everything goes through sanitize().
  *
  * Math becomes `<span class="nenrin-math">TeX</span>` placeholders; CardView renders them with
- * KaTeX, which is loaded only when a card has math (see ./math.ts). Keeps the main bundle small.
+ * KaTeX, which is loaded only when a card has math (see ./math.ts). Fenced ```mermaid blocks
+ * become `<div class="nenrin-diagram">` placeholders, rendered by Pele (see ./diagram.ts).
+ * Both keep the main bundle small.
  */
 import DOMPurify from 'dompurify';
 import { marked } from 'marked';
@@ -30,6 +32,19 @@ function renderMath(src: string): { text: string; math: string[] } {
   return { text, math };
 }
 
+// A fenced block (``` or ~~~, 3+ marks) whose info string is a diagram language.
+const DIAGRAM_RE = /^ {0,3}(`{3,}|~{3,})[ \t]*(mermaid)[ \t]*\n([\s\S]*?)\n {0,3}\1[`~]*[ \t]*$/gm;
+
+/** Pulls diagram fences out before Markdown and math touch them (`$` is valid Mermaid). */
+function extractDiagrams(src: string): { text: string; diagrams: string[] } {
+  const diagrams: string[] = [];
+  const text = src.replace(DIAGRAM_RE, (_, _fence, lang: string, body: string) => {
+    diagrams.push(`<div class="nenrin-diagram" data-lang="${lang}">${escapeText(body)}</div>`);
+    return `\n\n@@DIAGRAM${diagrams.length - 1}@@\n\n`;
+  });
+  return { text, diagrams };
+}
+
 const attr = (s: string) => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
 
 /** Anki's `[sound:file.mp3]` → an audio player for that media file. */
@@ -42,10 +57,16 @@ function renderSounds(html: string): string {
 
 /** Converts one field's source to HTML. Markdown notes get Markdown + math; HTML notes get math only. */
 export function fieldToHtml(value: string, format: Note['format'] = 'markdown'): string {
-  const { text, math } = renderMath(value);
+  const { text: rest, diagrams } =
+    format === 'html' ? { text: value, diagrams: [] } : extractDiagrams(value);
+  const { text, math } = renderMath(rest);
   const html =
     format === 'html' ? text : (marked.parse(text, { async: false, breaks: true }) as string);
-  return renderSounds(html.replace(/@@MATH(\d+)@@/g, (_, i) => math[Number(i)]));
+  return renderSounds(
+    html
+      .replace(/(?:<p>)?@@DIAGRAM(\d+)@@(?:<\/p>)?/g, (_, i) => diagrams[Number(i)])
+      .replace(/@@MATH(\d+)@@/g, (_, i) => math[Number(i)]),
+  );
 }
 
 export function sanitize(html: string): string {

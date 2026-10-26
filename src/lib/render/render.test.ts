@@ -126,3 +126,28 @@ describe('Anki template features', () => {
     expect(mediaRefs(sanitize(fieldToHtml('[sound:ki.mp3]', 'html')))).toEqual(['ki.mp3']);
   });
 });
+
+describe('diagrams', () => {
+  it('turns a ```mermaid fence into a placeholder, untouched by Markdown or math', () => {
+    const html = fieldToHtml(
+      'Before\n\n```mermaid\nflowchart LR\n  A[$5] --> B["**b**"]\n```\n\nAfter',
+    );
+    expect(html).toContain(
+      '<div class="nenrin-diagram" data-lang="mermaid">flowchart LR\n  A[$5] --&gt; B["**b**"]</div>',
+    );
+    expect(html).not.toContain('nenrin-math');
+    expect(html).not.toContain('<strong>');
+    expect(html).toMatch(/<p>Before<\/p>[\s\S]*<p>After<\/p>/);
+  });
+
+  it('keeps other code fences as code, and leaves HTML notes alone', () => {
+    expect(fieldToHtml('```js\nx\n```')).toContain('<code class="language-js">');
+    expect(fieldToHtml('```mermaid\nx\n```', 'html')).not.toContain('nenrin-diagram');
+  });
+
+  it('survives sanitizing', () => {
+    expect(sanitize(fieldToHtml('```mermaid\npie\n```'))).toContain(
+      '<div class="nenrin-diagram" data-lang="mermaid">pie</div>',
+    );
+  });
+});

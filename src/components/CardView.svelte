@@ -4,6 +4,7 @@
   import { mediaUrls } from '../lib/db/media';
   import { mediaRefs, resolveMedia } from '../lib/render';
   import { cssMediaRefs, isStockCss, scopeDeckCss } from '../lib/render/deck-css';
+  import { renderDiagramsIn } from '../lib/render/diagram';
   import { renderMathIn } from '../lib/render/math';
   import { isDarkMode } from '../lib/theme';
 
@@ -48,7 +49,10 @@
       resolved = final;
       await tick();
       if (cancelled) return;
-      if (container) renderMathIn(container);
+      if (container) {
+        renderMathIn(container);
+        renderDiagramsIn(container);
+      }
       if (autoplay) play();
     });
     return () => {
@@ -193,6 +197,39 @@
     border-radius: 8px;
     background: var(--surface-2);
     font-size: 0.9rem;
+  }
+  /* Diagrams use the app's tokens, so they follow light/dark and the accent without re-rendering. */
+  .card-content :global(.nenrin-diagram) {
+    --pele-bg: transparent;
+    --pele-fg: var(--text);
+    --pele-muted: var(--muted);
+    --pele-line: var(--muted);
+    --pele-surface: var(--surface-2);
+    --pele-surface-alt: var(--accent-soft);
+    --pele-border: var(--border);
+    --pele-accent: var(--accent);
+    --pele-font: inherit;
+    --pele-radius: 6px;
+    margin: 0.75rem auto;
+    max-width: 100%;
+    overflow-x: auto;
+    /* Source text shows until Pele has loaded; keep it quiet. */
+    white-space: pre;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+  .card-content :global(.nenrin-diagram[data-rendered]) {
+    white-space: normal;
+    color: inherit;
+    font-size: 1rem;
+  }
+  .card-content :global(.nenrin-diagram svg) {
+    display: block;
+    margin: 0 auto;
+  }
+  .card-content :global(.diagram-error) {
+    color: var(--again);
+    font-size: 0.85rem;
   }
   .card-content :global(.katex-display) {
     overflow-x: auto;
