@@ -23,6 +23,19 @@ const ordinals = async (noteId: string) =>
   (await db.cards.where('noteId').equals(noteId).toArray()).map((c) => c.ordinal).sort();
 
 describe('notes', () => {
+  it('makes the optional reverse card only while "Add Reverse" has text', async () => {
+    const note = await addNote(db, {
+      noteTypeId: 'basic-optional-reversed',
+      deckId,
+      fields: { Front: 'ki', Back: 'tree', 'Add Reverse': '' },
+    });
+    expect(await ordinals(note.id)).toEqual([0]);
+    await updateNote(db, note.id, { fields: { Front: 'ki', Back: 'tree', 'Add Reverse': 'y' } });
+    expect(await ordinals(note.id)).toEqual([0, 1]);
+    await updateNote(db, note.id, { fields: { Front: 'ki', Back: 'tree', 'Add Reverse': ' ' } });
+    expect(await ordinals(note.id)).toEqual([0]);
+  });
+
   it('creates one card for Basic and two for Basic (and reversed)', async () => {
     const basic = await addNote(db, {
       noteTypeId: 'basic',

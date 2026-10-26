@@ -8,6 +8,7 @@ Open a deck and choose **Add cards** (or press <kbd>A</kbd> anywhere). Pick the 
 
 - **Basic:** a front and a back.
 - **Basic (and reversed card):** two cards, front → back and back → front. Good for vocabulary.
+- **Basic (optional reversed card):** like the reversed type, but the back → front card is made only when you type something (anything, such as `y`) in **Add Reverse**. Good when only some notes deserve both directions.
 - **Basic (type in the answer):** you type the answer before you see it, and Nenrin shows what you got right and wrong. Good for spelling and short exact answers.
 - **Cloze:** a sentence with parts hidden. Wrap each hidden part in `{{c1::…}}`. Use `c2`, `c3` … to make one card per part; parts with the same number are hidden together. Select text and press <kbd>⌘⇧C</kbd> / <kbd>Ctrl+Shift+C</kbd> to wrap it.
 

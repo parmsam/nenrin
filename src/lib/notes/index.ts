@@ -9,6 +9,7 @@ import { BUILTIN_NOTE_TYPES } from './builtins';
 export {
   BASIC,
   BASIC_REVERSED,
+  BASIC_OPTIONAL_REVERSED,
   BASIC_TYPE,
   CLOZE,
   IMAGE_OCCLUSION,

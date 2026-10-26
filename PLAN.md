@@ -174,7 +174,7 @@ Math is already covered by KaTeX (`$…$`, `$$…$$`, and Anki's `\(…\)` / `\[
 
 - [x] Opt-in AI card generation from text using the user's own API key (no Nenrin servers): Anthropic via the official SDK (lazy, streamed, refusal fallbacks), or any OpenAI-compatible server (OpenAI, OpenRouter, Ollama). The reply fills Add cards → Paste for review. Keys stay on the device and out of backups. PDF input is still to do
 - [x] Type-in-the-answer cards: `{{type:Field}}` (and `type:cloze:`, `type:nc:`) render as a text box on the front (Enter shows the answer) and a character diff on the back, as Anki does; plus a built-in **Basic (type in the answer)** note type. The template only emits placeholders, so card HTML still never contains inputs
-- [ ] Built-in **Basic (optional reversed card)** note type: the reverse card is made only when the note's "Add Reverse" field has text
+- [x] Built-in **Basic (optional reversed card)** note type: the reverse card is made only when the note's "Add Reverse" field has text
 - [x] Image occlusion: an editor that masks parts of an image (one card per mask; hide one or all), and rendering for Anki's image occlusion notes on import. Uses Anki's Occlusion-field format unchanged (fractions, or Anki 23.10.0's pixels); Nenrin draws the masks as SVG since card scripts never run. Imported rect/ellipse/polygon masks render; the editor draws rectangles. Export marks the built-in type as Anki's stock image occlusion kind, so Anki's own editor opens the notes (checked in Anki 26.09)
 - [ ] Note type editor: add, rename and reorder fields, edit card templates and CSS with a live preview, and clone a built-in or imported type
 - [ ] Localization

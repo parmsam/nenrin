@@ -23,6 +23,23 @@ export const BASIC_REVERSED: NoteType = {
   css: '',
 };
 
+/** Like Basic (and reversed card), but the reverse card is made only when "Add Reverse" has text. */
+export const BASIC_OPTIONAL_REVERSED: NoteType = {
+  id: 'basic-optional-reversed',
+  name: 'Basic (optional reversed card)',
+  kind: 'basic',
+  fields: ['Front', 'Back', 'Add Reverse'],
+  templates: [
+    { name: 'Card 1', front: '{{Front}}', back: `{{FrontSide}}${ANSWER}{{Back}}` },
+    {
+      name: 'Card 2',
+      front: '{{#Add Reverse}}{{Back}}{{/Add Reverse}}',
+      back: `{{FrontSide}}${ANSWER}{{Front}}`,
+    },
+  ],
+  css: '',
+};
+
 export const BASIC_TYPE: NoteType = {
   id: 'basic-type',
   name: 'Basic (type in the answer)',
@@ -76,6 +93,7 @@ export const IMAGE_OCCLUSION: NoteType = {
 export const BUILTIN_NOTE_TYPES: readonly NoteType[] = [
   BASIC,
   BASIC_REVERSED,
+  BASIC_OPTIONAL_REVERSED,
   BASIC_TYPE,
   CLOZE,
   IMAGE_OCCLUSION,
