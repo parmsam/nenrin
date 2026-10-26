@@ -57,6 +57,7 @@ Last updated: 2026-10-25
 - [x] "Last backup" reminder; device id on review logs (groundwork for sync, see docs/storage-strategy.md)
 - [x] Keyboard shortcuts dialog: press <kbd>?</kbd> anywhere, or use the keyboard button in the header and review screen
 - [x] Paste Markdown mode in the editor: one block (e.g. from an LLM) is split into front/back by `---`, `Q:`/`A:` labels, a heading or the first paragraph; clozes switch to the Cloze type; fences are stripped; a final `Tags:` line becomes tags
+- [x] Optional progress while reviewing: a bar, alone or with a percentage or fraction (Settings → Studying, off by default); custom study sessions already show "Card x of y"
 - [x] Home screen for returning users: a tree cross-section of your studying (one ring per study day over the past year, wider for more reviews; the trunk grows with study days, older days become heartwood, breaks of more than a week leave a scar; today's ring closes as you finish, `src/lib/study/rings.ts`), cards left, reviews today, streak, one-tap "Study now" for the deck with the most due, per-deck Study buttons, and quick actions (Add, Import, Browse)
 - [x] Version shown in the app (header badge, footer, Settings → About) from `package.json`, with a README badge and `CHANGELOG.md`. Each phase bumps the minor version until 1.0
 - [x] Update prompt: new deploys wait for "A new version of Nenrin is ready → Reload" instead of swapping in mid-review; checks hourly and when the app comes back to the foreground

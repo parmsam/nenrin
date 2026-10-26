@@ -23,6 +23,8 @@ The three numbers on a deck count today's cards:
 - **Red: learning.** Cards you're learning or relearning today. They come back after a few minutes.
 - **Green: review.** Cards you've learned that are due today. Up to 200 a day by default.
 
+While you review, the same three numbers in the header count down what's left. Prefer a progress bar? Pick one in **Settings → Studying → Progress while reviewing**: a bar on its own, or with a percentage (40%) or a fraction (4 / 10). Cards you get wrong come back, so progress can step back a little.
+
 You can change the daily limits, and the **desired retention** (how likely you want to be to remember a card when it comes due, 90% by default), under each deck's **Settings**. Higher retention means more reviews.
 
 ## How scheduling works

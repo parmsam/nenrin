@@ -95,3 +95,13 @@ export async function studyState(
     newCards[0];
   return { counts, next, waitUntil: !next && learning[0] ? learning[0].due : undefined };
 }
+
+/**
+ * How far through today's queue a review session is, 0–1: cards answered this session against
+ * those answered plus those still due. Cards you fail come back as learning, so it can step back.
+ */
+export function sessionProgress(answered: number, left: StudyCounts): number {
+  const remaining = left.new + left.learning + left.review;
+  const total = answered + remaining;
+  return total === 0 ? 0 : answered / total;
+}

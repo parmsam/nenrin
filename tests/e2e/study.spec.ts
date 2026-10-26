@@ -52,6 +52,47 @@ test('add cards, study with the keyboard, and undo', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Done for now' })).toBeVisible();
 });
 
+test('optional progress bar while reviewing', async ({ page }) => {
+  await createDeck(page, 'Rivers');
+  await page.getByRole('link', { name: '+ Add cards' }).click();
+  await addBasic(page, 'Longest river?', 'Nile');
+  await addBasic(page, 'River through Paris?', 'Seine');
+  await page.getByRole('link', { name: '← Back' }).click();
+  await page.getByRole('link', { name: /Rivers/ }).click();
+
+  // Off by default.
+  await page.getByRole('link', { name: 'Study now' }).click();
+  await expect(page.getByText('Longest river?')).toBeVisible();
+  await expect(page.locator('progress')).toHaveCount(0);
+
+  await page.goto('./#/settings');
+  await page.getByLabel('Progress while reviewing').selectOption('fraction');
+  await page.goBack();
+  await expect(page.getByText('Longest river?')).toBeVisible();
+  const bar = page.getByRole('progressbar');
+  await expect(bar).toHaveAttribute('aria-label', 'Progress: 0 done, 2 left');
+
+  await page.keyboard.press('Space');
+  await page.keyboard.press('4');
+  await expect(bar).toHaveAttribute('aria-label', 'Progress: 1 done, 1 left');
+  await expect(bar).toHaveJSProperty('value', 0.5);
+  await expect(page.locator('.session-progress')).toContainText('1 / 2');
+
+  // Undo takes it back.
+  await page.keyboard.press('z');
+  await expect(bar).toHaveAttribute('aria-label', 'Progress: 0 done, 2 left');
+
+  // Or as a percentage.
+  await page.goto('./#/settings');
+  await page.getByLabel('Progress while reviewing').selectOption('percent');
+  await page.goBack();
+  await expect(page.locator('.session-progress')).toContainText('0%');
+  await expect(page.getByRole('button', { name: /Show answer/ })).toBeVisible();
+  await page.keyboard.press('Space');
+  await page.keyboard.press('4');
+  await expect(page.locator('.session-progress')).toContainText('50%');
+});
+
 test('cloze notes create one card per deletion', async ({ page }) => {
   await createDeck(page, 'Biology');
   await page.getByRole('link', { name: '+ Add cards' }).click();

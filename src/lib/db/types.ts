@@ -84,6 +84,9 @@ export interface Setting {
   value: unknown;
 }
 
+/** Off, a bar, or a bar with a percentage ("40%") or fraction ("4 / 10"). */
+export type ReviewProgress = 'off' | 'bar' | 'percent' | 'fraction';
+
 export interface Prefs {
   /** Local hour at which a new study day starts (Anki default: 4 AM). */
   rolloverHour: number;
@@ -95,6 +98,8 @@ export interface Prefs {
   reminderTime: string;
   /** Show a notification at reminderTime when cards are due and you haven't studied yet. */
   reminderNotify: boolean;
+  /** How to show progress through today's cards while reviewing. */
+  reviewProgress: ReviewProgress;
 }
 
 export const DEFAULT_PREFS: Prefs = {
@@ -103,6 +108,7 @@ export const DEFAULT_PREFS: Prefs = {
   deckStyling: true,
   reminderTime: '19:00',
   reminderNotify: false,
+  reviewProgress: 'off',
 };
 
 export const DEFAULT_DECK_CONFIG: DeckConfig = {

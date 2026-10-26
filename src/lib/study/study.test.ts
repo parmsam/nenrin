@@ -7,7 +7,7 @@ import { recordReview } from '../db/repo';
 import { addNote, ensureBuiltins } from '../notes';
 import { newSchedulingState, Rating, State, type Grade } from '../scheduler';
 import { dayStart, formatInterval, nextDayStart } from './day';
-import { LEARN_AHEAD_MS, studyState } from './queue';
+import { LEARN_AHEAD_MS, sessionProgress, studyState } from './queue';
 import { computeStats, longestStreak, streakFrom, todaySummary } from './stats';
 
 const MIN = 60_000;
@@ -229,5 +229,14 @@ describe('stats', () => {
     const days = new Set([1, 2, 3, 7, 8].map((d) => new Date(2026, 0, d, 4).getTime()));
     expect(longestStreak(days)).toBe(3);
     expect(longestStreak(new Set())).toBe(0);
+  });
+});
+
+describe('session progress', () => {
+  it('counts answered cards against those answered plus those still due', () => {
+    expect(sessionProgress(0, { new: 0, learning: 0, review: 0 })).toBe(0);
+    expect(sessionProgress(0, { new: 5, learning: 0, review: 5 })).toBe(0);
+    expect(sessionProgress(3, { new: 2, learning: 1, review: 4 })).toBeCloseTo(0.3);
+    expect(sessionProgress(4, { new: 0, learning: 0, review: 0 })).toBe(1);
   });
 });

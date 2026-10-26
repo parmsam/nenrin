@@ -1,7 +1,7 @@
 <script lang="ts">
   import { liveQuery } from 'dexie';
   import { onMount } from 'svelte';
-  import { db } from '../lib/db';
+  import { db, type ReviewProgress } from '../lib/db';
   import { InvalidBackupError, parseBackup, restoreBackup } from '../lib/db/backup';
   import { getPrefs, setPrefs } from '../lib/db/prefs';
   import {
@@ -32,6 +32,7 @@
   let rolloverHour = $state(4);
   let autoplayAudio = $state(true);
   let deckStyling = $state(true);
+  let reviewProgress = $state<ReviewProgress>('off');
   let persisted = $state<boolean | null>(null);
   let usage = $state('');
   let status = $state('');
@@ -116,6 +117,7 @@
     rolloverHour = prefs.rolloverHour;
     autoplayAudio = prefs.autoplayAudio;
     deckStyling = prefs.deckStyling;
+    reviewProgress = prefs.reviewProgress;
     reminderTime = prefs.reminderTime;
     reminderNotify = prefs.reminderNotify && support && (await notifyPermission()) === 'granted';
     backgroundCheck = await hasBackgroundCheck();
@@ -258,6 +260,15 @@
       >Use each deck’s own styling
       <span class="muted small">(for imported decks; kept inside the card)</span></span
     >
+  </label>
+  <label>
+    Progress while reviewing
+    <select bind:value={reviewProgress} onchange={() => setPrefs(db, { reviewProgress })}>
+      <option value="off">Off</option>
+      <option value="bar">Bar</option>
+      <option value="percent">Bar and percentage (40%)</option>
+      <option value="fraction">Bar and fraction (4 / 10)</option>
+    </select>
   </label>
 
   <label>

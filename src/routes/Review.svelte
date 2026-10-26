@@ -17,7 +17,12 @@
   import { navigate } from '../lib/router.svelte';
   import { createScheduler, GRADES, Rating, State, type Grade } from '../lib/scheduler';
   import { formatInterval, nextDayStart } from '../lib/study/day';
-  import { LEARN_AHEAD_MS, studyState, type StudyCounts } from '../lib/study/queue';
+  import {
+    LEARN_AHEAD_MS,
+    sessionProgress,
+    studyState,
+    type StudyCounts,
+  } from '../lib/study/queue';
   import { paletteState } from '../lib/palette.svelte';
   import { isTyping, shortcutsDialog } from '../lib/shortcuts.svelte';
 
@@ -51,6 +56,10 @@
   let waitUntil = $state<number | undefined>();
   // Raw (not deep-proxied): these snapshots go back into IndexedDB, which can't clone Proxies.
   let undoStack = $state.raw<(UndoEntry | CardsUndo)[]>([]);
+  /** Cards rated in this session (undo takes one back), for the progress bar. */
+  let answered = $state(0);
+  const progress = $derived(sessionProgress(answered, counts));
+  const left = $derived(counts.new + counts.learning + counts.review);
   /** Short confirmation after bury/suspend/undo, read out by screen readers. */
   let status = $state('');
   let statusTimer: ReturnType<typeof setTimeout> | undefined;
@@ -111,6 +120,7 @@
     try {
       const durationMs = Math.min(Date.now() - shownAt, MAX_ANSWER_MS);
       undoStack = [...undoStack, await recordReview(db, card.id, grade, { durationMs })];
+      answered++;
       await load();
     } finally {
       busy = false;
@@ -125,6 +135,7 @@
       if ('logId' in entry) await undoReview(db, entry);
       else await restoreCards(db, entry);
       undoStack = undoStack.slice(0, -1);
+      if ('logId' in entry) answered = Math.max(0, answered - 1);
       // Show the card that was rated, buried or suspended again (hide() puts it first).
       await load('logId' in entry ? entry.previous : entry.cards[0]);
       flash('Undone');
@@ -242,6 +253,22 @@
     >
   </header>
 
+  {#if prefs.reviewProgress !== 'off' && (answered > 0 || left > 0)}
+    <div class="session-progress">
+      <progress
+        max="1"
+        value={finished ? 1 : progress}
+        aria-label="Progress: {answered} done, {left} left"
+        title="{answered} done, {left} left"
+      ></progress>
+      {#if prefs.reviewProgress === 'percent'}
+        <span aria-hidden="true">{Math.round(progress * 100)}%</span>
+      {:else if prefs.reviewProgress === 'fraction'}
+        <span aria-hidden="true">{answered} / {answered + left}</span>
+      {/if}
+    </div>
+  {/if}
+
   <p class="status" role="status">{status}</p>
 
   {#if finished}
@@ -306,6 +333,44 @@
     align-items: center;
     gap: 0.75rem;
     padding: 0.9rem 0;
+  }
+  .session-progress {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .session-progress span {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .session-progress progress {
+    appearance: none;
+    flex: 1;
+    min-width: 0;
+    height: 0.3rem;
+    border: none;
+    border-radius: 999px;
+    background: var(--border);
+    overflow: hidden;
+  }
+  .session-progress progress::-webkit-progress-bar {
+    background: var(--border);
+  }
+  .session-progress progress::-webkit-progress-value {
+    background: var(--accent);
+    border-radius: 999px;
+    transition: width 0.3s ease;
+  }
+  .session-progress progress::-moz-progress-bar {
+    background: var(--accent);
+    border-radius: 999px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .session-progress progress::-webkit-progress-value {
+      transition: none;
+    }
   }
   .back {
     font-size: 1.4rem;
