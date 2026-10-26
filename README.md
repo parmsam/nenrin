@@ -30,7 +30,7 @@
   </picture>
 </p>
 
-> **Status: v0.4.0, pre-alpha, usable for daily study.** See the [changelog](CHANGELOG.md). Import your Anki decks (`.apkg` / `.colpkg`) or make your own Basic, Reversed and Cloze cards with Markdown, math and images, and review them with FSRS, offline. See [PLAN.md](PLAN.md).
+> **Status: v0.5.0, pre-alpha, usable for daily study.** See the [changelog](CHANGELOG.md). Import your Anki decks (`.apkg` / `.colpkg` / CrowdAnki) or make your own Basic, Reversed and Cloze cards with Markdown, math, diagrams and images (or have an LLM write them), and review them with FSRS, offline. New here? Read the [user guide](docs/guide/README.md). See [PLAN.md](PLAN.md) for what's next.
 
 ## What's in the name
 

@@ -2,29 +2,46 @@
 
 Nenrin follows [semantic versioning](https://semver.org/). Until 1.0, each roadmap phase in [PLAN.md](PLAN.md) bumps the minor version.
 
-## Unreleased
+## 0.5.0 (2026-10-25): Custom study, rich cards, CrowdAnki, reminders
 
-- **Typst in cards** (opt-in): put [Typst](https://typst.app/docs/) in a ` ```typst ` block for math and layouts beyond LaTeX math. Turn it on per device in **Settings → Typst** (a one-time download of about 32 MB); after that it renders offline, follows light and dark mode, and is cached so each block compiles once. Without it, cards show the source with a hint.
-- **Study reminders** (Settings → _Study reminder_): pick a time and **add a daily event to your calendar**, which works everywhere, iPhone included. Or turn on **notifications**: if cards are due and you haven't studied yet, Nenrin reminds you once that day. They work while Nenrin is open, and in installed Chrome/Edge apps the browser may also check in the background. Nothing leaves your device.
-- **User guide**: getting started, studying, making cards, moving from Anki, custom study, keyboard shortcuts, backups and a FAQ. Built into the app (**Help**, in the footer, Settings and the command palette; works offline) and on GitHub in [`docs/guide/`](docs/guide/README.md).
-- **New first-run screen** with three ways in: _Import from Anki_, _Take the tour_, or _Start from scratch_. The **Nenrin tour** is a short deck that shows you around the app while you study it.
-- **Import CrowdAnki decks**: the JSON format that shared decks on GitHub use, such as [Ultimate Geography](https://github.com/anki-geo/ultimate-geography). Choose the release `.zip` (or a bare `deck.json`) in Import. Media, sub-decks and the deck's styling come along; importing a newer release updates notes and keeps your progress.
-- **Fixed: Anki templates with nested sections** (`{{#A}}…{{#B}}…{{/B}}…{{/A}}`) showed raw `{{#B}}` tags.
-- **Fixed: image-only fields counted as empty**, so cards whose front is just an image (such as a flag) weren't created, and `{{#Field}}` sections around them were hidden.
-- **Fixed:** the import summary said "1 notes" and "1 cards".
-- **Make cards with an LLM**: Settings → _Make cards with an LLM_ copies a ready-made prompt for ChatGPT, Claude, Gemini or any other LLM, with rules for good cards and the exact format to paste back into _Add cards → Paste_. Also as a downloadable Agent Skill (`nenrin-cards.zip`) for Claude and Claude Code, from the command palette, and next to the Paste box. Paste now also unwraps replies fenced with four backticks, which LLMs use when a card contains a diagram.
-- **Mermaid diagrams** in cards: a ` ```mermaid ` block renders as a diagram that follows your theme and accent, light or dark. The renderer ([Pele](https://github.com/obsidianmd/pele), MIT) downloads only when a card has a diagram. Bad syntax shows the source and the error.
-- **Consistent breadcrumbs**: Browse, Stats, Import and Settings use the same "Decks / Page" trail as deck pages, instead of an underlined "← Decks" link.
+### Studying
+
 - **Preview a deck**: flip through every card (<kbd>P</kbd> on a deck, or the Preview button) with <kbd>←</kbd> <kbd>→</kbd>, without scheduling anything.
 - **Custom study** (<kbd>C</kbd> on a deck, or after finishing one): add extra new cards or reviews for today only, or start a one-off session: preview new cards, review forgotten cards, review ahead, or study by tag. Choose the order and size, and whether answers count as reviews or are practice only.
 - **Bury and suspend while reviewing**, with the same keys as Anki: <kbd>-</kbd> bury card, <kbd>=</kbd> bury note (until tomorrow), <kbd>@</kbd> suspend card, <kbd>!</kbd> suspend note. <kbd>Z</kbd> undoes them, and a ⋯ menu offers the same for mouse and touch.
-- **More keyboard shortcuts**: Anki's main-window keys work everywhere outside a review (<kbd>D</kbd> decks, <kbd>A</kbd> add, <kbd>B</kbd> browse, <kbd>T</kbd> stats, <kbd>I</kbd> import, <kbd>⌘,</kbd> settings); <kbd>S</kbd> studies; and the Browse list moves with <kbd>↓</kbd> <kbd>↑</kbd> or <kbd>J</kbd> <kbd>K</kbd>, with <kbd>X</kbd> to select. Press <kbd>?</kbd> for the full list.
-- **Fixed:** updating the address in place (typing a search in Browse) could reload and remount a lazily loaded screen.
-- **Faster start**: math rendering (KaTeX) and less-used screens (Import, Browse, Stats, Settings, the editor) now load on demand, so the app downloads about 60% less JavaScript up front. Lighthouse: 98–100 performance and 100 for accessibility, best practices and SEO on every page.
+- **Study reminders** (Settings → _Study reminder_): pick a time and **add a daily event to your calendar**, which works everywhere, iPhone included. Or turn on **notifications**: if cards are due and you haven't studied yet, Nenrin reminds you once that day. They work while Nenrin is open, and in installed Chrome/Edge apps the browser may also check in the background. Nothing leaves your device.
+
+### Cards
+
+- **Make cards with an LLM**: Settings → _Make cards with an LLM_ copies a ready-made prompt for ChatGPT, Claude, Gemini or any other LLM, with rules for good cards and the exact format to paste back into _Add cards → Paste_. Also as a downloadable Agent Skill (`nenrin-cards.zip`) for Claude and Claude Code, from the command palette, and next to the Paste box. Paste now also unwraps replies fenced with four backticks, which LLMs use when a card contains a diagram.
+- **Mermaid diagrams** in cards: a ` ```mermaid ` block renders as a diagram that follows your theme and accent, light or dark. The renderer ([Pele](https://github.com/obsidianmd/pele), MIT) downloads only when a card has a diagram. Bad syntax shows the source and the error.
+- **Typst in cards** (opt-in): put [Typst](https://typst.app/docs/) in a ` ```typst ` block for math and layouts beyond LaTeX math. Turn it on per device in **Settings → Typst** (a one-time download of about 32 MB); after that it renders offline, follows light and dark mode, and is cached so each block compiles once. Without it, cards show the source with a hint.
+
+### Importing
+
+- **Import CrowdAnki decks**: the JSON format that shared decks on GitHub use, such as [Ultimate Geography](https://github.com/anki-geo/ultimate-geography). Choose the release `.zip` (or a bare `deck.json`) in Import. Media, sub-decks and the deck's styling come along; importing a newer release updates notes and keeps your progress.
+
+### Getting started
+
+- **New first-run screen** with three ways in: _Import from Anki_, _Take the tour_, or _Start from scratch_. The **Nenrin tour** is a short deck that shows you around the app while you study it.
+- **User guide**: getting started, studying, making cards, moving from Anki, custom study, keyboard shortcuts, backups and a FAQ. Built into the app (**Help**, in the footer, Settings and the command palette; works offline) and on GitHub in [`docs/guide/`](docs/guide/README.md).
 - **Welcome splash** for returning users: the logo, 年輪, and today's due count, for a moment. Tap to skip; off in Settings → Appearance. Not shown over deep links or more than once per session.
+
+### Getting around
+
 - **Command palette** (<kbd>⌘K</kbd> / <kbd>Ctrl+K</kbd>): fuzzy-search every page, action, theme and deck ("Study …", "Open …"), or search notes for whatever you type. Recent commands come first.
-- **Fixed:** quickly reopening a dialog (palette, shortcuts, confirmation) could make it close by itself.
+- **More keyboard shortcuts**: Anki's main-window keys work everywhere outside a review (<kbd>D</kbd> decks, <kbd>A</kbd> add, <kbd>B</kbd> browse, <kbd>T</kbd> stats, <kbd>I</kbd> import, <kbd>⌘,</kbd> settings); <kbd>S</kbd> studies; and the Browse list moves with <kbd>↓</kbd> <kbd>↑</kbd> or <kbd>J</kbd> <kbd>K</kbd>, with <kbd>X</kbd> to select. Press <kbd>?</kbd> for the full list.
 - **Swipe to delete a deck**: swipe a deck left on the home screen to reveal Delete (or swipe all the way), then confirm. The dialog says how many cards and how much review history will go.
+- **Consistent breadcrumbs**: Browse, Stats, Import and Settings use the same "Decks / Page" trail as deck pages, instead of an underlined "← Decks" link.
+- **Faster start**: math rendering (KaTeX) and less-used screens (Import, Browse, Stats, Settings, the editor) now load on demand, so the app downloads about 60% less JavaScript up front. Lighthouse: 98–100 performance and 100 for accessibility, best practices and SEO on every page.
+
+### Fixes
+
+- **Anki templates with nested sections** (`{{#A}}…{{#B}}…{{/B}}…{{/A}}`) showed raw `{{#B}}` tags.
+- **Image-only fields counted as empty**, so cards whose front is just an image (such as a flag) weren't created, and `{{#Field}}` sections around them were hidden.
+- The import summary said "1 notes" and "1 cards".
+- Updating the address in place (typing a search in Browse) could reload and remount a lazily loaded screen.
+- Quickly reopening a dialog (palette, shortcuts, confirmation) could make it close by itself.
 
 ## 0.4.0 (2026-10-25): Stats, personal scheduling, audio, deck styling
 
