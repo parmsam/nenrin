@@ -24,6 +24,14 @@ Fields use [Markdown](https://commonmark.org/help/): `**bold**`, `*italic*`, lis
   ```
   ````
 
+- **Typst:** for math and layouts beyond LaTeX math (tables, aligned derivations, chemistry and more), put [Typst](https://typst.app/docs/) in a ` ```typst ` code block. Typst's compiler is a one-time download of about 32 MB, so it's off until you choose **Settings → Typst → Enable Typst** on each device. After that it works offline. Without it, the card shows the Typst source with a hint. Typst packages (`@preview/…`) aren't available.
+
+  ````markdown
+  ```typst
+  $ integral_0^oo e^(-x^2) dif x = sqrt(pi) / 2 $
+  ```
+  ````
+
 - **Images:** paste an image into a field. It's stored with your cards and works offline.
 
 ## Paste mode

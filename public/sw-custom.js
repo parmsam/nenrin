@@ -52,7 +52,22 @@ self.addEventListener('fetch', (event) => {
   );
 });
 
-// 3. Study reminders, without a server (see src/lib/reminder.ts).
+// 3. Typst, opt-in (src/lib/render/typst.ts). Its compiler and fonts are never precached;
+// Settings downloads them into the "nenrin-typst" cache, and this serves them from there so
+// Typst works offline once enabled.
+self.addEventListener('fetch', (event) => {
+  const url = new URL(event.request.url);
+  if (url.origin !== self.location.origin) return;
+  if (!/\/typst_ts_[^/]*\.wasm$|\/typst\/fonts\//.test(url.pathname)) return;
+  event.respondWith(
+    caches
+      .open('nenrin-typst')
+      .then((cache) => cache.match(url.href))
+      .then((hit) => hit ?? fetch(event.request)),
+  );
+});
+
+// 4. Study reminders, without a server (see src/lib/reminder.ts).
 //
 // The page asks for a check when its timer reaches the reminder time, and installed Chromium
 // apps also wake this worker with Periodic Background Sync. Either way: if notifications are

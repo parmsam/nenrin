@@ -154,12 +154,12 @@ Math is already covered by KaTeX (`$…$`, `$$…$$`, and Anki's `\(…\)` / `\[
   - Map Pele's CSS variables (`--pele-bg`, `--pele-fg`, `--pele-accent` …) to our tokens, so diagrams follow light/dark mode without re-rendering.
   - Pass the SVG through DOMPurify (SVG profile) like everything else.
   - Done: links and remote images are off in diagrams; bad syntax shows the source and Pele's error. The editor preview renders diagrams too (it uses the same CardView), which covers most of the live-preview item below.
-- [ ] **Typst** for fenced ` ```typst ` blocks (math and layouts that KaTeX can't do).
+- [x] **Typst** for fenced ` ```typst ` blocks (math and layouts that KaTeX can't do). Done with typst.ts 0.7 in a worker: opt-in per device (Settings → Typst downloads the 28 MB compiler, 1 MB renderer and 2.8 MB of fonts into the `nenrin-typst` cache; the service worker serves them, so it works offline), SVG cached by source hash, text and default black strokes follow the theme, no Typst CSS or scripts in cards. See the decision log for typst.ts vs typst-wasm.
   - There's no official Typst JS/WASM package. Use [typst.ts](https://github.com/Myriad-Dreamin/typst.ts) (Apache-2.0, the most mature), and benchmark [typst-wasm](https://github.com/typst-wasm/typst-wasm) (MIT, worker/JSPI backends) as a lighter option. ([typst.js](https://github.com/typst-community/typst.js) wraps the CLI and is Node-only, so it's out.)
   - The compiler is ~25 MB of WASM plus fonts, so make it **opt-in**: Settings → "Enable Typst (one-time download)". The service worker caches it at runtime, not in the precache.
   - Compile in a Web Worker. Cache rendered SVG in IndexedDB by hash of the source, so each block compiles once per device; the cache can be part of backups.
   - Without Typst enabled, show the source in a code block with an "Enable Typst to render" hint, never an error.
-- [ ] Editor: preview diagrams and Typst live (debounced), with error messages from Pele/Typst shown inline.
+- [x] Editor: preview diagrams and Typst live (debounced), with error messages from Pele/Typst shown inline. The editor preview uses the same CardView, and new Typst sources wait 300 ms for typing to pause
 
 **🚀 v1.0 release:** public on GitHub Pages and announced.
 
@@ -188,6 +188,8 @@ Math is already covered by KaTeX (`$…$`, `$$…$$`, and Anki's `\(…\)` / `\[
 | Scope creep (AI, sync, social) | Hold to the non-goals list; Phase 4+ only after v1                                                                                                   |
 
 ## Decision log
+
+- **2026-10-25:** Typst uses typst.ts (Apache-2.0), not typst-wasm (MIT). typst-wasm has the nicer API but needs either SharedArrayBuffer (only on cross-origin isolated pages; the main app deliberately isn't, see the optimizer entry) or JSPI (Chromium only), so it wouldn't run on iPhone. typst.ts is plain WebAssembly that runs in Safari too. Its default fonts come from a CDN, which rule 2 forbids, so the fonts are vendored from typst-assets v0.15.1 (OFL / Bitstream Vera, NOTICE in `public/typst/fonts/`). Typst's SVG places glyphs with `<use>`, so it gets its own DOMPurify instance that allows `<use>` with in-document `#id` references only; Typst's stylesheet is dropped because it has page-wide rules.
 
 - **2026-10-25:** Study reminders use a calendar file plus local notifications, not Web Push. Push needs a server holding subscriptions and sending at the right time, which breaks "no backend" (and Apple's push on iOS requires it too). The `.ics` event (daily RRULE with an alarm, floating local time) works on every platform offline. Notifications come from the service worker, which reads IndexedDB directly; Periodic Background Sync gives installed Chromium apps a best-effort background check. Revisit if optional sync ever adds a server.
 

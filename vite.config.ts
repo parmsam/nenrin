@@ -96,7 +96,8 @@ export default defineConfig({
         // The plugin precaches manifest.webmanifest itself. Globbing it too creates a
         // conflicting duplicate entry, and Workbox then silently precaches nothing.
         globPatterns: ['**/*.{js,css,html,svg,png,ico,wasm,woff2}'],
-        globIgnores: ['screenshots/**'],
+        // Typst (~29 MB) is opt-in: downloaded into its own cache from Settings, never precached.
+        globIgnores: ['screenshots/**', '**/typst_ts_*.wasm', 'typst/**'],
         // Control the page on first install; later updates still wait for the prompt.
         clientsClaim: true,
         // Update-prompt rescue + isolation headers for optimize.html (see public/sw-custom.js).

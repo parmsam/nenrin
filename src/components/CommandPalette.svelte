@@ -108,6 +108,13 @@
         },
       },
       {
+        id: 'typst',
+        label: 'Typst: enable or remove',
+        group: 'Go to',
+        keywords: 'typst math layout render settings',
+        run: go('/settings'),
+      },
+      {
         id: 'llm-prompt',
         label: 'Copy LLM prompt for making cards',
         group: 'Action',

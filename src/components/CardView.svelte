@@ -227,6 +227,17 @@
     display: block;
     margin: 0 auto;
   }
+  /* Typst's own stylesheet is dropped (page-wide rules); this is the part SVGs need. */
+  .card-content :global(.nenrin-diagram svg.typst-doc) {
+    fill: none;
+    overflow: visible;
+    max-width: 100%;
+    height: auto;
+  }
+  .card-content :global(.diagram-hint) {
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
   .card-content :global(.diagram-error) {
     color: var(--again);
     font-size: 0.85rem;

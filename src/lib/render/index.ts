@@ -3,8 +3,9 @@
  * DOMPurify. Imported Anki content is untrusted; everything goes through sanitize().
  *
  * Math becomes `<span class="nenrin-math">TeX</span>` placeholders; CardView renders them with
- * KaTeX, which is loaded only when a card has math (see ./math.ts). Fenced ```mermaid blocks
- * become `<div class="nenrin-diagram">` placeholders, rendered by Pele (see ./diagram.ts).
+ * KaTeX, which is loaded only when a card has math (see ./math.ts). Fenced ```mermaid and
+ * ```typst blocks become `<div class="nenrin-diagram">` placeholders, rendered by Pele or
+ * (opt-in) Typst (see ./diagram.ts).
  * Both keep the main bundle small.
  */
 import DOMPurify from 'dompurify';
@@ -33,7 +34,8 @@ function renderMath(src: string): { text: string; math: string[] } {
 }
 
 // A fenced block (``` or ~~~, 3+ marks) whose info string is a diagram language.
-const DIAGRAM_RE = /^ {0,3}(`{3,}|~{3,})[ \t]*(mermaid)[ \t]*\n([\s\S]*?)\n {0,3}\1[`~]*[ \t]*$/gm;
+const DIAGRAM_RE =
+  /^ {0,3}(`{3,}|~{3,})[ \t]*(mermaid|typst)[ \t]*\n([\s\S]*?)\n {0,3}\1[`~]*[ \t]*$/gm;
 
 /** Pulls diagram fences out before Markdown and math touch them (`$` is valid Mermaid). */
 function extractDiagrams(src: string): { text: string; diagrams: string[] } {

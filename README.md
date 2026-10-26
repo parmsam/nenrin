@@ -59,7 +59,7 @@ New here? Read the **[user guide](docs/guide/README.md)** (also built into the a
 - **Browse and search**: find any note with Anki-style search (`deck:`, `tag:`, `is:due`, `-exclude`, `\"phrases\"` …), then suspend, move, tag or delete in bulk
 - **Card types**: Basic, Basic (and reversed card), and Cloze (`{{c1::answer::hint}}`), with Anki-compatible templates
 - **Paste from an LLM**: switch the editor to _Paste Markdown_ and paste what ChatGPT, Claude and the like give you. One card is split into front and back (at `---`, `Q:`/`A:` labels, a heading, or the first paragraph); a whole set becomes many cards (numbered Q/A pairs, a Markdown table, or cloze paragraphs). Clozes are detected, and a final `Tags:` line adds tags
-- **Rich cards**: Markdown, LaTeX math (`$x^2$`, `$$…$$`) via KaTeX, Mermaid diagrams, and pasted images, with a live preview
+- **Rich cards**: Markdown, LaTeX math (`$x^2$`, `$$…$$`) via KaTeX, Mermaid diagrams, opt-in Typst, and pasted images, with a live preview
 - **Make cards with an LLM**: copy a ready-made prompt (or download it as an Agent Skill for Claude), and paste the reply back as cards
 - **Preview and custom study**: flip through a deck without scheduling, raise today's limits, or study forgotten cards, cards due soon, or a tag
 - **Review**: FSRS-6 scheduling, learning steps, interval previews on each button, sibling burying, and undo

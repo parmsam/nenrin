@@ -23,6 +23,9 @@
     "check:decks": "node scripts/check-decks.mjs"
   },
   "dependencies": {
+    "@myriaddreamin/typst-ts-renderer": "0.7.0",
+    "@myriaddreamin/typst-ts-web-compiler": "0.7.0",
+    "@myriaddreamin/typst.ts": "0.7.0",
     "dexie": "^4.4.7",
     "dompurify": "^3.4.17",
     "fflate": "^0.8.3",

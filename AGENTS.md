@@ -38,8 +38,8 @@ src/
     render/      # card templates, cloze, markdown, KaTeX, sanitization
   routes/        # screens: Home, DeckView, Review, Editor, Settings (hash router in lib/router.svelte.ts)
   components/    # shared UI: CardView (renders sanitized card HTML + media), Counts
-  workers/       # anki.worker.ts: package parsing off the main thread
-public/          # favicon.svg, logo.svg, screenshots/, sw-custom.js (imported into the service worker)
+  workers/       # anki.worker.ts: package parsing; typst.worker.ts: opt-in Typst compiles
+public/          # favicon.svg, logo.svg, screenshots/, sw-custom.js (imported into the service worker), typst/fonts/ (vendored, licenses in NOTICE.txt)
 optimize.html    # separate cross-origin isolated page for the FSRS optimizer (see PLAN decision log)
 scripts/         # generate-brand.mjs (logo), screenshots.mjs
 docs/brand/      # logo files + palette; see docs/brand/README.md

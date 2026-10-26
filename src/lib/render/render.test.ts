@@ -163,3 +163,11 @@ describe('diagrams', () => {
     );
   });
 });
+
+describe('typst fences', () => {
+  it('become diagram placeholders like mermaid', () => {
+    expect(fieldToHtml('```typst\n$ x^2 $\n```')).toContain(
+      '<div class="nenrin-diagram" data-lang="typst">$ x^2 $</div>',
+    );
+  });
+});

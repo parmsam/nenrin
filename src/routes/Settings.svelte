@@ -10,6 +10,7 @@
     exportBackup as exportBackupFile,
   } from '../lib/actions';
   import { cardPrompt } from '../lib/llm/prompt';
+  import { disableTypst, enableTypst, typstEnabled } from '../lib/render/typst';
   import {
     enableNotifications,
     canNotify,
@@ -53,6 +54,30 @@
 
   const hourLabel = (h: number) =>
     new Date(2000, 0, 1, h).toLocaleTimeString([], { hour: 'numeric' });
+
+  let typstOn = $state(typstEnabled());
+  let typstProgress = $state<number | null>(null);
+  let typstNote = $state('');
+
+  async function turnOnTypst() {
+    typstNote = '';
+    typstProgress = 0;
+    try {
+      await enableTypst((p) => (typstProgress = p));
+      typstOn = true;
+      typstNote = 'Typst is ready, and works offline from now on.';
+    } catch (err) {
+      typstNote = `Download failed: ${(err as Error).message}. Check your connection and try again.`;
+    } finally {
+      typstProgress = null;
+    }
+  }
+
+  async function turnOffTypst() {
+    await disableTypst();
+    typstOn = false;
+    typstNote = 'Typst removed from this device.';
+  }
 
   let reminderTime = $state('19:00');
   let reminderNotify = $state(false);
@@ -290,6 +315,27 @@
   <div class="row">
     <a class="button secondary" href="#/import">Import .txt / .csv…</a>
     <button class="secondary" onclick={exportAllText}>Export all notes (.txt)</button>
+  </div>
+</div>
+
+<h3 class="section-title" id="typst">Typst</h3>
+<div class="panel stack">
+  <p>
+    Cards can hold <a href="https://typst.app/docs/" target="_blank" rel="noreferrer">Typst</a> in a
+    <code>```typst</code> block, for math and layouts beyond what LaTeX math covers. Its compiler is large,
+    so it’s off until you turn it on, per device.
+  </p>
+  <div class="row">
+    {#if typstOn}
+      <button class="secondary" onclick={turnOffTypst}>Remove Typst (frees about 32 MB)</button>
+    {:else}
+      <button onclick={turnOnTypst} disabled={typstProgress !== null}>
+        {typstProgress === null
+          ? 'Enable Typst (one-time download, about 32 MB)'
+          : `Downloading… ${Math.round(typstProgress * 100)}%`}
+      </button>
+    {/if}
+    {#if typstNote}<span class="muted" role="status">{typstNote}</span>{/if}
   </div>
 </div>
 
