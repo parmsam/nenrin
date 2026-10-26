@@ -60,6 +60,10 @@ Turn on **Settings → Appearance → Rewards** for a few quiet extras built aro
 - **Milestones** (<span lang="ja">節目</span>): your first review, seven study days, the tree's first heartwood, a year of study, coming back after a long break, and 100, 1,000 and 10,000 mature cards. They show in the stamp book, and on "Done for now" the day you reach one.
 - **Seasons:** the tree on the home screen gets cherry blossom in spring, leaves in summer, maple in autumn and snow in winter (northern-hemisphere seasons).
 
+## Controllers and page turners
+
+You can study without a keyboard: with a game controller (Ⓐ shows the answer and then rates Good, Ⓑ is Again, Ⓧ Hard, Ⓨ Easy), or with a Bluetooth page turner or presentation clicker (Page Down shows the answer and then rates Good, Page Up is Again). See [Keyboard shortcuts](keyboard.md) for every button, and **Settings → Game controllers and remotes** to change them.
+
 ## Audio
 
 Cards with audio play it when they appear, and the answer's audio when you reveal it. <kbd>R</kbd> replays it. You can turn autoplay off in **Settings → Studying**. On iPhone, Safari may block autoplay; tap the player or press <kbd>R</kbd>.

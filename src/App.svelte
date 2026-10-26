@@ -43,6 +43,7 @@
   import UpdatePrompt from './components/UpdatePrompt.svelte';
   import { headerPrefs } from './lib/header.svelte';
   import { plainKey, shortcutsDialog } from './lib/shortcuts.svelte';
+  import { startControllers } from './lib/input/controller.svelte';
 
   const GO_KEYS: Record<string, string> = {
     d: '/',
@@ -84,6 +85,7 @@
   }
 
   onMount(async () => {
+    startControllers();
     await ensureBuiltins(db);
     ready = true;
     const { reminderTime, reminderNotify } = await getPrefs(db);

@@ -21,6 +21,7 @@
   } from '../lib/reminder';
   import { downloadFile } from '../lib/download';
   import AiSettings from '../components/AiSettings.svelte';
+  import ControllerSettings from '../components/ControllerSettings.svelte';
   import ExportDialog from '../components/ExportDialog.svelte';
   import { headerPrefs, setHelpButton } from '../lib/header.svelte';
   import { setSplashEnabled, splashEnabled } from '../lib/splash';
@@ -304,6 +305,9 @@
     Reviews after midnight still count toward the previous day until this hour.
   </p>
 </div>
+
+<h3 class="section-title" id="controllers">Game controllers and remotes</h3>
+<ControllerSettings />
 
 <h3 class="section-title" id="reminders">Study reminder</h3>
 <div class="panel stack">

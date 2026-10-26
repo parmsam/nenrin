@@ -59,6 +59,28 @@ export const SHORTCUTS: { group: string; items: Shortcut[] }[] = [
     ],
   },
   {
+    group: 'Game controller (default buttons; change them in Settings)',
+    items: [
+      { keys: [['Ⓐ']], action: 'Show answer, then rate Good (on other screens: study)' },
+      { keys: [['Ⓑ']], action: 'Again (with a short rumble)' },
+      { keys: [['Ⓧ']], action: 'Hard' },
+      { keys: [['Ⓨ']], action: 'Easy' },
+      { keys: [['LB']], action: 'Undo' },
+      { keys: [['RB']], action: 'Replay audio' },
+      { keys: [['D-pad ↑'], ['D-pad ↓']], action: 'Scroll a long card' },
+      { keys: [['D-pad ←'], ['D-pad →']], action: 'Previous / next card (preview)' },
+      { keys: [['View']], action: 'Back to deck' },
+    ],
+  },
+  {
+    group: 'Page turners, clickers and media keys',
+    items: [
+      { keys: [['PageDown'], ['⏯']], action: 'Show answer, then rate Good' },
+      { keys: [['PageUp']], action: 'Again (in preview: previous card)' },
+      { keys: [['→'], ['←']], action: 'While reviewing: Good / Again (clickers send arrows)' },
+    ],
+  },
+  {
     group: 'Browsing',
     items: [
       { keys: [['/']], action: 'Focus the search box' },
