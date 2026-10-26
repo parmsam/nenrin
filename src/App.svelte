@@ -1,7 +1,9 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { db } from './lib/db';
+  import { getPrefs } from './lib/db/prefs';
   import { ensureBuiltins } from './lib/notes';
+  import { scheduleReminder } from './lib/reminder';
   import { match, navigate, router } from './lib/router.svelte';
   import DeckView from './routes/DeckView.svelte';
   import Home from './routes/Home.svelte';
@@ -82,6 +84,8 @@
   onMount(async () => {
     await ensureBuiltins(db);
     ready = true;
+    const { reminderTime, reminderNotify } = await getPrefs(db);
+    scheduleReminder(reminderTime, reminderNotify);
   });
 
   // Where to return when the gear is clicked again while Settings is open.

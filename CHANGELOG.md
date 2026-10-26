@@ -4,6 +4,7 @@ Nenrin follows [semantic versioning](https://semver.org/). Until 1.0, each roadm
 
 ## Unreleased
 
+- **Study reminders** (Settings → _Study reminder_): pick a time and **add a daily event to your calendar**, which works everywhere, iPhone included. Or turn on **notifications**: if cards are due and you haven't studied yet, Nenrin reminds you once that day. They work while Nenrin is open, and in installed Chrome/Edge apps the browser may also check in the background. Nothing leaves your device.
 - **User guide**: getting started, studying, making cards, moving from Anki, custom study, keyboard shortcuts, backups and a FAQ. Built into the app (**Help**, in the footer, Settings and the command palette; works offline) and on GitHub in [`docs/guide/`](docs/guide/README.md).
 - **New first-run screen** with three ways in: _Import from Anki_, _Take the tour_, or _Start from scratch_. The **Nenrin tour** is a short deck that shows you around the app while you study it.
 - **Import CrowdAnki decks**: the JSON format that shared decks on GitHub use, such as [Ultimate Geography](https://github.com/anki-geo/ultimate-geography). Choose the release `.zip` (or a bare `deck.json`) in Import. Media, sub-decks and the deck's styling come along; importing a newer release updates notes and keeps your progress.

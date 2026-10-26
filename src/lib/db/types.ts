@@ -91,9 +91,19 @@ export interface Prefs {
   autoplayAudio: boolean;
   /** Apply each note type's own CSS (e.g. from imported Anki decks), safely scoped. */
   deckStyling: boolean;
+  /** Daily study reminder time, local "HH:MM". The service worker reads it too (sw-custom.js). */
+  reminderTime: string;
+  /** Show a notification at reminderTime when cards are due and you haven't studied yet. */
+  reminderNotify: boolean;
 }
 
-export const DEFAULT_PREFS: Prefs = { rolloverHour: 4, autoplayAudio: true, deckStyling: true };
+export const DEFAULT_PREFS: Prefs = {
+  rolloverHour: 4,
+  autoplayAudio: true,
+  deckStyling: true,
+  reminderTime: '19:00',
+  reminderNotify: false,
+};
 
 export const DEFAULT_DECK_CONFIG: DeckConfig = {
   newPerDay: 20,

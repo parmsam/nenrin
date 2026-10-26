@@ -137,7 +137,7 @@ From the Anki manual ([importing](https://docs.ankiweb.net/manual/importing/intr
   - In-app Help screen (`#/help`, works offline, linked from the footer, the palette, Settings and the first-run screen): getting started, studying and the rating buttons, keyboard shortcuts, moving from Anki, custom study and preview, making cards with an LLM, backups and storage on iPhone, FAQ (what FSRS is, why a card came back).
   - The same pages as Markdown in `docs/guide/` (one source: the app bundles them), so they read well on GitHub and can later become a static site; README links to them. A test keeps `keyboard.md` in step with the shortcuts dialog.
   - [ ] Screenshots or short recordings in the guide pages
-- [ ] Study reminders (Web Push / notifications where supported)
+- [x] Study reminders, without a server: Settings → _Study reminder_ picks a time and offers **Add to calendar** (a daily `.ics` event with an alert, which works everywhere, iPhone included) and **notifications**. The service worker checks: time passed, nothing studied today, reviews due, at most once a day. That check runs from the page's timer while Nenrin is open and, in installed Chromium apps, from Periodic Background Sync. True Web Push would need a push server; see the decision log
 - [x] Audio: autoplay the question's audio, then only the answer's new audio on reveal (like Anki), clips in sequence; <kbd>R</kbd> replays; toggle in Settings. (iOS may block autoplay after async loading; R and the player always work.) TTS for `{{tts}}` fields is still to do
 - [x] Import CrowdAnki JSON decks (`deck.json` + `media/`, zipped or bare). Popular open decks such as [Ultimate Geography](https://github.com/anki-geo/ultimate-geography) ship this way. Converted to the same package model as `.apkg` in the import worker, so GUID dedupe, media and deck styling come for free; cards are generated like Anki does (non-empty fronts, one per cloze)
 - [x] Onboarding with sample decks; first-run "Import from Anki" flow. The empty home screen offers three paths (Import from Anki, Take the tour, Start from scratch); the **Nenrin tour** deck teaches the app while you study it (rating, cloze, math, a diagram, making cards, backups)
@@ -188,6 +188,8 @@ Math is already covered by KaTeX (`$…$`, `$$…$$`, and Anki's `\(…\)` / `\[
 | Scope creep (AI, sync, social) | Hold to the non-goals list; Phase 4+ only after v1                                                                                                   |
 
 ## Decision log
+
+- **2026-10-25:** Study reminders use a calendar file plus local notifications, not Web Push. Push needs a server holding subscriptions and sending at the right time, which breaks "no backend" (and Apple's push on iOS requires it too). The `.ics` event (daily RRULE with an alarm, floating local time) works on every platform offline. Notifications come from the service worker, which reads IndexedDB directly; Periodic Background Sync gives installed Chromium apps a best-effort background check. Revisit if optional sync ever adds a server.
 
 - **2026-10-25:** Custom study runs as an in-memory session over a list of card ids, not as an Anki-style filtered deck that moves cards. Nothing to clean up or un-move, and it can't strand cards if the tab closes. Practice-only sessions write nothing; scheduled ones go through the normal `recordReview`. Manual bury uses a new optional `Card.buriedUntil` (next day start) so it expires on its own; no index, so no Dexie migration.
 

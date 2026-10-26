@@ -31,3 +31,10 @@ Be honest: if you didn't remember, press **Again**. The scheduler learns from yo
 ## Come back tomorrow
 
 A few minutes a day is the whole trick. The home screen shows how many cards are waiting, with a ring that fills as you go and your streak. New days start at 4 AM by default; you can change that in **Settings → Studying**.
+
+## Get a daily reminder
+
+In **Settings → Study reminder**, pick a time, then:
+
+- **Add to calendar** downloads a daily event with an alert for your calendar app. It's the most reliable reminder, and the one to use on iPhone.
+- **Also notify me** shows a notification at that time if cards are due and you haven't studied yet. It works while Nenrin is open, for example in a background tab. As an installed app in Chrome or Edge, the browser may also check now and then while it's closed. Nenrin has no server, so it can't wake your device on its own.

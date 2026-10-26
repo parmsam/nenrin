@@ -10,6 +10,14 @@
     exportBackup as exportBackupFile,
   } from '../lib/actions';
   import { cardPrompt } from '../lib/llm/prompt';
+  import {
+    enableNotifications,
+    canNotify,
+    hasBackgroundCheck,
+    notifyPermission,
+    reminderIcs,
+    scheduleReminder,
+  } from '../lib/reminder';
   import { downloadFile } from '../lib/download';
   import { exportNotesText, textExportFilename } from '../lib/export/text';
   import { setSplashEnabled, splashEnabled } from '../lib/splash';
@@ -46,11 +54,45 @@
   const hourLabel = (h: number) =>
     new Date(2000, 0, 1, h).toLocaleTimeString([], { hour: 'numeric' });
 
+  let reminderTime = $state('19:00');
+  let reminderNotify = $state(false);
+  let reminderNote = $state('');
+  let backgroundCheck = $state(false);
+  const support = canNotify();
+
+  async function saveReminder() {
+    await setPrefs(db, { reminderTime, reminderNotify });
+    scheduleReminder(reminderTime, reminderNotify);
+  }
+
+  async function toggleNotify() {
+    if (reminderNotify && !(await enableNotifications())) {
+      reminderNotify = false;
+      reminderNote =
+        (await notifyPermission()) === 'denied'
+          ? 'Notifications are blocked for this site. Allow them in your browser’s site settings.'
+          : 'Notifications weren’t allowed.';
+      await saveReminder();
+    } else {
+      await saveReminder();
+      reminderNote = reminderNotify ? 'Notifications on.' : '';
+    }
+  }
+
+  function addToCalendar() {
+    const url = new URL(import.meta.env.BASE_URL, location.origin).href;
+    downloadFile(reminderIcs(reminderTime, url), 'nenrin-reminder.ics', 'text/calendar');
+    reminderNote = 'Open the downloaded file to add the daily reminder to your calendar.';
+  }
+
   onMount(async () => {
     const prefs = await getPrefs(db);
     rolloverHour = prefs.rolloverHour;
     autoplayAudio = prefs.autoplayAudio;
     deckStyling = prefs.deckStyling;
+    reminderTime = prefs.reminderTime;
+    reminderNotify = prefs.reminderNotify && support && (await notifyPermission()) === 'granted';
+    backgroundCheck = await hasBackgroundCheck();
     await refreshStorage();
   });
 
@@ -152,7 +194,7 @@
       bind:checked={showSplash}
       onchange={() => setSplashEnabled(showSplash)}
     />
-    Show welcome screen when opening Nenrin
+    <span class="label-text">Show welcome screen when opening Nenrin</span>
   </label>
 </div>
 
@@ -164,7 +206,9 @@
       bind:checked={autoplayAudio}
       onchange={() => setPrefs(db, { autoplayAudio })}
     />
-    Play audio automatically <span class="muted small">(press R to replay)</span>
+    <span class="label-text"
+      >Play audio automatically <span class="muted small">(press R to replay)</span></span
+    >
   </label>
   <label class="check">
     <input
@@ -172,8 +216,10 @@
       bind:checked={deckStyling}
       onchange={() => setPrefs(db, { deckStyling })}
     />
-    Use each deck’s own styling
-    <span class="muted small">(for imported decks; kept inside the card)</span>
+    <span class="label-text"
+      >Use each deck’s own styling
+      <span class="muted small">(for imported decks; kept inside the card)</span></span
+    >
   </label>
 
   <label>
@@ -187,6 +233,33 @@
   <p class="hint muted">
     Reviews after midnight still count toward the previous day until this hour.
   </p>
+</div>
+
+<h3 class="section-title" id="reminders">Study reminder</h3>
+<div class="panel stack">
+  <label class="inline">
+    Remind me at
+    <input type="time" bind:value={reminderTime} onchange={saveReminder} required />
+  </label>
+  <div class="row">
+    <button class="secondary" onclick={addToCalendar}>Add to calendar</button>
+  </div>
+  <p class="hint muted">
+    A daily event with an alert, in whatever calendar app you use. The most reliable reminder,
+    especially on iPhone.
+  </p>
+  {#if support}
+    <label class="check">
+      <input type="checkbox" bind:checked={reminderNotify} onchange={toggleNotify} />
+      <span class="label-text">Also notify me when cards are due and I haven’t studied yet</span>
+    </label>
+    <p class="hint muted">
+      {backgroundCheck
+        ? 'Works while Nenrin is open in the background; as an installed app, the browser may also check now and then when it’s closed.'
+        : 'Works while Nenrin is open (for example in a background tab). Nenrin has no server, so it can’t wake your device when it’s closed; use the calendar for that.'}
+    </p>
+  {/if}
+  {#if reminderNote}<p class="muted" role="status">{reminderNote}</p>{/if}
 </div>
 
 <h3 class="section-title">Backup</h3>
@@ -324,15 +397,17 @@
     font-size: 0.8rem;
     margin: 0.5rem 0 0;
   }
+  /* Checkbox, then its text; long text wraps beside the box, not under it. */
   .check {
     display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 0.5rem;
+    align-items: baseline;
+    gap: 0.6rem;
     font-weight: 600;
   }
   .check input {
     width: auto;
+    flex: none;
+    transform: translateY(0.1em);
   }
   .ok {
     color: var(--good);
@@ -423,6 +498,14 @@
     width: 1px;
     height: 1px;
     opacity: 0;
+  }
+  .inline {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .inline input {
+    width: auto;
   }
   textarea[readonly] {
     margin-top: 0.5rem;
