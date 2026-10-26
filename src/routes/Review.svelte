@@ -4,11 +4,19 @@
   import Counts from '../components/Counts.svelte';
   import { db, DEFAULT_PREFS, type Card, type Prefs } from '../lib/db';
   import { getPrefs } from '../lib/db/prefs';
-  import { recordReview, undoReview, type UndoEntry } from '../lib/db/repo';
-  import { renderCard, type RenderedCard } from '../lib/render';
+  import {
+    hideCards,
+    recordReview,
+    restoreCards,
+    undoReview,
+    type CardsUndo,
+    type UndoEntry,
+  } from '../lib/db/repo';
+  import type { RenderedCard } from '../lib/render';
+  import { cardContent } from '../lib/study/content';
   import { navigate } from '../lib/router.svelte';
   import { createScheduler, GRADES, Rating, State, type Grade } from '../lib/scheduler';
-  import { formatInterval } from '../lib/study/day';
+  import { formatInterval, nextDayStart } from '../lib/study/day';
   import { LEARN_AHEAD_MS, studyState, type StudyCounts } from '../lib/study/queue';
   import { paletteState } from '../lib/palette.svelte';
   import { isTyping, shortcutsDialog } from '../lib/shortcuts.svelte';
@@ -21,6 +29,12 @@
     [Rating.Good]: 'Good',
     [Rating.Easy]: 'Easy',
   };
+  const HIDE_ACTIONS = [
+    { key: '-', label: 'Bury card', action: 'bury', scope: 'card' },
+    { key: '=', label: 'Bury note', action: 'bury', scope: 'note' },
+    { key: '@', label: 'Suspend card', action: 'suspend', scope: 'card' },
+    { key: '!', label: 'Suspend note', action: 'suspend', scope: 'note' },
+  ] as const;
   /** Cap on the time recorded for one card, so walking away doesn't skew stats (as in Anki). */
   const MAX_ANSWER_MS = 60_000;
 
@@ -36,7 +50,11 @@
   let finished = $state(false);
   let waitUntil = $state<number | undefined>();
   // Raw (not deep-proxied): these snapshots go back into IndexedDB, which can't clone Proxies.
-  let undoStack = $state.raw<UndoEntry[]>([]);
+  let undoStack = $state.raw<(UndoEntry | CardsUndo)[]>([]);
+  /** Short confirmation after bury/suspend/undo, read out by screen readers. */
+  let status = $state('');
+  let statusTimer: ReturnType<typeof setTimeout> | undefined;
+  let moreMenu: HTMLDetailsElement | undefined = $state();
   let busy = false;
   let shownAt = 0;
   let timer: ReturnType<typeof setTimeout> | undefined;
@@ -68,9 +86,8 @@
       if (waitUntil) timer = setTimeout(load, Math.max(1000, waitUntil - LEARN_AHEAD_MS - now));
       return;
     }
-    const note = await db.notes.get(next.noteId);
-    const noteType = note && (await db.noteTypes.get(note.noteTypeId));
-    if (!note || !noteType) return; // Shouldn't happen: cards are deleted with their note.
+    const content = await cardContent(db, next, prefs);
+    if (!content) return; // Shouldn't happen: cards are deleted with their note.
 
     const scheduler = createScheduler({
       desiredRetention: deck.config.desiredRetention,
@@ -80,17 +97,8 @@
     intervals = Object.fromEntries(
       GRADES.map((g) => [g, formatInterval(preview[g] - now)]),
     ) as Record<Grade, string>;
-    // Full deck path for Anki's {{Deck}} / {{Subdeck}} template fields.
-    const deckPath: string[] = [];
-    for (
-      let d = await db.decks.get(next.deckId);
-      d;
-      d = d.parentId ? await db.decks.get(d.parentId) : undefined
-    ) {
-      deckPath.unshift(d.name);
-    }
-    rendered = renderCard(noteType, note, next.ordinal, { deckPath });
-    cardCss = prefs.deckStyling ? noteType.css : '';
+    rendered = content;
+    cardCss = content.css;
     card = next;
     finished = false;
     revealed = false;
@@ -114,9 +122,39 @@
     if (!entry || busy) return;
     busy = true;
     try {
-      await undoReview(db, entry);
+      if ('logId' in entry) await undoReview(db, entry);
+      else await restoreCards(db, entry);
       undoStack = undoStack.slice(0, -1);
-      await load(entry.previous);
+      // Show the card that was rated, buried or suspended again (hide() puts it first).
+      await load('logId' in entry ? entry.previous : entry.cards[0]);
+      flash('Undone');
+    } finally {
+      busy = false;
+    }
+  }
+
+  function flash(text: string) {
+    status = text;
+    clearTimeout(statusTimer);
+    statusTimer = setTimeout(() => (status = ''), 2500);
+  }
+
+  /** Bury (until the next study day) or suspend the current card, or its whole note. */
+  async function hide(action: 'bury' | 'suspend', scope: 'card' | 'note') {
+    if (!card || busy) return;
+    busy = true;
+    try {
+      const how =
+        action === 'bury'
+          ? ({ action, until: nextDayStart(Date.now(), prefs.rolloverHour) } as const)
+          : ({ action } as const);
+      const entry = await hideCards(db, card, how, scope);
+      // Undo should bring back the card on screen, so keep it first.
+      entry.cards.sort((a, b) => Number(b.id === card?.id) - Number(a.id === card?.id));
+      undoStack = [...undoStack, entry];
+      const what = scope === 'card' ? 'Card' : 'Note';
+      flash(`${what} ${action === 'bury' ? 'buried until tomorrow' : 'suspended'}. Z to undo.`);
+      await load();
     } finally {
       busy = false;
     }
@@ -129,17 +167,25 @@
   function onKey(e: KeyboardEvent) {
     if (isTyping(e) || shortcutsDialog.open || paletteState.open) return;
     // Z or Cmd/Ctrl+Z.
-    if (e.key === 'z' && !e.altKey && !e.shiftKey) {
+    if (e.key.toLowerCase() === 'z' && !e.altKey && !e.shiftKey) {
       e.preventDefault();
       undo();
     } else if (e.metaKey || e.ctrlKey || e.altKey) {
       return;
     } else if (e.key === 'Escape') {
       navigate(`/deck/${deckId}`);
-    } else if (e.key === 'r') {
+    } else if (e.key.toLowerCase() === 'r') {
       cardView?.replay();
-    } else if (e.key === 'e') {
+    } else if (e.key.toLowerCase() === 'e') {
       edit();
+    } else if (e.key === '-') {
+      hide('bury', 'card');
+    } else if (e.key === '=') {
+      hide('bury', 'note');
+    } else if (e.key === '@') {
+      hide('suspend', 'card');
+    } else if (e.key === '!') {
+      hide('suspend', 'note');
     } else if (e.key === ' ' || e.key === 'Enter') {
       e.preventDefault();
       if (!card) return;
@@ -155,7 +201,10 @@
       prefs = p;
       load();
     });
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(statusTimer);
+    };
   });
 </script>
 
@@ -170,6 +219,21 @@
       >Undo</button
     >
     <button class="secondary tool" onclick={edit} disabled={!card} title="Edit (E)">Edit</button>
+    <details class="more" bind:this={moreMenu}>
+      <summary class="tool" aria-label="More actions" title="More actions">⋯</summary>
+      <div class="menu panel">
+        {#each HIDE_ACTIONS as a (a.key)}
+          <button
+            class="secondary"
+            disabled={!card}
+            onclick={() => {
+              moreMenu!.open = false;
+              hide(a.action, a.scope);
+            }}>{a.label} <kbd>{a.key}</kbd></button
+          >
+        {/each}
+      </div>
+    </details>
     <button
       class="secondary tool kbd-button"
       onclick={() => (shortcutsDialog.open = true)}
@@ -177,6 +241,8 @@
       title="Keyboard shortcuts (?)">?</button
     >
   </header>
+
+  <p class="status" role="status">{status}</p>
 
   {#if finished}
     <section class="done">
@@ -192,6 +258,7 @@
       {/if}
       <div class="row center">
         <a class="button" href="#/">Back to decks</a>
+        <a class="button secondary" href="#/custom/{deckId}">Custom study</a>
         {#if undoStack.length}<button class="secondary" onclick={undo}>Undo last</button>{/if}
       </div>
     </section>
@@ -328,6 +395,45 @@
     .kbd-button {
       display: none;
     }
+  }
+  .more {
+    position: relative;
+  }
+  .more summary {
+    list-style: none;
+    cursor: pointer;
+    font-weight: 600;
+    border-radius: 10px;
+    background: var(--surface-2);
+    color: var(--text);
+  }
+  .more summary::-webkit-details-marker {
+    display: none;
+  }
+  .menu {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 0.35rem);
+    z-index: 5;
+    display: grid;
+    gap: 0.35rem;
+    padding: 0.5rem;
+    min-width: 11rem;
+    box-shadow: var(--shadow);
+  }
+  .menu button {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    font-size: 0.85rem;
+    padding: 0.45rem 0.7rem;
+  }
+  .status {
+    margin: 0;
+    min-height: 1.2em;
+    font-size: 0.85rem;
+    color: var(--muted);
+    text-align: center;
   }
   .done {
     flex: 1;

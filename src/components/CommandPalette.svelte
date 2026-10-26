@@ -123,6 +123,20 @@
           run: go(`/study/${d.id}`),
         },
         {
+          id: `preview-${d.id}`,
+          label: `Preview ${d.path}`,
+          group: 'Deck',
+          keywords: 'browse flip read through',
+          run: go(`/session/${d.id}?kind=all`),
+        },
+        {
+          id: `custom-${d.id}`,
+          label: `Custom study ${d.path}`,
+          group: 'Deck',
+          keywords: 'cram extra more ahead forgotten tag practice',
+          run: go(`/custom/${d.id}`),
+        },
+        {
           id: `deck-${d.id}`,
           label: `Open ${d.path}`,
           group: 'Deck',

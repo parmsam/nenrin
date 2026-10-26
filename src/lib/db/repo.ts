@@ -9,6 +9,37 @@ export interface UndoEntry {
   logId: string;
 }
 
+/** Cards as they were before a bury or suspend, so it can be undone. */
+export interface CardsUndo {
+  cards: Card[];
+}
+
+/**
+ * Buries or suspends cards from the review screen: one card, or all cards of its note.
+ * `bury` hides them until the next study day starts (`until`).
+ */
+export async function hideCards(
+  db: NenrinDB,
+  card: Card,
+  how: { action: 'bury'; until: number } | { action: 'suspend' },
+  scope: 'card' | 'note',
+): Promise<CardsUndo> {
+  return db.transaction('rw', db.cards, async () => {
+    const cards =
+      scope === 'card'
+        ? [(await db.cards.get(card.id))!]
+        : await db.cards.where('noteId').equals(card.noteId).toArray();
+    const patch = how.action === 'bury' ? { buriedUntil: how.until } : { suspended: true };
+    await db.cards.bulkUpdate(cards.map((c) => ({ key: c.id, changes: patch })));
+    return { cards };
+  });
+}
+
+/** Puts cards back as they were (undo for `hideCards`). */
+export async function restoreCards(db: NenrinDB, entry: CardsUndo): Promise<void> {
+  await db.cards.bulkPut(entry.cards);
+}
+
 /** Applies a rating to a card and appends the review log in one transaction. */
 export async function recordReview(
   db: NenrinDB,

@@ -4,6 +4,11 @@ Nenrin follows [semantic versioning](https://semver.org/). Until 1.0, each roadm
 
 ## Unreleased
 
+- **Preview a deck**: flip through every card (<kbd>P</kbd> on a deck, or the Preview button) with <kbd>←</kbd> <kbd>→</kbd>, without scheduling anything.
+- **Custom study** (<kbd>C</kbd> on a deck, or after finishing one): add extra new cards or reviews for today only, or start a one-off session: preview new cards, review forgotten cards, review ahead, or study by tag. Choose the order and size, and whether answers count as reviews or are practice only.
+- **Bury and suspend while reviewing**, with the same keys as Anki: <kbd>-</kbd> bury card, <kbd>=</kbd> bury note (until tomorrow), <kbd>@</kbd> suspend card, <kbd>!</kbd> suspend note. <kbd>Z</kbd> undoes them, and a ⋯ menu offers the same for mouse and touch.
+- **More keyboard shortcuts**: Anki's main-window keys work everywhere outside a review (<kbd>D</kbd> decks, <kbd>A</kbd> add, <kbd>B</kbd> browse, <kbd>T</kbd> stats, <kbd>I</kbd> import, <kbd>⌘,</kbd> settings); <kbd>S</kbd> studies; and the Browse list moves with <kbd>↓</kbd> <kbd>↑</kbd> or <kbd>J</kbd> <kbd>K</kbd>, with <kbd>X</kbd> to select. Press <kbd>?</kbd> for the full list.
+- **Fixed:** updating the address in place (typing a search in Browse) could reload and remount a lazily loaded screen.
 - **Faster start**: math rendering (KaTeX) and less-used screens (Import, Browse, Stats, Settings, the editor) now load on demand, so the app downloads about 60% less JavaScript up front. Lighthouse: 98–100 performance and 100 for accessibility, best practices and SEO on every page.
 - **Welcome splash** for returning users: the logo, 年輪, and today's due count, for a moment. Tap to skip; off in Settings → Appearance. Not shown over deep links or more than once per session.
 - **Command palette** (<kbd>⌘K</kbd> / <kbd>Ctrl+K</kbd>): fuzzy-search every page, action, theme and deck ("Study …", "Open …"), or search notes for whatever you type. Recent commands come first.

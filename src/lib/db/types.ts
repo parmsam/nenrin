@@ -9,6 +9,8 @@ export interface DeckConfig {
   /** When fsrsParams were computed, and from how many reviews. */
   fsrsOptimizedAt?: number;
   fsrsOptimizedReviews?: number;
+  /** Custom study: extra new cards / reviews allowed on one study day (`day` = its start). */
+  extraToday?: { day: number; newCards: number; reviews: number };
 }
 
 export interface Deck {
@@ -57,6 +59,8 @@ export interface Card extends SchedulingState {
   ordinal: number;
   suspended: boolean;
   buried: boolean;
+  /** Buried by hand (Anki's "bury"): left out of the queue until this time (next day start). */
+  buriedUntil?: number;
 }
 
 /** Append-only. Kept complete so FSRS parameters can be re-optimized later. */

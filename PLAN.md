@@ -128,6 +128,8 @@ From the Anki manual ([importing](https://docs.ankiweb.net/manual/importing/intr
   - On touch devices, a search button in the header opens it.
 - [x] Stats (`#/stats`, per deck or overall): review heatmap, true retention (30 days), streaks, 30-day forecast, cards by stage; hand-built SVG charts with keyboard readouts and table views; colors validated for color-blind separation in light and dark
 - [x] FSRS parameter optimization (`fsrs-browser`: fsrs-rs in WASM) on a separate cross-origin isolated page (`optimize.html`); the service worker adds COOP/COEP to that page and its worker only, so the app keeps remote images and sign-in popups working. Results saved per deck (and sub-decks), with a revert
+- [x] **Deck preview and custom study** (like Anki's): preview every card without scheduling; raise today's new/review limits; one-off sessions for new cards, forgotten cards, review ahead, or tags, in added/due/random order, either scheduled through FSRS or practice-only. Sessions live in the URL (`#/session/:deck?kind=…&seed=…&at=…`), so a reload or a trip to the editor keeps your place; no filtered decks are created
+- [x] **Keyboard coverage**: Anki's keys for navigation (D/A/B/T, S study, C custom study), bury/suspend in review (`-` `=` `@` `!`, undoable), preview arrows, and arrow/J/K/X in the Browse list. All listed in the shortcuts dialog from one registry
 - [ ] Study reminders (Web Push / notifications where supported)
 - [x] Audio: autoplay the question's audio, then only the answer's new audio on reveal (like Anki), clips in sequence; <kbd>R</kbd> replays; toggle in Settings. (iOS may block autoplay after async loading; R and the player always work.) TTS for `{{tts}}` fields is still to do
 - [ ] Import CrowdAnki JSON decks (`deck.json` + `media/`). Popular open decks such as [Ultimate Geography](https://github.com/anki-geo/ultimate-geography) ship this way
@@ -178,6 +180,8 @@ Math is already covered by KaTeX (`$…$`, `$$…$$`, and Anki's `\(…\)` / `\[
 | Scope creep (AI, sync, social) | Hold to the non-goals list; Phase 4+ only after v1                                                                                                   |
 
 ## Decision log
+
+- **2026-10-25:** Custom study runs as an in-memory session over a list of card ids, not as an Anki-style filtered deck that moves cards. Nothing to clean up or un-move, and it can't strand cards if the tab closes. Practice-only sessions write nothing; scheduled ones go through the normal `recordReview`. Manual bury uses a new optional `Card.buriedUntil` (next day start) so it expires on its own; no index, so no Dexie migration.
 
 - **2026-10-25:** Optimizer isolation is scoped to one page. `fsrs-browser` needs SharedArrayBuffer (WASM threads), so it needs COOP/COEP, which GitHub Pages can't send. Isolating the whole app would block hot-linked images in imported decks and popup-based OAuth for future sync. Instead the service worker (`public/sw-custom.js`) adds the headers only to `optimize.html` and its worker; a Vite plugin does the same in dev and preview. Safari without COEP support shows an explanation instead.
 - **2026-10-25:** Real-deck checks run in real Chromium (`scripts/check-decks.mjs`), not jsdom or happy-dom. Both fake DOMs leak ~4 MB per DOMPurify call on large card HTML and ran out of memory on a 1,850-card Tatoeba deck, while Chromium stayed flat. Unit tests still use jsdom for small inputs.

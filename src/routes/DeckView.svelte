@@ -14,6 +14,7 @@
   import { exportNotesText, textExportFilename } from '../lib/export/text';
   import { confirmAction } from '../lib/confirm.svelte';
   import { navigate } from '../lib/router.svelte';
+  import { plainKey } from '../lib/shortcuts.svelte';
   import { formatInterval } from '../lib/study/day';
   import { studyState } from '../lib/study/queue';
 
@@ -103,6 +104,18 @@
     for (const deckId of await deckSubtreeIds(db, id)) await updateDeckConfig(db, deckId, reset);
   }
 
+  /** S study, P preview, C custom study (Anki uses S and C on the deck overview too). */
+  function onKey(e: KeyboardEvent) {
+    if (!plainKey(e) || !$data) return;
+    const to = { s: `/study/${id}`, p: `/session/${id}?kind=all`, c: `/custom/${id}` }[
+      e.key.toLowerCase()
+    ];
+    if (to) {
+      e.preventDefault();
+      navigate(to);
+    }
+  }
+
   const dateFmt = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' });
 
   async function remove() {
@@ -123,6 +136,8 @@
     navigate('/', { replace: true });
   }
 </script>
+
+<svelte:window onkeydown={onKey} />
 
 {#if $data === undefined}
   <p class="muted">Loading…</p>
@@ -159,7 +174,7 @@
       <span class="muted">new · learning · review</span>
     </div>
     {#if total > 0}
-      <a class="button big" href="#/study/{id}">Study now</a>
+      <a class="button big" href="#/study/{id}" title="Study (S)">Study now</a>
     {:else if study.waitUntil}
       <p>
         Next learning card in {formatInterval(study.waitUntil - Date.now())}.
@@ -170,6 +185,14 @@
     {:else}
       <p><strong>Done for today.</strong> <span class="muted">Come back tomorrow.</span></p>
     {/if}
+    <div class="row">
+      <a
+        class="button secondary"
+        href="#/session/{id}?kind=all"
+        title="Flip through every card without scheduling (P)">Preview</a
+      >
+      <a class="button secondary" href="#/custom/{id}" title="Custom study (C)">Custom study</a>
+    </div>
     <div class="row">
       <a class="button secondary" href="#/add?deck={id}">+ Add cards</a>
       <a class="button secondary" href="#/import?deck={id}">Import</a>

@@ -94,11 +94,45 @@
     };
   }
 
+  let list: HTMLUListElement | undefined = $state();
+
+  /** Moves focus to the result row at `i` (its link), or back to the search box above row 0. */
+  function focusRow(i: number) {
+    const links = list?.querySelectorAll<HTMLAnchorElement>('a.main') ?? [];
+    if (i < 0) return input?.focus();
+    links[Math.min(i, links.length - 1)]?.focus();
+  }
+
   function onKey(e: KeyboardEvent) {
+    if (e.metaKey || e.ctrlKey || e.altKey || document.querySelector('dialog[open]')) return;
     if (e.key === '/' && !isTyping(e)) {
       e.preventDefault();
       input?.focus();
       input?.select();
+      return;
+    }
+    // ↓ from the search box jumps into the results.
+    if (e.target === input && e.key === 'ArrowDown') {
+      e.preventDefault();
+      focusRow(0);
+      return;
+    }
+    const row = (e.target as HTMLElement | null)?.closest?.<HTMLElement>('li[data-id]');
+    if (!row || !list) return;
+    const rows = [...list.querySelectorAll<HTMLElement>('li[data-id]')];
+    const i = rows.indexOf(row);
+    const key = e.key.toLowerCase();
+    if (key === 'arrowdown' || key === 'j') {
+      e.preventDefault();
+      focusRow(i + 1);
+    } else if (key === 'arrowup' || key === 'k') {
+      e.preventDefault();
+      focusRow(i - 1);
+    } else if (key === 'x' || (key === ' ' && e.target instanceof HTMLAnchorElement)) {
+      e.preventDefault();
+      toggle(row.dataset.id!);
+    } else if (key === 'escape') {
+      input?.focus();
     }
   }
 
@@ -141,7 +175,7 @@
   {#each ['is:due', 'is:new', 'is:suspended', 'added:7', '-tag:leech'] as ex (ex)}
     <button type="button" class="chip" onclick={() => addExample(ex)}>{ex}</button>
   {/each}
-  · <kbd>/</kbd> to search
+  · <kbd>/</kbd> to search, <kbd>↓</kbd> <kbd>↑</kbd> to move, <kbd>X</kbd> to select
 </p>
 
 {#if $data === undefined}
@@ -203,10 +237,10 @@
   {#if results.length === 0}
     <p class="muted empty">No notes match.</p>
   {:else}
-    <ul class="results">
+    <ul class="results" bind:this={list}>
       {#each visible as row (row.note.id)}
         {@const st = stateLabel(row)}
-        <li class:selected={selected.has(row.note.id)}>
+        <li class:selected={selected.has(row.note.id)} data-id={row.note.id}>
           <input
             type="checkbox"
             checked={selected.has(row.note.id)}

@@ -61,7 +61,8 @@ export async function studyState(
     );
     fresh.push(...(await db.cards.where('[deckId+state]').equals([id, State.New]).toArray()));
   }
-  const active = (c: Card) => !c.suspended && !c.buried;
+  const active = (c: Card) => !c.suspended && !c.buried && !(c.buriedUntil && c.buriedUntil > now);
+  const extra = config.extraToday?.day === start ? config.extraToday : undefined;
   const byDue = (a: Card, b: Card) => a.due - b.due || a.id.localeCompare(b.id);
 
   const learning = due
@@ -80,9 +81,12 @@ export async function studyState(
   };
   const review = takeUnburied(
     due.filter((c) => c.state === State.Review),
-    Math.max(0, config.reviewsPerDay - reviewsDone),
+    Math.max(0, config.reviewsPerDay + (extra?.reviews ?? 0) - reviewsDone),
   );
-  const newCards = takeUnburied(fresh, Math.max(0, config.newPerDay - newDone));
+  const newCards = takeUnburied(
+    fresh,
+    Math.max(0, config.newPerDay + (extra?.newCards ?? 0) - newDone),
+  );
 
   const counts = { new: newCards.length, learning: learning.length, review: review.length };
   const next =

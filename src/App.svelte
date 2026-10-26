@@ -7,14 +7,29 @@
   import Home from './routes/Home.svelte';
   import Review from './routes/Review.svelte';
 
+  /**
+   * Loads a module once and hands back the same promise after, so an in-place URL update (a
+   * search query, a session's position) doesn't restart the {#await} and remount the screen.
+   * A failed load is forgotten, so the next visit retries.
+   */
+  function once<T>(load: () => Promise<T>): () => Promise<T> {
+    let p: Promise<T> | undefined;
+    return () =>
+      (p ??= load().catch((err) => {
+        p = undefined;
+        throw err;
+      }));
+  }
   // Everyday screens ship in the main bundle; the rest load on first visit (and are
   // precached by the service worker, so they still open offline).
   const lazy = {
-    editor: () => import('./routes/Editor.svelte'),
-    stats: () => import('./routes/Stats.svelte'),
-    browse: () => import('./routes/Browse.svelte'),
-    import: () => import('./routes/Import.svelte'),
-    settings: () => import('./routes/Settings.svelte'),
+    editor: once(() => import('./routes/Editor.svelte')),
+    stats: once(() => import('./routes/Stats.svelte')),
+    browse: once(() => import('./routes/Browse.svelte')),
+    import: once(() => import('./routes/Import.svelte')),
+    settings: once(() => import('./routes/Settings.svelte')),
+    custom: once(() => import('./routes/Custom.svelte')),
+    session: once(() => import('./routes/Session.svelte')),
   };
   import CommandPalette from './components/CommandPalette.svelte';
   import ConfirmDialog from './components/ConfirmDialog.svelte';
@@ -22,7 +37,15 @@
   import ShortcutsDialog from './components/ShortcutsDialog.svelte';
   import Splash from './components/Splash.svelte';
   import UpdatePrompt from './components/UpdatePrompt.svelte';
-  import { isTyping, shortcutsDialog } from './lib/shortcuts.svelte';
+  import { plainKey, shortcutsDialog } from './lib/shortcuts.svelte';
+
+  const GO_KEYS: Record<string, string> = {
+    d: '/',
+    a: '/add',
+    b: '/browse',
+    t: '/stats',
+    i: '/import',
+  };
 
   const logo = `${import.meta.env.BASE_URL}logo.svg`;
   let ready = $state(false);
@@ -34,9 +57,24 @@
       paletteState.open = !paletteState.open;
       return;
     }
-    if (e.key === '?' && !isTyping(e) && !e.metaKey && !e.ctrlKey) {
+    if (e.key === ',' && (e.metaKey || e.ctrlKey) && !e.altKey) {
+      e.preventDefault();
+      navigate('/settings');
+      return;
+    }
+    if (!plainKey(e)) return;
+    if (e.key === '?') {
       e.preventDefault();
       shortcutsDialog.open = true;
+      return;
+    }
+    // Anki's main-window keys. Not while studying, where letters belong to the review.
+    // Nor in the editor, where a stray key would leave an unsaved note behind.
+    if (['study', 'session', 'edit', 'add'].includes(route.name)) return;
+    const to = GO_KEYS[e.key.toLowerCase()];
+    if (to && router.path !== to) {
+      e.preventDefault();
+      navigate(to);
     }
   }
 
@@ -65,6 +103,8 @@
     if ((m = match('/deck/:id', p))) return { name: 'deck', id: m.id } as const;
     if ((m = match('/study/:id', p))) return { name: 'study', id: m.id } as const;
     if ((m = match('/edit/:id', p))) return { name: 'edit', id: m.id } as const;
+    if ((m = match('/custom/:id', p))) return { name: 'custom', id: m.id } as const;
+    if ((m = match('/session/:id', p))) return { name: 'session', id: m.id } as const;
     if (p === '/add') return { name: 'add' } as const;
     if (p === '/import') return { name: 'import' } as const;
     if (p === '/browse') return { name: 'browse' } as const;
@@ -74,7 +114,7 @@
   });
 </script>
 
-{#if route.name !== 'study'}
+{#if route.name !== 'study' && route.name !== 'session'}
   <header class="app-header">
     <a class="brand" href="#/">
       <img src={logo} alt="" width="36" height="36" />
@@ -136,6 +176,12 @@
     {#key route.id}<DeckView id={route.id} />{/key}
   {:else if route.name === 'study'}
     {#key route.id}<Review deckId={route.id} />{/key}
+  {:else if route.name === 'custom' || route.name === 'session'}
+    {#await lazy[route.name]() then m}
+      {#key route.id}<m.default deckId={route.id} />{/key}
+    {:catch}
+      <p class="error">Couldn’t load this screen. Check your connection and reload.</p>
+    {/await}
   {:else if route.name === 'edit' || route.name === 'add'}
     {#await lazy.editor() then m}
       {#key route.name === 'edit' ? route.id : 'add'}
@@ -159,7 +205,7 @@
 <svelte:window onkeydown={onKey} />
 
 <!-- Rendered once the app is ready, so it doesn't jump down as content loads (CLS). -->
-{#if ready && route.name !== 'study'}
+{#if ready && route.name !== 'study' && route.name !== 'session'}
   <footer class="muted">
     Nenrin v{__APP_VERSION__} (pre-alpha) · Local-first · works offline ·
     <a href="https://github.com/parmsam/nenrin">Source (MIT)</a>

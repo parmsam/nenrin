@@ -8,6 +8,7 @@
   import { createDeck, deckSubtreeIds, deckTree, deleteDeck, type DeckNode } from '../lib/db/decks';
   import { createSampleDeck } from '../lib/db/sample';
   import { navigate } from '../lib/router.svelte';
+  import { plainKey } from '../lib/shortcuts.svelte';
   import { studyState } from '../lib/study/queue';
   import { todaySummary } from '../lib/study/stats';
 
@@ -82,7 +83,17 @@
       error = (err as Error).message;
     }
   }
+
+  /** S studies the suggested deck, like "Study now". */
+  function onKey(e: KeyboardEvent) {
+    if (e.key.toLowerCase() === 's' && plainKey(e) && nextDeck) {
+      e.preventDefault();
+      navigate(`/study/${nextDeck.id}`);
+    }
+  }
 </script>
+
+<svelte:window onkeydown={onKey} />
 
 {#if $decks === undefined}
   <p class="muted">Loading…</p>
@@ -155,8 +166,11 @@
       </p>
       {#if nextDeck}
         <p class="next">
-          <a class="button study-now" href="#/study/{nextDeck.id}" aria-describedby="next-deck"
-            >Study now</a
+          <a
+            class="button study-now"
+            href="#/study/{nextDeck.id}"
+            aria-describedby="next-deck"
+            title="Study now (S)">Study now</a
           >
           <span id="next-deck" class="next-deck">{nextDeck.name}</span>
         </p>
