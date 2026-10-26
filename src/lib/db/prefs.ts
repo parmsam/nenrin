@@ -15,9 +15,13 @@ export async function getPrefs(db: NenrinDB): Promise<Prefs> {
 }
 
 export async function setPrefs(db: NenrinDB, changes: Partial<Prefs>): Promise<Prefs> {
-  const next = { ...(await getPrefs(db)), ...changes };
-  await db.settings.put({ key: KEY, value: next });
-  return next;
+  // Read and write in one transaction, so two quick changes (say, a toggle while another
+  // setting saves) can't overwrite each other.
+  return db.transaction('rw', db.settings, async () => {
+    const next = { ...(await getPrefs(db)), ...changes };
+    await db.settings.put({ key: KEY, value: next });
+    return next;
+  });
 }
 
 /** A random id for this browser/device, created on first use. Tags review logs for future sync. */
