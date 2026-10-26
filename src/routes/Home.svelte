@@ -322,7 +322,7 @@
     color: var(--muted);
   }
   .new-deck {
-    margin-top: 1rem;
+    margin: 1rem 0;
     flex-wrap: nowrap;
   }
   .paths {
