@@ -11,6 +11,7 @@
 import DOMPurify from 'dompurify';
 import { marked } from 'marked';
 import type { Note, NoteType } from '../db/types';
+import { isImageOcclusion, renderOcclusion } from './occlusion';
 import { renderTemplate } from './template';
 
 export { clozeNumbers, isEmptyFront, renderTemplate, stripHtml } from './template';
@@ -98,6 +99,7 @@ export function renderCard(
   extras: RenderExtras = {},
 ): RenderedCard {
   const cloze = noteType.kind === 'cloze' ? ordinal + 1 : undefined;
+  if (isImageOcclusion(noteType)) return renderOcclusionCard(noteType, note, ordinal + 1);
   const tpl = noteType.kind === 'cloze' ? noteType.templates[0] : noteType.templates[ordinal];
   if (!tpl) return { front: '', back: '' };
   const fields: Record<string, string> = {
@@ -114,6 +116,19 @@ export function renderCard(
   const front = renderTemplate(tpl.front, fields, { side: 'front', cloze });
   const back = renderTemplate(tpl.back, fields, { side: 'back', cloze, frontSide: front });
   return { front: sanitize(front), back: sanitize(back) };
+}
+
+/**
+ * Image occlusion cards are drawn by Nenrin, not by the note type's template (Anki's relies on
+ * a script). Fields by position: Occlusion, Image, Header, Back Extra.
+ */
+function renderOcclusionCard(type: NoteType, note: Note, cloze: number): RenderedCard {
+  const [occlusion, image, header, extra] = type.fields.map((f) => note.fields[f] ?? '');
+  const html = (v: string | undefined) => (v?.trim() ? fieldToHtml(v, note.format) : '');
+  const head = html(header) && `<div class="io-header">${html(header)}</div>`;
+  const side = (s: 'front' | 'back') => renderOcclusion(occlusion ?? '', html(image), cloze, s);
+  const back = `${head}${side('back')}${html(extra) && `<hr id="answer">${html(extra)}`}`;
+  return { front: sanitize(head + side('front')), back: sanitize(back) };
 }
 
 /** Local media filenames referenced by `<img src>` / `<audio src>` in rendered HTML. */

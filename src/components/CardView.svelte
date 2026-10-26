@@ -60,6 +60,7 @@
         renderMathIn(container);
         renderDiagramsIn(container);
         mountTyping(container);
+        fitOcclusions(container);
       }
       if (autoplay) play();
     });
@@ -132,6 +133,18 @@
     }
   }
 
+  /** Masks stored in pixels (Anki 23.10.0) take their coordinate space from the image. */
+  function fitOcclusions(root: HTMLElement) {
+    for (const io of root.querySelectorAll<HTMLElement>('.nenrin-io[data-units="px"]')) {
+      const img = io.querySelector('img');
+      const svg = io.querySelector('svg');
+      if (!img || !svg) continue;
+      const fit = () => svg.setAttribute('viewBox', `0 0 ${img.naturalWidth} ${img.naturalHeight}`);
+      if (img.complete && img.naturalWidth) fit();
+      else img.addEventListener('load', fit, { once: true });
+    }
+  }
+
   function audios(): HTMLAudioElement[] {
     if (!container) return [];
     const all = [...container.querySelectorAll('audio')];
@@ -197,6 +210,45 @@
 </div>
 
 <style>
+  /* Image occlusion: an SVG of masks laid over the image (see render/occlusion.ts). */
+  .card-content :global(.nenrin-io) {
+    position: relative;
+    display: inline-block;
+    max-width: 100%;
+    line-height: 0;
+  }
+  .card-content :global(.nenrin-io img) {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+  .card-content :global(.io-masks) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .card-content :global(.io-masks > *) {
+    vector-effect: non-scaling-stroke;
+    stroke-width: 2px;
+  }
+  /* As in Anki: the masks to guess in red, the others in yellow. */
+  .card-content :global(.io-active) {
+    fill: var(--io-active);
+    stroke: var(--again);
+  }
+  .card-content :global(.io-inactive) {
+    fill: var(--io-inactive);
+    stroke: var(--hard);
+  }
+  .card-content :global(.io-revealed) {
+    fill: none;
+    stroke: var(--good);
+    stroke-dasharray: 6 4;
+  }
+  .card-content :global(.io-header) {
+    margin-bottom: 0.75rem;
+  }
   /* Type-in-the-answer: the box, and the comparison (Anki's colors: right, wrong, missing). */
   .card-content :global(.type-answer) {
     display: block;

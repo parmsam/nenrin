@@ -53,4 +53,30 @@ export const CLOZE: NoteType = {
   css: '',
 };
 
-export const BUILTIN_NOTE_TYPES: readonly NoteType[] = [BASIC, BASIC_REVERSED, BASIC_TYPE, CLOZE];
+/**
+ * Masks over an image, one card per mask. Same fields and Occlusion format as Anki's, so
+ * notes import and export cleanly. Cards are drawn by render/occlusion.ts, not the template;
+ * the template is only what other apps would show.
+ */
+export const IMAGE_OCCLUSION: NoteType = {
+  id: 'image-occlusion',
+  name: 'Image Occlusion',
+  kind: 'cloze',
+  fields: ['Occlusion', 'Image', 'Header', 'Back Extra', 'Comments'],
+  templates: [
+    {
+      name: 'Image Occlusion',
+      front: '{{#Header}}<div>{{Header}}</div>{{/Header}}{{cloze:Occlusion}}{{Image}}',
+      back: `{{#Header}}<div>{{Header}}</div>{{/Header}}{{cloze:Occlusion}}{{Image}}${ANSWER}{{Back Extra}}`,
+    },
+  ],
+  css: '',
+};
+
+export const BUILTIN_NOTE_TYPES: readonly NoteType[] = [
+  BASIC,
+  BASIC_REVERSED,
+  BASIC_TYPE,
+  CLOZE,
+  IMAGE_OCCLUSION,
+];

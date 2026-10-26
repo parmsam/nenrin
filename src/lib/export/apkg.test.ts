@@ -1,4 +1,5 @@
 import 'fake-indexeddb/auto';
+import { unzipSync } from 'fflate';
 import initSqlJs, { type SqlJsStatic } from 'sql.js';
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { NenrinDB } from '../db';
@@ -176,6 +177,39 @@ describe('apkg export', () => {
       memory: undefined,
     });
     expect(pkg.revlog).toEqual([]);
+  });
+
+  it('exports image occlusion notes as Anki’s own image occlusion type', async () => {
+    const deck = await createDeck(db, 'IO', undefined, NOW);
+    await addNote(
+      db,
+      {
+        noteTypeId: 'image-occlusion',
+        deckId: deck.id,
+        fields: {
+          Occlusion: '{{c1::image-occlusion:rect:left=.1:top=.1:width=.2:height=.2:oi=1}}',
+          Image: '<img src="heart.png">',
+        },
+      },
+      NOW,
+    );
+    const zip = unzipSync(writeAnkiPackage(await collectApkg(db, { scheduling: true }, NOW), SQL));
+    const col = new SQL.Database(zip['collection.anki21']);
+    const models = JSON.parse(String(col.exec('SELECT models FROM col')[0].values[0][0]));
+    col.close();
+    const io = Object.values(models as Record<string, Record<string, unknown>>).find(
+      (m) => m.name === 'Image Occlusion',
+    )!;
+    expect(io.originalStockKind).toBe(6);
+    expect(JSON.stringify(io.tmpls)).toContain('anki.imageOcclusion.setup()');
+    // The Occlusion field goes out unchanged, in Anki's format.
+    const pkg = readAnkiPackage(
+      writeAnkiPackage(await collectApkg(db, { scheduling: true }, NOW), SQL),
+      SQL,
+    );
+    expect(pkg.notes[0].fields[0]).toBe(
+      '{{c1::image-occlusion:rect:left=.1:top=.1:width=.2:height=.2:oi=1}}',
+    );
   });
 
   it('maps learning, suspended and buried cards to Anki queues', () => {

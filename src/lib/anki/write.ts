@@ -13,6 +13,11 @@ import { zipSync } from 'fflate';
 import type { SqlJsStatic } from 'sql.js';
 import type { AnkiNote, AnkiNoteType } from './package';
 
+export interface ApkgNoteType extends AnkiNoteType {
+  /** Anki's `originalStockKind`, e.g. 6 for image occlusion, so Anki treats it as its own. */
+  stockKind?: number;
+}
+
 export interface ApkgDeck {
   id: number;
   /** Path segments, e.g. ["Japanese", "Vocab"]. */
@@ -68,7 +73,7 @@ export interface ApkgInput {
   crt: number;
   /** Modification time for everything written, ms. */
   now: number;
-  noteTypes: AnkiNoteType[];
+  noteTypes: ApkgNoteType[];
   decks: ApkgDeck[];
   notes: ApkgNote[];
   cards: ApkgCard[];
@@ -130,8 +135,9 @@ const CLOZE_CSS = `
 }
 `;
 
-function modelJson(t: AnkiNoteType, mod: number) {
+function modelJson(t: ApkgNoteType, mod: number) {
   return {
+    ...(t.stockKind !== undefined && { originalStockKind: t.stockKind }),
     id: t.id,
     name: t.name,
     type: t.kind === 'cloze' ? 1 : 0,

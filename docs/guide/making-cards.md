@@ -13,6 +13,20 @@ Open a deck and choose **Add cards** (or press <kbd>A</kbd> anywhere). Pick the 
 
   `The {{c1::mitochondria}} produce most of the cell's {{c2::ATP}}.` makes two cards.
 
+## Image occlusion
+
+Hide parts of a picture and test yourself on them: labels on a diagram, bones, countries on a map.
+
+1. In **Add cards**, choose the **Image Occlusion** type.
+2. **Choose an image** (or paste one).
+3. Drag over each part to hide. Each mask becomes its own card, numbered on the image. Select a mask (click it, or Tab to it) and press **Delete mask** or <kbd>Delete</kbd> to remove it.
+4. Pick how cards look while you study:
+   - **Hide all, guess one:** every mask stays covered, and the one to guess is red. Best when the parts give each other away.
+   - **Hide one, guess one:** only the mask to guess is covered.
+5. Add a **Header** (shown above the image) and **Back Extra** (shown with the answer) if you like, then **Add**.
+
+On the answer side, the mask you guessed turns into a dashed outline so you can see what was under it. Image occlusion notes from Anki import as they are, and export back to Anki as Anki's own image occlusion type.
+
 ## Formatting
 
 Fields use [Markdown](https://commonmark.org/help/): `**bold**`, `*italic*`, lists, `` `code` ``, tables and links.

@@ -2,10 +2,18 @@ import { newSchedulingState } from '../scheduler';
 import { newId, type NenrinDB } from '../db';
 import type { Card, Note, NoteType } from '../db/types';
 import { fieldToHtml } from '../render';
+import { isImageOcclusion } from '../render/occlusion';
 import { clozeNumbers, isEmptyFront, renderTemplate } from '../render/template';
 import { BUILTIN_NOTE_TYPES } from './builtins';
 
-export { BASIC, BASIC_REVERSED, BASIC_TYPE, CLOZE, BUILTIN_NOTE_TYPES } from './builtins';
+export {
+  BASIC,
+  BASIC_REVERSED,
+  BASIC_TYPE,
+  CLOZE,
+  IMAGE_OCCLUSION,
+  BUILTIN_NOTE_TYPES,
+} from './builtins';
 
 /** Writes the built-in note types. Safe to call on every start. */
 export async function ensureBuiltins(db: NenrinDB): Promise<void> {
@@ -43,9 +51,11 @@ export interface NoteInput {
 export class NoCardsError extends Error {
   constructor(noteType: NoteType) {
     super(
-      noteType.kind === 'cloze'
-        ? 'Add at least one cloze, like {{c1::answer}}.'
-        : `The front of the card is empty.`,
+      isImageOcclusion(noteType)
+        ? 'Draw at least one mask on the image.'
+        : noteType.kind === 'cloze'
+          ? 'Add at least one cloze, like {{c1::answer}}.'
+          : `The front of the card is empty.`,
     );
   }
 }

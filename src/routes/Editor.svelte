@@ -2,6 +2,8 @@
   import GenerateCards from '../components/GenerateCards.svelte';
   import { onMount, tick } from 'svelte';
   import CardView from '../components/CardView.svelte';
+  import OcclusionEditor from '../components/OcclusionEditor.svelte';
+  import { isImageOcclusion } from '../lib/render/occlusion';
   import { db, type Note, type NoteType } from '../lib/db';
   import { deckTree, type DeckNode } from '../lib/db/decks';
   import { addImage } from '../lib/db/media';
@@ -49,6 +51,8 @@
   const pasted = $derived<PastedCard | null>(pastedCards[0] ?? null);
   /** Field boxes to show: none while pasting a new card. */
   const fieldNames = $derived(mode === 'paste' && !note ? [] : (noteType?.fields ?? []));
+  /** Image occlusion notes get the mask editor instead of their first two field boxes. */
+  const io = $derived(!!noteType && isImageOcclusion(noteType) && fieldNames.length > 0);
 
   type Target = { type: NoteType; fields: Record<string, string> };
 
@@ -373,27 +377,37 @@
       </div>
     {/if}
 
+    {#if io && noteType}
+      <OcclusionEditor
+        bind:occlusion={fields[noteType.fields[0]]}
+        bind:image={fields[noteType.fields[1]]}
+      />
+    {/if}
+
     {#each fieldNames as name, i (name)}
-      <div class="field">
-        <div class="field-head">
-          <label for="field-{i}">{name}</label>
-          {#if noteType?.kind === 'cloze' && i === 0}
-            <button type="button" class="secondary tiny" onclick={() => wrapCloze(i)}
-              >Cloze […] <kbd>⌘⇧C</kbd></button
-            >
-          {/if}
+      <!-- Image occlusion: the first two fields are the mask editor above. -->
+      {#if !(io && i < 2)}
+        <div class="field">
+          <div class="field-head">
+            <label for="field-{i}">{name}</label>
+            {#if noteType?.kind === 'cloze' && i === 0}
+              <button type="button" class="secondary tiny" onclick={() => wrapCloze(i)}
+                >Cloze […] <kbd>⌘⇧C</kbd></button
+              >
+            {/if}
+          </div>
+          <textarea
+            id="field-{i}"
+            bind:this={textareas[i]}
+            bind:value={fields[name]}
+            rows={i === 0 ? 3 : 2}
+            onpaste={(e) => onPaste(e, i)}
+            onkeydown={(e) => onKey(e, i)}
+            placeholder={noteType?.kind === 'cloze' && i === 0
+              ? 'The {{c1::mitochondria}} is the powerhouse of the cell.'
+              : ''}></textarea>
         </div>
-        <textarea
-          id="field-{i}"
-          bind:this={textareas[i]}
-          bind:value={fields[name]}
-          rows={i === 0 ? 3 : 2}
-          onpaste={(e) => onPaste(e, i)}
-          onkeydown={(e) => onKey(e, i)}
-          placeholder={noteType?.kind === 'cloze' && i === 0
-            ? 'The {{c1::mitochondria}} is the powerhouse of the cell.'
-            : ''}></textarea>
-      </div>
+      {/if}
     {/each}
 
     <label>

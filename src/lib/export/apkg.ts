@@ -8,6 +8,7 @@ import type { Card, Deck, Note, NoteType, ReviewLog } from '../db/types';
 import { deckSubtreeIds } from '../db/decks';
 import { getPrefs } from '../db/prefs';
 import { ankiNoteTypeId } from '../anki/import';
+import { IMAGE_OCCLUSION } from '../notes/builtins';
 import type { ApkgCard, ApkgInput, ApkgNote, ApkgRevlog } from '../anki/write';
 import { fieldToAnkiHtml, mediaRefs, stripHtml } from '../render';
 import { State } from '../scheduler';
@@ -143,6 +144,52 @@ export function toAnkiRevlog(logs: ReviewLog[], cardIds: Map<string, number>): A
     });
 }
 
+/** Anki's `originalStockKind` for image occlusion note types. */
+const ANKI_STOCK_IMAGE_OCCLUSION = 6;
+
+/**
+ * Templates for Nenrin's built-in image occlusion type in Anki. Nenrin draws masks itself;
+ * Anki draws them with its own script, which needs the occlusions (hidden), the image, and a
+ * canvas in a container, then a call to its setup hook. Written for Nenrin from Anki's
+ * documented behavior; Anki can also restore its own stock template for this kind.
+ */
+const ANKI_IO_FRONT = `{{#Header}}<div>{{Header}}</div>{{/Header}}
+<div style="display: none">{{cloze:Occlusion}}</div>
+<div id="image-occlusion-container">{{Image}}<canvas id="image-occlusion-canvas"></canvas></div>
+<script>anki.imageOcclusion.setup();</script>`;
+const ANKI_IO_BACK = `${ANKI_IO_FRONT}
+{{#Back Extra}}<div>{{Back Extra}}</div>{{/Back Extra}}`;
+const ANKI_IO_CSS = `#image-occlusion-container {
+  position: relative;
+}
+#image-occlusion-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+`;
+
+/** How a note type is written for Anki. */
+function ankiNoteType(t: NoteType) {
+  const base = {
+    id: noteTypeNumber(t.id),
+    name: t.name,
+    kind: t.kind,
+    fields: t.fields,
+    templates: t.templates.map((tpl) => ({ name: tpl.name, qfmt: tpl.front, afmt: tpl.back })),
+    css: t.css,
+  };
+  if (t.id !== IMAGE_OCCLUSION.id) return base;
+  return {
+    ...base,
+    stockKind: ANKI_STOCK_IMAGE_OCCLUSION,
+    templates: [
+      { name: t.templates[0]?.name ?? 'Image Occlusion', qfmt: ANKI_IO_FRONT, afmt: ANKI_IO_BACK },
+    ],
+    css: ANKI_IO_CSS,
+  };
+}
+
 /** Template and CSS files an imported note type uses (Anki names them with a leading _). */
 function noteTypeMedia(t: NoteType): string[] {
   const text = [t.css, ...t.templates.flatMap((tpl) => [tpl.front, tpl.back])].join('\n');
@@ -262,14 +309,7 @@ export async function collectApkg(
   return {
     crt: Math.floor(crtMs / 1000),
     now,
-    noteTypes: types.map((t) => ({
-      id: noteTypeNumber(t.id),
-      name: t.name,
-      kind: t.kind,
-      fields: t.fields,
-      templates: t.templates.map((tpl) => ({ name: tpl.name, qfmt: tpl.front, afmt: tpl.back })),
-      css: t.css,
-    })),
+    noteTypes: types.map(ankiNoteType),
     decks: decks.map((d) => ({ id: deckNumber.get(d.id)!, path: path(d) })),
     notes: apkgNotes,
     cards: apkgCards,
