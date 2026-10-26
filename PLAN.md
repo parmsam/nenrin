@@ -57,7 +57,7 @@ Last updated: 2026-10-25
 - [x] "Last backup" reminder; device id on review logs (groundwork for sync, see docs/storage-strategy.md)
 - [x] Keyboard shortcuts dialog: press <kbd>?</kbd> anywhere, or use the keyboard button in the header and review screen
 - [x] Paste Markdown mode in the editor: one block (e.g. from an LLM) is split into front/back by `---`, `Q:`/`A:` labels, a heading or the first paragraph; clozes switch to the Cloze type; fences are stripped; a final `Tags:` line becomes tags
-- [x] Home screen for returning users: a tree cross-section of your studying (one ring per study day in recent weeks, wider for more reviews; today's ring closes as you finish, `src/lib/study/rings.ts`), cards left, reviews today, streak, one-tap "Study now" for the deck with the most due, per-deck Study buttons, and quick actions (Add, Import, Browse)
+- [x] Home screen for returning users: a tree cross-section of your studying (one ring per study day over the past year, wider for more reviews; the trunk grows with study days, older days become heartwood, breaks of more than a week leave a scar; today's ring closes as you finish, `src/lib/study/rings.ts`), cards left, reviews today, streak, one-tap "Study now" for the deck with the most due, per-deck Study buttons, and quick actions (Add, Import, Browse)
 - [x] Version shown in the app (header badge, footer, Settings → About) from `package.json`, with a README badge and `CHANGELOG.md`. Each phase bumps the minor version until 1.0
 - [x] Update prompt: new deploys wait for "A new version of Nenrin is ready → Reload" instead of swapping in mid-review; checks hourly and when the app comes back to the foreground
 - [x] Theme options: System / Light / Dark, plus accent palettes Wood 木, Matcha 抹茶, Sakura 桜 and Indigo 藍 (Settings → Appearance; per device, applied before first paint)
@@ -172,8 +172,10 @@ Math is already covered by KaTeX (`$…$`, `$$…$$`, and Anki's `\(…\)` / `\[
 ### Phase 5: Maybe later
 
 - [ ] Opt-in AI card generation from text/PDF using the user's own API key (no Nenrin servers)
-- [ ] Image occlusion
-- [ ] Type-in-the-answer cards
+- [ ] Type-in-the-answer cards: render Anki's `{{type:Field}}` as an input and compare the typed answer on the back (imported decks show nothing there today), plus a built-in **Basic (type in the answer)** note type
+- [ ] Built-in **Basic (optional reversed card)** note type: the reverse card is made only when the note's "Add Reverse" field has text
+- [ ] Image occlusion: an editor that masks parts of an image (one card per mask; hide one or all), and rendering for Anki's image occlusion notes on import
+- [ ] Note type editor: add, rename and reorder fields, edit card templates and CSS with a live preview, and clone a built-in or imported type
 - [ ] Localization
 - [ ] iOS/Android store builds (Tauri mobile or Capacitor)
 
@@ -188,6 +190,8 @@ Math is already covered by KaTeX (`$…$`, `$$…$$`, and Anki's `\(…\)` / `\[
 | Scope creep (AI, sync, social) | Hold to the non-goals list; Phase 4+ only after v1                                                                                                   |
 
 ## Decision log
+
+- **2026-10-25:** The home screen's tree grows with the number of study days (log curve, full size at 365), not with the window it shows. The first version filled its space after about two weeks and then only thinned its rings, so month 1 and month 3 looked the same; it also measured widths against the busiest day, so one 300-review day thinned everything else, and skipped days left no trace. Now widths are relative to the median day (square root, clamped), at most 16 rings are drawn and older days merge into heartwood, and gaps of more than 7 days leave a scar.
 
 - **2026-10-25:** Typst uses typst.ts (Apache-2.0), not typst-wasm (MIT). typst-wasm has the nicer API but needs either SharedArrayBuffer (only on cross-origin isolated pages; the main app deliberately isn't, see the optimizer entry) or JSPI (Chromium only), so it wouldn't run on iPhone. typst.ts is plain WebAssembly that runs in Safari too. Its default fonts come from a CDN, which rule 2 forbids, so the fonts are vendored from typst-assets v0.15.1 (OFL / Bitstream Vera, NOTICE in `public/typst/fonts/`). Typst's SVG places glyphs with `<use>`, so it gets its own DOMPurify instance that allows `<use>` with in-document `#id` references only; Typst's stylesheet is dropped because it has page-wide rules.
 
