@@ -10,6 +10,8 @@ On a deck, choose **Preview** (or press <kbd>P</kbd>) to flip through every card
 
 On a deck, choose **Custom study** (or press <kbd>C</kbd>). It's also offered when you finish a deck for the day.
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="images/custom-dark.webp"><img src="images/custom-light.webp" alt="The Custom study screen: more cards today, and the kinds of study session" width="300"></picture>
+
 **More cards today** raises today's limit of new cards or reviews for this deck. Tomorrow the limits go back to the deck's settings.
 
 **Study session** gathers a set of cards for one session:

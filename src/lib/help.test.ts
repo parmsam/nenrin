@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { describe, expect, it } from 'vitest';
-import { helpHtml, helpPages, pageBySlug } from './help';
+import { helpHtml, helpPages, pageBySlug, shotUrl } from './help';
 import { SHORTCUTS } from './shortcuts.svelte';
 
 describe('user guide', () => {
@@ -27,5 +27,22 @@ describe('user guide', () => {
       .filter((combo) => combo.length === 1)
       .map((combo) => combo[0]);
     for (const key of new Set(keys)) expect(md, key).toContain(`<kbd>${key}</kbd>`);
+  });
+
+  it('shows each screenshot in the light and dark theme, from the bundle', () => {
+    const pictures = helpPages().flatMap((p) => [
+      ...p.markdown.matchAll(/<picture>.*?<\/picture>/g),
+    ]);
+    expect(pictures.length).toBeGreaterThanOrEqual(5);
+    for (const page of helpPages()) {
+      const html = helpHtml(page);
+      expect(html).not.toContain('<picture');
+      expect(html).not.toContain('src="images/');
+      expect(html.match(/class="shot shot-light"/g)?.length ?? 0).toBe(
+        html.match(/class="shot shot-dark"/g)?.length ?? 0,
+      );
+    }
+    for (const [, file] of pictures.flatMap((m) => [...m[0].matchAll(/images\/([\w-]+\.webp)/g)]))
+      expect(shotUrl(file), file).toBeTruthy();
   });
 });

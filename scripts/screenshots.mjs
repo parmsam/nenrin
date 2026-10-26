@@ -1,14 +1,19 @@
 // Captures app screenshots for the README and the PWA install dialog, then composes the
 // README's row of phones (readme-light.png / readme-dark.png, one per GitHub theme).
-// Usage: npm run screenshots (builds first). Output: public/screenshots/*.png
+// Also captures the user guide's smaller WebP screenshots (docs/guide/images/), which the
+// in-app Help bundles, so keep those few and light.
+// Usage: npm run screenshots (builds first). Output: public/screenshots/*.png, docs/guide/images/*.webp
 import { spawn } from 'node:child_process';
-import { mkdirSync, readFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { chromium, devices } from '@playwright/test';
 
 const port = 4180;
 const url = `http://localhost:${port}/`;
 const out = 'public/screenshots';
+const guideOut = 'docs/guide/images';
 const phone = { device: 'iPhone 15' };
+// The guide shows phones at about 300 CSS px, so 2x is plenty.
+const guidePhone = { device: 'iPhone 15', deviceScaleFactor: 2, guide: true };
 const desktop = { viewport: { width: 1280, height: 800 } };
 
 // Steps that put the app into the state each screenshot shows.
@@ -75,6 +80,21 @@ const addCloze = async (page) => {
     .fill('**年輪** (nenrin) are the {{c1::growth rings}} of a tree, one per {{c2::year}}.');
   await page.locator('.preview .cloze').waitFor();
 };
+const openCustom = async (page) => {
+  await openDeck(page);
+  await page.getByRole('link', { name: 'Custom study' }).click();
+  await page.getByRole('heading', { name: 'Custom study' }).waitFor();
+};
+
+const guideShots = [
+  ['start', async () => {}],
+  ['home', withHistory],
+  ['review', reviewAnswer],
+  ['add', addCloze],
+  ['custom', openCustom],
+].flatMap(([name, setup]) =>
+  ['light', 'dark'].map((scheme) => ({ name: `${name}-${scheme}`, ...guidePhone, scheme, setup })),
+);
 
 const shots = [
   { name: 'mobile-empty-light', ...phone, scheme: 'light', setup: async () => {} },
@@ -88,7 +108,25 @@ const shots = [
   { name: 'mobile-add-dark', ...phone, scheme: 'dark', setup: addCloze },
   { name: 'desktop-decks-light', ...desktop, scheme: 'light', setup: withHistory },
   { name: 'desktop-review-light', ...desktop, scheme: 'light', setup: reviewAnswer },
+  ...guideShots,
 ];
+
+/** Re-encodes a PNG as WebP in the browser (no image library needed). */
+async function toWebp(browser, png) {
+  const page = await browser.newPage();
+  const dataUrl = await page.evaluate(async (b64) => {
+    const img = new Image();
+    img.src = `data:image/png;base64,${b64}`;
+    await img.decode();
+    const canvas = document.createElement('canvas');
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+    canvas.getContext('2d').drawImage(img, 0, 0);
+    return canvas.toDataURL('image/webp', 0.8);
+  }, png.toString('base64'));
+  await page.close();
+  return Buffer.from(dataUrl.split(',')[1], 'base64');
+}
 
 /** Lays four phone screenshots side by side, same size, with rounded corners. */
 async function composeReadme(browser) {
@@ -130,10 +168,12 @@ const up = () =>
 try {
   for (let i = 0; i < 50 && !(await up()); i++) await new Promise((r) => setTimeout(r, 200));
   mkdirSync(out, { recursive: true });
+  mkdirSync(guideOut, { recursive: true });
   const browser = await chromium.launch();
   for (const shot of shots) {
     const context = await browser.newContext({
       ...(shot.device ? devices[shot.device] : { viewport: shot.viewport, deviceScaleFactor: 1 }),
+      ...(shot.deviceScaleFactor && { deviceScaleFactor: shot.deviceScaleFactor }),
       colorScheme: shot.scheme,
       serviceWorkers: 'block',
     });
@@ -147,8 +187,14 @@ try {
       scrollTo(0, 0);
     });
     await page.waitForTimeout(150);
-    await page.screenshot({ path: `${out}/${shot.name}.png` });
-    console.log(`${out}/${shot.name}.png`);
+    if (shot.guide) {
+      const path = `${guideOut}/${shot.name}.webp`;
+      writeFileSync(path, await toWebp(browser, await page.screenshot()));
+      console.log(path);
+    } else {
+      await page.screenshot({ path: `${out}/${shot.name}.png` });
+      console.log(`${out}/${shot.name}.png`);
+    }
     await context.close();
   }
   await composeReadme(browser);

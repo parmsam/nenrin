@@ -79,6 +79,32 @@
   .guide :global(code) {
     font-size: 0.9em;
   }
+  .guide :global(.shot) {
+    display: block;
+    width: min(100%, 300px);
+    height: auto;
+    margin: 1rem 0;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+  }
+  /* Show the screenshot for the app's theme, which Settings can set apart from the OS. */
+  .guide :global(.shot-dark) {
+    display: none;
+  }
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme='light'])) .guide :global(.shot-light) {
+      display: none;
+    }
+    :global(:root:not([data-theme='light'])) .guide :global(.shot-dark) {
+      display: block;
+    }
+  }
+  :global(:root[data-theme='dark']) .guide :global(.shot-light) {
+    display: none;
+  }
+  :global(:root[data-theme='dark']) .guide :global(.shot-dark) {
+    display: block;
+  }
   .guide :global(li) {
     margin: 0.25rem 0;
   }

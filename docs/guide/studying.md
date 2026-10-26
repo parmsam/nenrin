@@ -4,6 +4,8 @@
 
 After you reveal the answer, rate how well you remembered it:
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="images/review-dark.webp"><img src="images/review-light.webp" alt="A card's answer with the Again, Hard, Good and Easy buttons, each showing when the card comes back" width="300"></picture>
+
 | Button    | Key          | Use it when                                    | What happens                                                           |
 | --------- | ------------ | ---------------------------------------------- | ---------------------------------------------------------------------- |
 | **Again** | <kbd>1</kbd> | You forgot, or got it wrong                    | You'll see it again in a few minutes, and its next interval is shorter |

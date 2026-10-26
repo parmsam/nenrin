@@ -14,6 +14,8 @@ Installing it puts an icon on your home screen or dock, opens it in its own wind
 
 On the first visit you have three ways to start:
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="images/start-dark.webp"><img src="images/start-light.webp" alt="The first-run screen with three choices: Import from Anki, Take the tour, Start from scratch" width="300"></picture>
+
 - **Coming from Anki?** Choose **Import from Anki** and pick an `.apkg` or `.colpkg` file. See [Moving from Anki](from-anki.md).
 - **Just looking?** Add the **Nenrin tour** sample deck. Its cards show you around the app as you study them.
 - **Starting fresh?** Name a deck, then **Add cards**. Or let an LLM write them for you: see [Make cards with an LLM](llm.md).
@@ -31,6 +33,8 @@ Be honest: if you didn't remember, press **Again**. The scheduler learns from yo
 ## Come back tomorrow
 
 A few minutes a day is the whole trick. The home screen shows how many cards are waiting and your streak, next to your tree: a cross-section where each ring is a day you studied, wider on days with more reviews. The trunk grows as the days add up; older days darken into heartwood at the center, and a break of more than a week leaves a dark scar. Today's ring closes around the outside as you finish today's cards. New days start at 4 AM by default; you can change that in **Settings → Studying**.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="images/home-dark.webp"><img src="images/home-light.webp" alt="The home screen: a tree cross-section of study days, the number of cards to study, and the Study now button" width="300"></picture>
 
 ## Get a daily reminder
 

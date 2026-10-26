@@ -2,6 +2,8 @@
 
 Open a deck and choose **Add cards** (or press <kbd>A</kbd> anywhere). Pick the deck and the type, fill in the fields, and press **Add** (<kbd>⌘Enter</kbd> / <kbd>Ctrl+Enter</kbd>). The preview shows the front and back as you type.
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="images/add-dark.webp"><img src="images/add-light.webp" alt="Adding a cloze card: the text field with two hidden parts, and a live preview below" width="300"></picture>
+
 ## Card types
 
 - **Basic:** a front and a back.

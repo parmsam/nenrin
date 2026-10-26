@@ -6,6 +6,8 @@ Nenrin follows [semantic versioning](https://semver.org/). Until 1.0, each roadm
 
 - **Your tree keeps growing**: the trunk now gets bigger with every day you study, quickly at first and then more slowly, so a year of study looks like a year. A huge day no longer makes the rest of your rings look thin. Older days darken into heartwood at the center, and a break of more than a week leaves a dark scar line, as a hard year does in a real tree.
 
+- **Screenshots in the user guide**, in light or dark to match your theme, in the app (offline too) and on GitHub.
+
 - **Progress while reviewing** (optional): Settings → Studying → _Progress while reviewing_ shows how far through today's cards you are, as a bar on its own or with a percentage (40%) or fraction (4 / 10). Off by default; the header's counts still show what's left.
 
 ## 0.6.0 (2026-10-25): Your tree, Help button
