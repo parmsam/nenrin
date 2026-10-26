@@ -30,7 +30,7 @@
   </picture>
 </p>
 
-> **Status: v0.8.1, pre-alpha, usable for daily study.** See the [changelog](CHANGELOG.md). Import your Anki decks (`.apkg` / `.colpkg` / CrowdAnki) and export them back, or make your own Basic, Reversed, Type-in, Cloze and Image Occlusion cards (or design your own note types) with Markdown, math, diagrams and images (or have an LLM write them), and review them with FSRS, offline. New here? Read the [user guide](docs/guide/README.md). See [PLAN.md](PLAN.md) for what's next.
+> **Status: v0.9.0, pre-alpha, usable for daily study.** See the [changelog](CHANGELOG.md). Import your Anki decks (`.apkg` / `.colpkg` / CrowdAnki) and export them back, or make your own Basic, Reversed, Type-in, Cloze and Image Occlusion cards (or design your own note types) with Markdown, math, diagrams and images (or have an LLM write them), and review them with FSRS, offline. New here? Read the [user guide](docs/guide/README.md). See [PLAN.md](PLAN.md) for what's next.
 
 ## What's in the name
 
@@ -65,6 +65,7 @@ New here? Read the **[user guide](docs/guide/README.md)** (also built into the a
 - **Review**: FSRS-6 scheduling, learning steps, interval previews on each button, sibling burying, and undo
 - **Keyboard-first**: <kbd>Space</kbd> to show the answer or rate Good, <kbd>1</kbd>–<kbd>4</kbd> to rate, <kbd>Z</kbd> to undo, Anki's keys to bury and suspend, and <kbd>D</kbd>/<kbd>A</kbd>/<kbd>B</kbd>/<kbd>T</kbd> to get around; press <kbd>?</kbd> for the full list, and <kbd>⌘K</kbd> for the command palette
 - **Import from Anki**: `.apkg` decks, `.colpkg` collections and CrowdAnki decks (modern and legacy formats) with images, audio, sub-decks and, optionally, your review history and FSRS memory. Re-importing an updated deck updates notes without touching your progress. Deck styling is applied safely inside each card (with automatic dark mode), and card audio autoplays (<kbd>R</kbd> replays)
+- **Game controllers, page turners and clickers**: study from the couch; remappable buttons
 - **Image occlusion**: mask parts of a picture, one card per mask; compatible with Anki's image occlusion notes both ways
 - **AI card generation with your own key** (optional): Claude, OpenAI or a local model; straight from your device, reviewed before adding
 - **Export to Anki (`.apkg`)**: notes, sub-decks, media and (optionally) progress: due dates, FSRS memory and review history

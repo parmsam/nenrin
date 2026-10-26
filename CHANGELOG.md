@@ -2,7 +2,7 @@
 
 Nenrin follows [semantic versioning](https://semver.org/). Until 1.0, each roadmap phase in [PLAN.md](PLAN.md) bumps the minor version.
 
-## Unreleased
+## 0.9.0 (2026-10-26): Controllers and page turners
 
 - **Game controllers, page turners and clickers**: study from the couch. With a controller, Ⓐ shows the answer and then rates Good, Ⓑ is Again (with a short rumble), Ⓧ Hard, Ⓨ Easy, LB undoes. Change the buttons in Settings → _Game controllers and remotes_. Bluetooth page turners and presentation clickers work without setup: Page Down shows the answer and then rates Good, Page Up is Again. Listed in the shortcuts dialog.
 
