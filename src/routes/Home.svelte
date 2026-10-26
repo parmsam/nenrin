@@ -11,6 +11,8 @@
   import { plainKey } from '../lib/shortcuts.svelte';
   import { studyState } from '../lib/study/queue';
   import { todaySummary } from '../lib/study/stats';
+  import { getPrefs } from '../lib/db/prefs';
+  import { seasonOf, stampIfFinished } from '../lib/study/rewards';
 
   const logo = `${import.meta.env.BASE_URL}logo.svg`;
   const BACKUP_NUDGE_DAYS = 14;
@@ -20,6 +22,7 @@
     return Promise.all(tree.map(async (d) => ({ ...d, ...(await studyState(db, d.id)) })));
   });
   const today = liveQuery(() => todaySummary(db));
+  const rewardsOn = liveQuery(async () => (await getPrefs(db)).rewards);
   const backupNudge = liveQuery(async () => {
     if ((await db.cards.count()) === 0) return false;
     const last = (await db.settings.get('lastBackupAt'))?.value as number | undefined;
@@ -34,6 +37,12 @@
     d.counts.new + d.counts.learning + d.counts.review;
   const topLevel = $derived(($decks ?? []).filter((d) => d.depth === 0));
   const totalDue = $derived(topLevel.reduce((n, d) => n + dueOf(d), 0));
+  // A finished day gets its stamp (see lib/study/rewards.ts), even if you never open a deck's
+  // "Done for now" screen, for example after finishing on another screen.
+  $effect(() => {
+    if ($decks && ($today?.reviewedToday ?? 0) > 0 && totalDue === 0) void stampIfFinished(db);
+  });
+
   /** "Study now" opens the top-level deck with the most cards due. */
   const nextDeck = $derived(
     topLevel.filter((d) => dueOf(d) > 0).sort((a, b) => dueOf(b) - dueOf(a))[0],
@@ -183,6 +192,7 @@
       done={$today?.reviewedToday ?? 0}
       remaining={totalDue}
       growth={$today?.growth ?? []}
+      season={$rewardsOn ? seasonOf(new Date()) : null}
     />
     <div class="today-text">
       <p class="eyebrow">{greeting}</p>

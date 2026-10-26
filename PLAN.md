@@ -178,7 +178,8 @@ Math is already covered by KaTeX (`$…$`, `$$…$$`, and Anki's `\(…\)` / `\[
 - [x] Image occlusion: an editor that masks parts of an image (one card per mask; hide one or all), and rendering for Anki's image occlusion notes on import. Uses Anki's Occlusion-field format unchanged (fractions, or Anki 23.10.0's pixels); Nenrin draws the masks as SVG since card scripts never run. Imported rect/ellipse/polygon masks render; the editor draws rectangles. Export marks the built-in type as Anki's stock image occlusion kind, so Anki's own editor opens the notes (checked in Anki 26.09)
 - [x] Note type editor (`#/note-types`): add, rename and reorder fields, edit card templates and CSS with a live preview, and clone a built-in or imported type. Edits are a draft saved in one transaction; renames carry note text and template references along, template moves keep each card's history, and losses (cards, reviews, field text) are counted and confirmed first. Built-ins stay read-only (they're rewritten at start)
 - [ ] Localization
-- [ ] Opt-in rewards, built around the tree rather than ratings (see [docs/gamification.md](docs/gamification.md)): session marks 木 → 林 → 森, a stamp book (御朱印帳) of finished days, milestones, seasons for the tree, a forest of decks, woods to unlock, a yearly 年輪 review image, rest days
+- [x] Opt-in rewards, built around the tree rather than ratings (see [docs/gamification.md](docs/gamification.md)): session marks 木 → 林 → 森 (with an optional synthesized wood-block clack), a stamp book (御朱印帳) of finished days on Stats, milestones derived from the review log, and seasons for the home tree
+- [ ] More rewards, after real use of the first ones: a forest of decks, woods to unlock, a yearly 年輪 review image, rest days
 - [ ] iOS/Android store builds (Tauri mobile or Capacitor)
 
 ## Risks
@@ -192,6 +193,8 @@ Math is already covered by KaTeX (`$…$`, `$$…$$`, and Anki's `\(…\)` / `\[
 | Scope creep (AI, sync, social) | Hold to the non-goals list; Phase 4+ only after v1                                                                                                   |
 
 ## Decision log
+
+- **2026-10-26:** Rewards are derived from the review log wherever possible (session marks, milestones, studied days), so a restore or future sync brings them back with no migration. The one exception is the stamp for a finished day: the log can't tell whether everything due was done on a past day, so `stampIfFinished` records a day key (local date, not a timestamp, so a later rollover change can't shift it) in a `stamps` setting. It records even with rewards off, so the stamp book is complete when they're turned on. The clack is synthesized with Web Audio (no file to license or fetch).
 
 - **2026-10-26:** Opt-in AI card generation is the one runtime network call (an exception to rule 2). It runs only after the user enters their own key and presses Generate, and goes straight to the provider they chose; there is still no Nenrin server. Claude goes through the official `@anthropic-ai/sdk` (Apache-2.0) in browser mode, loaded only on Generate and kept out of the service worker's precache (~340 KB, useless offline). Other providers use the OpenAI chat-completions shape, which covers OpenAI, OpenRouter and local servers like Ollama. The reply is plain text in the paste format, not structured output, so it lands in the existing paste preview and the user reviews every card before adding. Keys are a "secret setting": never written to backups, and kept on the device across restores.
 

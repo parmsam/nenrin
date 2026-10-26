@@ -3,14 +3,19 @@
   import CardStages from '../components/charts/CardStages.svelte';
   import Forecast from '../components/charts/Forecast.svelte';
   import Heatmap from '../components/charts/Heatmap.svelte';
+  import StampBook from '../components/StampBook.svelte';
+  import { getPrefs } from '../lib/db/prefs';
   import { db } from '../lib/db';
   import { deckTree } from '../lib/db/decks';
   import { navigate, router } from '../lib/router.svelte';
   import { loadStats } from '../lib/study/stats';
 
   let deckId = $state(router.query.get('deck') ?? '');
+  /** #/stats?book=1 (from "Done for now") opens at the stamp book. */
+  const focusBook = router.query.get('book') === '1';
 
   const decks = liveQuery(async () => deckTree(await db.decks.toArray()));
+  const rewardsOn = liveQuery(async () => (await getPrefs(db)).rewards);
   // Re-reads whenever reviews or cards change; keeps the last result while recomputing.
   const stats = $derived(liveQuery(() => loadStats(db, deckId || undefined)));
 
@@ -116,6 +121,9 @@
     <CardStages cards={s.cards} />
   </section>
 {/if}
+
+<!-- The stamp book covers every deck, so it's shown on the all-decks view only. -->
+{#if $rewardsOn && !deckId}<StampBook focus={focusBook} />{/if}
 
 <style>
   h2 {

@@ -100,6 +100,10 @@ export interface Prefs {
   reminderNotify: boolean;
   /** How to show progress through today's cards while reviewing. */
   reviewProgress: ReviewProgress;
+  /** Opt-in rewards: session marks, the stamp book, milestones and seasons (docs/gamification.md). */
+  rewards: boolean;
+  /** A wood-block clack when a session mark is reached. */
+  rewardSounds: boolean;
 }
 
 export const DEFAULT_PREFS: Prefs = {
@@ -109,6 +113,8 @@ export const DEFAULT_PREFS: Prefs = {
   reminderTime: '19:00',
   reminderNotify: false,
   reviewProgress: 'off',
+  rewards: false,
+  rewardSounds: false,
 };
 
 export const DEFAULT_DECK_CONFIG: DeckConfig = {

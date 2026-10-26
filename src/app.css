@@ -52,6 +52,13 @@
   /* Image occlusion masks: opaque, so they hide what's under them. */
   --io-active: #f2a59e;
   --io-inactive: #f3df9f;
+  /* Rewards: the stamp book's vermilion seal (朱印), and the tree's seasons (drawn on the hero card). */
+  --stamp: #c2371f;
+  --stamp-text: #fff;
+  --season-spring: #c95f80;
+  --season-summer: #8cc277;
+  --season-autumn: #e8773f;
+  --season-winter: #f4f8fb;
   --hard: #8a6a2f;
   --good: #2f7a4a;
   --easy: #2c6a9a;
@@ -86,6 +93,13 @@
     /* Image occlusion masks: opaque, so they hide what's under them. */
     --io-active: #8f3a33;
     --io-inactive: #6f5c2c;
+    /* Rewards: the stamp book's vermilion seal (朱印), and the tree's seasons (drawn on the hero card). */
+    --stamp: #d0533a;
+    --stamp-text: #1a1714;
+    --season-spring: #c95f80;
+    --season-summer: #4f8a3e;
+    --season-autumn: #b8441c;
+    --season-winter: #6f93b3;
     --hard: #d8b46a;
     --good: #7fc79a;
     --easy: #8cbfe8;
@@ -120,6 +134,13 @@
   /* Image occlusion masks: opaque, so they hide what's under them. */
   --io-active: #8f3a33;
   --io-inactive: #6f5c2c;
+  /* Rewards: the stamp book's vermilion seal (朱印), and the tree's seasons (drawn on the hero card). */
+  --stamp: #d0533a;
+  --stamp-text: #1a1714;
+  --season-spring: #c95f80;
+  --season-summer: #4f8a3e;
+  --season-autumn: #b8441c;
+  --season-winter: #6f93b3;
   --hard: #d8b46a;
   --good: #7fc79a;
   --easy: #8cbfe8;

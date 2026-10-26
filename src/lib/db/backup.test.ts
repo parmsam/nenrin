@@ -18,6 +18,16 @@ afterEach(async () => {
   await db.delete();
 });
 
+describe('prefs', () => {
+  it('keeps both of two changes saved at the same moment', async () => {
+    await Promise.all([setPrefs(db, { rewards: true }), setPrefs(db, { rolloverHour: 2 })]);
+    expect((await db.settings.get('prefs'))!.value).toMatchObject({
+      rewards: true,
+      rolloverHour: 2,
+    });
+  });
+});
+
 describe('backup', () => {
   it('leaves API keys out of backups, and keeps this device’s key on restore', async () => {
     await db.settings.put({ key: 'aiConfig', value: { provider: 'anthropic', apiKey: 'sk-a' } });

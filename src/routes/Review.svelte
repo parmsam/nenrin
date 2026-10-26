@@ -2,6 +2,8 @@
   import { onMount } from 'svelte';
   import CardView from '../components/CardView.svelte';
   import Counts from '../components/Counts.svelte';
+  import SessionMark from '../components/SessionMark.svelte';
+  import { loadRewards, sessionMark, stampIfFinished, type Milestone } from '../lib/study/rewards';
   import { db, DEFAULT_PREFS, type Card, type Prefs } from '../lib/db';
   import { getPrefs } from '../lib/db/prefs';
   import {
@@ -55,12 +57,24 @@
   /** Type-in-the-answer text for the current card. */
   let typed = $state('');
   let finished = $state(false);
+  /** Rewards for "Done for now": today's stamp, and milestones reached today. */
+  let stamped = $state(false);
+  let newMilestones = $state.raw<Milestone[]>([]);
+
+  async function celebrate() {
+    stamped = await stampIfFinished(db);
+    if (!prefs.rewards) return;
+    const r = await loadRewards(db);
+    newMilestones = r.milestones.filter((m) => m.day === r.today);
+    stamped ||= r.stamps.has(r.today);
+  }
   let waitUntil = $state<number | undefined>();
   // Raw (not deep-proxied): these snapshots go back into IndexedDB, which can't clone Proxies.
   let undoStack = $state.raw<(UndoEntry | CardsUndo)[]>([]);
   /** Cards rated in this session (undo takes one back), for the progress bar. */
   let answered = $state(0);
   const progress = $derived(sessionProgress(answered, counts));
+  const bestMark = $derived(sessionMark(answered));
   const left = $derived(counts.new + counts.learning + counts.review);
   /** Short confirmation after bury/suspend/undo, read out by screen readers. */
   let status = $state('');
@@ -93,6 +107,7 @@
     if (!next) {
       card = null;
       finished = true;
+      if (!state.waitUntil) void celebrate();
       waitUntil = state.waitUntil;
       if (waitUntil) timer = setTimeout(load, Math.max(1000, waitUntil - LEARN_AHEAD_MS - now));
       return;
@@ -229,6 +244,7 @@
     <a class="back" href="#/deck/{deckId}" aria-label="Back to deck" title="Back (Esc)">←</a>
     <span class="deck-name">{deckName}</span>
     <Counts {counts} current={kind} />
+    {#if prefs.rewards}<SessionMark {answered} sound={prefs.rewardSounds} />{/if}
     <button class="secondary tool" onclick={undo} disabled={undoStack.length === 0} title="Undo (Z)"
       >Undo</button
     >
@@ -285,6 +301,31 @@
         </p>
       {:else}
         <p class="muted">You’ve finished this deck for today. Another ring on the tree.</p>
+      {/if}
+      {#if prefs.rewards}
+        <ul class="rewards">
+          {#if bestMark}
+            <li>
+              <span lang="ja" class="seal">{bestMark.kanji}</span>
+              <span>{bestMark.name}: {answered} cards this session</span>
+            </li>
+          {/if}
+          {#if stamped}
+            <li>
+              <span lang="ja" class="seal stamp">印</span>
+              <span
+                >Everything due is done. Today is stamped in your
+                <a href="#/stats?book=1">stamp book</a>.</span
+              >
+            </li>
+          {/if}
+          {#each newMilestones as m (m.id)}
+            <li>
+              <span lang="ja" class="seal">{m.kanji}</span>
+              <span><strong>{m.name}.</strong> {m.description}</span>
+            </li>
+          {/each}
+        </ul>
       {/if}
       <div class="row center">
         <a class="button" href="#/">Back to decks</a>
@@ -519,5 +560,36 @@
   .center {
     justify-content: center;
     margin-top: 1rem;
+  }
+  .rewards {
+    list-style: none;
+    padding: 0;
+    margin: 0 auto 1.25rem;
+    display: grid;
+    gap: 0.5rem;
+    max-width: 26rem;
+    text-align: left;
+  }
+  .rewards li {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+  }
+  .seal {
+    display: inline-grid;
+    place-items: center;
+    min-width: 2rem;
+    height: 2rem;
+    padding: 0 0.3rem;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-weight: 700;
+    flex: none;
+  }
+  .seal.stamp {
+    background: var(--stamp);
+    color: var(--stamp-text);
+    border-radius: 6px;
   }
 </style>

@@ -1,6 +1,8 @@
 # Gamification ideas
 
-Status: **draft for discussion** (2026-10-26). Nothing here is built except the tree on the home screen.
+Status (2026-10-26): **steps 1–3 of the suggested order are built**, behind Settings → Appearance → _Rewards_ (off by default): session marks with an optional synthesized wood-block clack, the stamp book with milestones on Stats, and seasons for the home tree. Steps 4 (forest, woods, year in rings, rest days) wait for real use, as planned.
+
+Decisions on the open questions below: the session mark counts the cards answered on one review screen and resets when you leave it; rest days aren't built yet; the clack is synthesized with Web Audio, so there is no sound file at all. Finished days are the one stored reward (a `stamps` setting, carried by backups), because whether a past day was finished can't be read back from the review log; everything else is derived.
 
 ## Inspiration
 

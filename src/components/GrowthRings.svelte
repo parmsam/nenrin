@@ -12,17 +12,31 @@
     ringsDescription,
     treeLayout,
   } from '../lib/study/rings';
+  import type { Season } from '../lib/study/rewards';
 
   let {
     done,
     remaining,
     growth = [],
+    season = null,
   }: {
     done: number;
     remaining: number;
     /** Reviews per day before today, oldest first. */
     growth?: number[];
+    /** Rewards: blossom, leaves, maple or snow around the tree. */
+    season?: Season | null;
   } = $props();
+
+  /** Corners of the viewBox, clear of today's ring: x, y, rotation, size. */
+  const SPOTS = [
+    [9, 11, 20, 1.5],
+    [24, 4, -35, 1.1],
+    [109, 9, 60, 1.5],
+    [116, 26, -10, 1.05],
+    [111, 108, 35, 1.4],
+    [6, 105, -50, 1.25],
+  ] as const;
 
   const tree = $derived(treeLayout(growth));
   const total = $derived(done + remaining);
@@ -53,6 +67,30 @@
       <path d={ringPath(r)} class="scar grow" style="--i: {tree.rings.length}" />
     {/each}
     <circle cx={CENTER} cy={CENTER} r={PITH} class="pith" />
+
+    {#if season}
+      <g class="season {season}">
+        {#each SPOTS as [x, y, angle, size], i (i)}
+          <g transform="translate({x} {y}) rotate({angle}) scale({size})" style="--d: {i}">
+            {#if season === 'spring'}
+              <!-- A cherry petal, notched at the tip. -->
+              <path
+                d="M0 -3.4 C2.6 -2.4 2.6 1.8 0 3 C-2.6 1.8 -2.6 -2.4 0 -3.4 Z M-0.7 -3.6 L0 -2.4 L0.7 -3.6"
+              />
+            {:else if season === 'summer'}
+              <path d="M0 -4 C3 -1.5 3 1.5 0 4 C-3 1.5 -3 -1.5 0 -4 Z" />
+            {:else if season === 'autumn'}
+              <!-- A maple leaf: five points. -->
+              <path
+                d="M0 -4 L1 -1.4 L3.8 -2.2 L2.3 0.2 L3.2 1.6 L0.6 1.2 L0.4 4 L-0.4 4 L-0.6 1.2 L-3.2 1.6 L-2.3 0.2 L-3.8 -2.2 L-1 -1.4 Z"
+              />
+            {:else}
+              <circle r="1.7" />
+            {/if}
+          </g>
+        {/each}
+      </g>
+    {/if}
 
     <path d={todayPath} class="track" />
     <!-- Not drawn at zero: a round-capped empty stroke would still show a dot. -->
@@ -112,6 +150,21 @@
     fill: currentColor;
     fill-opacity: 0.6;
   }
+  .season.spring {
+    fill: var(--season-spring);
+  }
+  .season.summer {
+    fill: var(--season-summer);
+  }
+  .season.autumn {
+    fill: var(--season-autumn);
+  }
+  .season.winter {
+    fill: var(--season-winter);
+  }
+  .season.spring path {
+    fill-rule: evenodd;
+  }
   .track,
   .today {
     fill: none;
@@ -147,6 +200,18 @@
       animation:
         draw 0.9s ease-out both,
         settle 1.2s ease-out;
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    /* Petals, leaves and snow drift a little, each at its own pace. */
+    .season > g {
+      animation: drift 6s ease-in-out infinite alternate;
+      animation-delay: calc(var(--d) * -1.3s);
+    }
+  }
+  @keyframes drift {
+    to {
+      translate: 0 2px;
     }
   }
   @keyframes grow {

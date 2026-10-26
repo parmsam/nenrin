@@ -4,6 +4,8 @@ Nenrin follows [semantic versioning](https://semver.org/). Until 1.0, each roadm
 
 ## Unreleased
 
+- **Rewards, built around the tree** (optional, Settings → Appearance → _Rewards_): a mark that grows as a session does (<span lang="ja">木 → 林 → 森</span>), with an optional wood-block sound; a **stamp book** (<span lang="ja">御朱印帳</span>) in Stats with a red seal for each day you finished everything due; **milestones** such as your first heartwood or a year of study; and a home-screen tree that follows the **seasons**. None of it depends on which button you press, and nothing is ever taken away.
+
 - **Note types you can edit**: Settings → _Manage note types_. Clone a built-in type (or edit an imported one) to rename, reorder, add and remove fields, change the card templates and styling with a live preview, and add or remove card types. Nenrin warns before anything would delete cards or text.
 
 - **Basic (optional reversed card)**: a new note type whose back → front card is made only when you put something in _Add Reverse_, as in Anki.

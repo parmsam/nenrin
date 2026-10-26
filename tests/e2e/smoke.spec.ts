@@ -23,12 +23,15 @@ test('works offline after the first visit', async ({ page }) => {
   });
   const url = `http://localhost:${port}/`;
   try {
+    // Starting a second server takes a while when the rest of the suite runs alongside.
     await expect
-      .poll(() =>
-        fetch(url).then(
-          (r) => r.ok,
-          () => false,
-        ),
+      .poll(
+        () =>
+          fetch(url).then(
+            (r) => r.ok,
+            () => false,
+          ),
+        { timeout: 30_000 },
       )
       .toBe(true);
     await page.goto(url);

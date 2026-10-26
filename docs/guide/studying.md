@@ -51,6 +51,15 @@ While reviewing:
 
 Cards made from the same note (like the two directions of a reversed card) are spread over different days automatically.
 
+## Rewards (optional)
+
+Turn on **Settings → Appearance → Rewards** for a few quiet extras built around the tree. They count showing up and finishing, never which button you press, so they never tempt you to rate a card **Good** when it was **Again**.
+
+- **Session marks:** as a review session grows, a mark appears next to the counts: <span lang="ja">木</span> (a tree) at 10 cards, <span lang="ja">林</span> (a grove) at 25, <span lang="ja">森</span> (a forest) at 50, then 100 and 200 with rings around it. Turn on the wood-block sound in the same place if you like.
+- **Stamp book** (<span lang="ja">御朱印帳</span>), in **Stats**: a red seal on each day you finished everything due, and a light mark on days you studied. A missed day is just blank; nothing is taken away.
+- **Milestones** (<span lang="ja">節目</span>): your first review, seven study days, the tree's first heartwood, a year of study, coming back after a long break, and 100, 1,000 and 10,000 mature cards. They show in the stamp book, and on "Done for now" the day you reach one.
+- **Seasons:** the tree on the home screen gets cherry blossom in spring, leaves in summer, maple in autumn and snow in winter (northern-hemisphere seasons).
+
 ## Audio
 
 Cards with audio play it when they appear, and the answer's audio when you reveal it. <kbd>R</kbd> replays it. You can turn autoplay off in **Settings → Studying**. On iPhone, Safari may block autoplay; tap the player or press <kbd>R</kbd>.

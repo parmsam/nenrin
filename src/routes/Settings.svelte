@@ -34,6 +34,8 @@
   let autoplayAudio = $state(true);
   let deckStyling = $state(true);
   let reviewProgress = $state<ReviewProgress>('off');
+  let rewards = $state(false);
+  let rewardSounds = $state(false);
   let persisted = $state<boolean | null>(null);
   let usage = $state('');
   let status = $state('');
@@ -119,6 +121,8 @@
     autoplayAudio = prefs.autoplayAudio;
     deckStyling = prefs.deckStyling;
     reviewProgress = prefs.reviewProgress;
+    rewards = prefs.rewards;
+    rewardSounds = prefs.rewardSounds;
     reminderTime = prefs.reminderTime;
     reminderNotify = prefs.reminderNotify && support && (await notifyPermission()) === 'granted';
     backgroundCheck = await hasBackgroundCheck();
@@ -233,6 +237,25 @@
       <span class="muted small">(the guide is also in the footer and the command palette)</span
       ></span
     >
+  </label>
+  <label class="check">
+    <input type="checkbox" bind:checked={rewards} onchange={() => setPrefs(db, { rewards })} />
+    <span class="label-text"
+      >Rewards <span lang="ja" class="muted">木 林 森</span>
+      <span class="muted small"
+        >(a mark as a session grows, a stamp book and milestones in Stats, and a tree that follows
+        the seasons; never tied to which button you press)</span
+      ></span
+    >
+  </label>
+  <label class="check">
+    <input
+      type="checkbox"
+      bind:checked={rewardSounds}
+      disabled={!rewards}
+      onchange={() => setPrefs(db, { rewardSounds })}
+    />
+    <span class="label-text">Wood-block sound when a session mark is reached</span>
   </label>
 </div>
 
