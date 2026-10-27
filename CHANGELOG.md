@@ -2,6 +2,11 @@
 
 Nenrin follows [semantic versioning](https://semver.org/). Until 1.0, each roadmap phase in [PLAN.md](PLAN.md) bumps the minor version.
 
+## 0.9.1 (2026-10-26): Softer themes
+
+- **Softer home card**: in light mode the card at the top of the home screen is now warm tan instead of near-black, and in dark mode it's a deep brown instead of bright tan, so it no longer glares at night. Light mode's buttons and lists are a warm off-white, and dark mode's cards get a faint top edge.
+- **Fixed:** the new-deck name box sat right against the first deck in the list.
+
 ## 0.9.0 (2026-10-26): Controllers and page turners
 
 - **Game controllers, page turners and clickers**: study from the couch. With a controller, Ⓐ shows the answer and then rates Good, Ⓑ is Again (with a short rumble), Ⓧ Hard, Ⓨ Easy, LB undoes. Change the buttons in Settings → _Game controllers and remotes_. Bluetooth page turners and presentation clickers work without setup: Page Down shows the answer and then rates Good, Page Up is Again. Listed in the shortcuts dialog.
