@@ -9,6 +9,8 @@ In Anki, use **File → Export**:
 
 Then in Nenrin choose **Import** (<kbd>I</kbd>) and pick the file. Nenrin reads it on your device and shows what's inside before anything is saved.
 
+On a computer you can also drop the file onto the Import page. On iPhone and iPad, first save the file to the Files app: a downloaded deck is already in **Downloads**, or use **Share → Save to Files** and pick **iCloud Drive** (which also puts it on your other devices). Then in Nenrin tap **Choose a file…**, then **Browse**, and open it. iPhone doesn't let web apps appear in the Share menu, so Nenrin can't be a Share target there.
+
 With scheduling on, cards keep their due dates and FSRS memory, and your review history comes along, so stats, streaks and the optimizer work right away. Without it, every card starts as new, which is usually right for a deck someone shared.
 
 Importing a newer version of the same deck later updates changed notes, adds new cards, and keeps your progress.

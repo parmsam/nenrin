@@ -2,6 +2,11 @@
 
 Nenrin follows [semantic versioning](https://semver.org/). Until 1.0, each roadmap phase in [PLAN.md](PLAN.md) bumps the minor version.
 
+## Unreleased
+
+- **Easier importing on iPhone and iPad**: the file picker no longer greys out `.apkg` and `.colpkg` files in Downloads and iCloud Drive. Files Nenrin can't read get a clear message instead.
+- **Drop to import**: drop a deck or text file anywhere on the Import page.
+
 ## 0.9.1 (2026-10-26): Softer themes
 
 - **Softer home card**: in light mode the card at the top of the home screen is now warm tan instead of near-black, and in dark mode it's a deep brown instead of bright tan, so it no longer glares at night. Light mode's buttons and lists are a warm off-white, and dark mode's cards get a faint top edge.

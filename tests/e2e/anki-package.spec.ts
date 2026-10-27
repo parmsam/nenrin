@@ -137,3 +137,28 @@ test('imports a CrowdAnki deck (zipped folder) with media', async ({ page }) => 
   // The image-only field still makes a card, and its image comes from the zip.
   await expect(page.locator('.card-content img')).toHaveAttribute('src', /^blob:/);
 });
+
+test('imports a file dropped on the page, and turns away files it cannot read', async ({
+  page,
+}) => {
+  await page.goto('./#/import');
+  await expect(page.getByText('Choose a file…')).toBeVisible();
+  const drop = (name: string, text: string) =>
+    page.evaluate(
+      ([name, text]) => {
+        const data = new DataTransfer();
+        data.items.add(new File([text], name));
+        for (const type of ['dragover', 'drop'])
+          window.dispatchEvent(new DragEvent(type, { dataTransfer: data, cancelable: true }));
+      },
+      [name, text],
+    );
+
+  await drop('photo.jpg', 'not a deck');
+  await expect(page.getByRole('alert')).toContainText("can't import “photo.jpg”");
+
+  await drop('words.csv', 'front,back\n犬,dog\n猫,cat\n');
+  await expect(page.getByRole('alert')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Import 3 notes' }).click();
+  await expect(page.getByRole('status')).toContainText('3 added');
+});

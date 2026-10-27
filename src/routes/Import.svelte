@@ -10,6 +10,7 @@
     type DuplicateMode,
     type ImportResult,
   } from '../lib/import/apply';
+  import { fileAccept, importKind } from '../lib/import/files';
   import { parseTextFile, SEPARATOR_LABELS, type TextFile } from '../lib/import/text';
   import { parseTags } from '../lib/notes';
   import { router } from '../lib/router.svelte';
@@ -31,6 +32,7 @@
   let result = $state.raw<ImportResult | null>(null);
   let busy = $state(false);
   let error = $state('');
+  let dragging = $state(false);
 
   const noteType = $derived(noteTypes.find((t) => t.id === typeId));
   const hasDeckColumn = $derived(mapping.some((m) => m.kind === 'deck'));
@@ -81,20 +83,44 @@
     );
   }
 
-  async function pick(e: Event) {
-    const input = e.currentTarget as HTMLInputElement;
-    const f = input.files?.[0];
-    if (!f) return;
+  async function openFile(f: File) {
     fileName = f.name;
-    if (/\.(apkg|colpkg|zip|json)$/i.test(f.name)) {
-      file = null;
-      error = '';
+    file = null;
+    packageFile = null;
+    result = null;
+    error = '';
+    const kind = importKind(f.name);
+    if (!kind) {
+      error = `Nenrin can't import “${f.name}”. Choose an .apkg, .colpkg, .zip, .json, .txt, .csv or .tsv file.`;
+      return;
+    }
+    if (kind === 'package') {
       packageFile = f;
       return;
     }
-    packageFile = null;
     source = await f.text();
     load();
+  }
+
+  function pick(e: Event) {
+    const f = (e.currentTarget as HTMLInputElement).files?.[0];
+    if (f) void openFile(f);
+  }
+
+  const hasFiles = (e: DragEvent) => !!e.dataTransfer?.types.includes('Files');
+
+  function dragOver(e: DragEvent) {
+    if (!hasFiles(e)) return;
+    e.preventDefault();
+    dragging = true;
+  }
+
+  function drop(e: DragEvent) {
+    if (!hasFiles(e)) return;
+    e.preventDefault();
+    dragging = false;
+    const f = e.dataTransfer?.files[0];
+    if (f) void openFile(f);
   }
 
   function changeType() {
@@ -126,12 +152,20 @@
   const columnName = (i: number) => file?.headers.columns?.[i] || `Column ${i + 1}`;
 </script>
 
+<svelte:window
+  ondragover={dragOver}
+  ondragleave={(e) => {
+    if (!e.relatedTarget) dragging = false;
+  }}
+  ondrop={drop}
+/>
+
 <nav class="crumbs muted" aria-label="Breadcrumb">
   <a href="#/">Decks</a> / <span aria-current="page">Import</span>
 </nav>
 <h2>Import</h2>
 
-<section class="panel stack">
+<section class="panel stack" class:dragging>
   <p>
     Import an <strong>Anki package</strong> (<strong>.apkg</strong> deck or
     <strong>.colpkg</strong> collection) with its media and, optionally, your review history.
@@ -153,12 +187,12 @@
   </p>
   <label class="button secondary file">
     {fileName ? `Chosen: ${fileName}` : 'Choose a file…'}
-    <input
-      type="file"
-      accept=".apkg,.colpkg,.zip,.json,.txt,.csv,.tsv,text/plain,text/csv,text/tab-separated-values"
-      onchange={pick}
-    />
+    <input type="file" accept={fileAccept()} onchange={pick} />
   </label>
+  <p class="muted small">
+    Or drop a file anywhere on this page. On iPhone and iPad, files you downloaded or saved to
+    iCloud Drive are under <strong>Browse</strong> in the picker.
+  </p>
 </section>
 
 {#if error}<p class="error" role="alert">{error}</p>{/if}
@@ -331,6 +365,10 @@
     inset: 0;
     opacity: 0;
     cursor: pointer;
+  }
+  .dragging {
+    outline: 2px dashed var(--accent);
+    outline-offset: 4px;
   }
   .table-wrap {
     overflow-x: auto;
