@@ -36,7 +36,7 @@
 
 :root {
   --bg: #faf6ef;
-  --surface: #ffffff;
+  --surface: #fffdf9;
   --surface-2: #f1e9dc;
   --border: #e8dccb;
   --text: #2b2520;
@@ -85,10 +85,11 @@
     --accent: var(--accent-d);
     --accent-text: #1a1714;
     --accent-soft: var(--accent-soft-d);
-    --hero: #ecd3a8;
-    --hero-text: #2b2520;
-    --hero-accent: var(--accent-l);
-    --shadow: none;
+    --hero: #3b2d22;
+    --hero-text: #f4e2c2;
+    --hero-accent: var(--accent-d);
+    /* No drop shadow on a dark page; a faint top edge gives cards their lift. */
+    --shadow: inset 0 1px 0 rgb(255 255 255 / 5%);
     --again: #f08a80;
     /* Image occlusion masks: opaque, so they hide what's under them. */
     --io-active: #8f3a33;
@@ -96,10 +97,10 @@
     /* Rewards: the stamp book's vermilion seal (朱印), and the tree's seasons (drawn on the hero card). */
     --stamp: #d0533a;
     --stamp-text: #1a1714;
-    --season-spring: #c95f80;
-    --season-summer: #4f8a3e;
-    --season-autumn: #b8441c;
-    --season-winter: #6f93b3;
+    --season-spring: #e07a9a;
+    --season-summer: #8cc277;
+    --season-autumn: #e8773f;
+    --season-winter: #f4f8fb;
     --hard: #d8b46a;
     --good: #7fc79a;
     --easy: #8cbfe8;
@@ -126,10 +127,11 @@
   --accent: var(--accent-d);
   --accent-text: #1a1714;
   --accent-soft: var(--accent-soft-d);
-  --hero: #ecd3a8;
-  --hero-text: #2b2520;
-  --hero-accent: var(--accent-l);
-  --shadow: none;
+  --hero: #3b2d22;
+  --hero-text: #f4e2c2;
+  --hero-accent: var(--accent-d);
+  /* No drop shadow on a dark page; a faint top edge gives cards their lift. */
+  --shadow: inset 0 1px 0 rgb(255 255 255 / 5%);
   --again: #f08a80;
   /* Image occlusion masks: opaque, so they hide what's under them. */
   --io-active: #8f3a33;
@@ -137,10 +139,10 @@
   /* Rewards: the stamp book's vermilion seal (朱印), and the tree's seasons (drawn on the hero card). */
   --stamp: #d0533a;
   --stamp-text: #1a1714;
-  --season-spring: #c95f80;
-  --season-summer: #4f8a3e;
-  --season-autumn: #b8441c;
-  --season-winter: #6f93b3;
+  --season-spring: #e07a9a;
+  --season-summer: #8cc277;
+  --season-autumn: #e8773f;
+  --season-winter: #f4f8fb;
   --hard: #d8b46a;
   --good: #7fc79a;
   --easy: #8cbfe8;
