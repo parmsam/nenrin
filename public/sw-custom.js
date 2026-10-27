@@ -67,7 +67,36 @@ self.addEventListener('fetch', (event) => {
   );
 });
 
-// 4. Study reminders, without a server (see src/lib/reminder.ts).
+// 4. Share target (manifest share_target in vite.config.ts): Android and desktop Chrome POST
+// shared files here. Park the file in a cache and open the Import screen, which picks it up
+// (src/lib/import/shared.ts). A POST can't be answered from the precache, so this comes first.
+const SHARE_CACHE = 'nenrin-share';
+
+self.addEventListener('fetch', (event) => {
+  const { request } = event;
+  if (request.method !== 'POST') return;
+  if (request.url !== new URL('share-target', self.registration.scope).href) return;
+  event.respondWith(
+    (async () => {
+      const file = (await request.formData()).get('file');
+      if (file instanceof File) {
+        const cache = await caches.open(SHARE_CACHE);
+        await cache.put(
+          new URL('shared-file', self.registration.scope).href,
+          new Response(file, {
+            headers: {
+              'Content-Type': file.type || 'application/octet-stream',
+              'X-Filename': encodeURIComponent(file.name),
+            },
+          }),
+        );
+      }
+      return Response.redirect(new URL('#/import?shared=1', self.registration.scope).href, 303);
+    })(),
+  );
+});
+
+// 5. Study reminders, without a server (see src/lib/reminder.ts).
 //
 // The page asks for a check when its timer reaches the reminder time, and installed Chromium
 // apps also wake this worker with Periodic Background Sync. Either way: if notifications are

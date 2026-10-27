@@ -60,6 +60,38 @@ export default defineConfig({
         display: 'standalone',
         start_url: base,
         scope: base,
+        // "Share → Nenrin" on Android and desktop Chrome (iOS has no share targets). The service
+        // worker catches the POST and hands the file to the Import screen (public/sw-custom.js).
+        share_target: {
+          action: `${base}share-target`,
+          method: 'POST',
+          enctype: 'multipart/form-data',
+          params: {
+            files: [
+              {
+                name: 'file',
+                // Android shares .apkg files as generic binaries, so these MIME types matter more
+                // than the extensions.
+                accept: [
+                  '.apkg',
+                  '.colpkg',
+                  '.zip',
+                  '.json',
+                  '.txt',
+                  '.csv',
+                  '.tsv',
+                  'application/octet-stream',
+                  'application/zip',
+                  'application/x-zip-compressed',
+                  'application/json',
+                  'text/plain',
+                  'text/csv',
+                  'text/tab-separated-values',
+                ],
+              },
+            ],
+          },
+        },
         // Shown in the richer install dialog on Android and desktop Chrome. Regenerate with `npm run screenshots`.
         screenshots: [
           {

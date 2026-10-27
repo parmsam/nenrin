@@ -11,9 +11,10 @@
     type ImportResult,
   } from '../lib/import/apply';
   import { fileAccept, importKind } from '../lib/import/files';
+  import { takeSharedFile } from '../lib/import/shared';
   import { parseTextFile, SEPARATOR_LABELS, type TextFile } from '../lib/import/text';
   import { parseTags } from '../lib/notes';
-  import { router } from '../lib/router.svelte';
+  import { navigate, router } from '../lib/router.svelte';
 
   let noteTypes = $state<NoteType[]>([]);
   let decks = $state<DeckNode[]>([]);
@@ -48,6 +49,13 @@
     decks = deckTree(await db.decks.toArray());
     const wanted = router.query.get('deck');
     deckId = decks.find((d) => d.id === wanted)?.id ?? decks[0]?.id ?? '';
+    if (router.query.has('shared')) {
+      // Drop ?shared, so a reload doesn't look for the file again.
+      navigate('/import', { replace: true });
+      const shared = await takeSharedFile();
+      if (shared) await openFile(shared);
+      else error = 'No shared file found. Share it again, or choose it below.';
+    }
   });
 
   const targetKey = (t: ColumnTarget) => (t.kind === 'field' ? `field:${t.name}` : t.kind);

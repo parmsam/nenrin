@@ -162,3 +162,29 @@ test('imports a file dropped on the page, and turns away files it cannot read', 
   await page.getByRole('button', { name: 'Import 3 notes' }).click();
   await expect(page.getByRole('status')).toContainText('3 added');
 });
+
+test('a file shared from another app opens in Import', async ({ page }) => {
+  await page.goto('./');
+  await page.waitForFunction(() => navigator.serviceWorker.controller !== null);
+  // What Android's share sheet does: POST the file to the manifest's share_target action.
+  await page.evaluate(() => {
+    const form = Object.assign(document.createElement('form'), {
+      action: 'share-target',
+      method: 'post',
+      enctype: 'multipart/form-data',
+    });
+    const input = Object.assign(document.createElement('input'), { type: 'file', name: 'file' });
+    const data = new DataTransfer();
+    data.items.add(new File(['front,back\n犬,dog\n猫,cat\n'], 'shared words.csv'));
+    input.files = data.files;
+    form.append(input);
+    document.body.append(form);
+    form.submit();
+  });
+  await expect(page).toHaveURL(/#\/import$/);
+  await expect(page.getByText('Chosen: shared words.csv')).toBeVisible();
+  await page.getByRole('button', { name: 'Import 3 notes' }).click();
+  await expect(page.getByRole('status')).toContainText('3 added');
+  // The parked file is used up.
+  expect(await page.evaluate(() => caches.open('nenrin-share').then((c) => c.keys()))).toEqual([]);
+});
