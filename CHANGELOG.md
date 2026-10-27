@@ -2,7 +2,7 @@
 
 Nenrin follows [semantic versioning](https://semver.org/). Until 1.0, each roadmap phase in [PLAN.md](PLAN.md) bumps the minor version.
 
-## Unreleased
+## 0.10.0 (2026-10-27): Easier importing
 
 - **Easier importing on iPhone and iPad**: the file picker no longer greys out `.apkg` and `.colpkg` files in Downloads and iCloud Drive. Files Nenrin can't read get a clear message instead.
 - **Drop to import**: drop a deck or text file anywhere on the Import page.

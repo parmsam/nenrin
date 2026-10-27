@@ -30,7 +30,7 @@
   </picture>
 </p>
 
-> **Status: v0.9.1, pre-alpha, usable for daily study.** See the [changelog](CHANGELOG.md). Import your Anki decks (`.apkg` / `.colpkg` / CrowdAnki) and export them back, or make your own Basic, Reversed, Type-in, Cloze and Image Occlusion cards (or design your own note types) with Markdown, math, diagrams and images (or have an LLM write them), and review them with FSRS, offline. New here? Read the [user guide](docs/guide/README.md). See [PLAN.md](PLAN.md) for what's next.
+> **Status: v0.10.0, pre-alpha, usable for daily study.** See the [changelog](CHANGELOG.md). Import your Anki decks (`.apkg` / `.colpkg` / CrowdAnki) and export them back, or make your own Basic, Reversed, Type-in, Cloze and Image Occlusion cards (or design your own note types) with Markdown, math, diagrams and images (or have an LLM write them), and review them with FSRS, offline. New here? Read the [user guide](docs/guide/README.md). See [PLAN.md](PLAN.md) for what's next.
 
 ## What's in the name
 
