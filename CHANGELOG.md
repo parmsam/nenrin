@@ -2,6 +2,12 @@
 
 Nenrin follows [semantic versioning](https://semver.org/). Until 1.0, each roadmap phase in [PLAN.md](PLAN.md) bumps the minor version.
 
+## 0.11.0 (2026-11-08): Read through and welcome tips
+
+- **Read through**: next to **Study now** on a deck (or press R), see every card with its front and back together, to learn cards before you study them. Nothing is scheduled. In any preview or practice session, **Both sides** (B) switches between this and flipping.
+- **Delete from a preview**: remove the current note while previewing (Delete key), after a confirmation.
+- **Welcome tips**: short tips explain the name (年輪 means "tree rings") and what each main screen is for. Close one with ×, or hide them all; **Settings → Show welcome tips** brings them back.
+
 ## 0.10.0 (2026-10-27): Easier importing
 
 - **Easier importing on iPhone and iPad**: the file picker no longer greys out `.apkg` and `.colpkg` files in Downloads and iCloud Drive. Files Nenrin can't read get a clear message instead.
