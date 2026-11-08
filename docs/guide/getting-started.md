@@ -20,6 +20,10 @@ On the first visit you have three ways to start:
 - **Just looking?** Add the **Nenrin tour** sample deck. Its cards show you around the app as you study them.
 - **Starting fresh?** Name a deck, then **Add cards**. Or let an LLM write them for you: see [Make cards with an LLM](llm.md).
 
+## Welcome tips
+
+Short tips on the main screens explain the name (Nenrin, 年輪, means "tree rings") and what each screen is for. Close one with **×**, or choose **Hide all tips**. To see them all again, turn on **Settings → Show welcome tips**.
+
 ## Your first study session
 
 Open a deck and choose **Study now** (or press <kbd>S</kbd>).

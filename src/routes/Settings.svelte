@@ -25,6 +25,7 @@
   import ExportDialog from '../components/ExportDialog.svelte';
   import { headerPrefs, setHelpButton } from '../lib/header.svelte';
   import { setSplashEnabled, splashEnabled } from '../lib/splash';
+  import { setTipsEnabled, tips } from '../lib/tips.svelte';
   import { loadTheme, MODES, PALETTES, saveTheme } from '../lib/theme';
 
   let theme = $state(loadTheme());
@@ -226,6 +227,17 @@
       onchange={() => setSplashEnabled(showSplash)}
     />
     <span class="label-text">Show welcome screen when opening Nenrin</span>
+  </label>
+  <label class="check">
+    <input
+      type="checkbox"
+      checked={tips.on}
+      onchange={(e) => setTipsEnabled(e.currentTarget.checked)}
+    />
+    <span class="label-text"
+      >Show welcome tips <span class="muted">(turning this on brings back tips you closed)</span
+      ></span
+    >
   </label>
   <label class="check">
     <input

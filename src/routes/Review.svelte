@@ -27,6 +27,7 @@
   } from '../lib/study/queue';
   import { paletteState } from '../lib/palette.svelte';
   import { isTyping, shortcutsDialog } from '../lib/shortcuts.svelte';
+  import Tip from '../components/Tip.svelte';
 
   let { deckId }: { deckId: string } = $props();
 
@@ -334,6 +335,11 @@
       </div>
     </section>
   {:else if card}
+    <Tip id="review" title="How a review works">
+      Try to recall the answer, then press <strong>Show answer</strong> (<kbd>Space</kbd>). Rate it
+      honestly: <strong>Again</strong> if you forgot, <strong>Good</strong> most of the time. The better
+      you know a card, the longer it waits before coming back.
+    </Tip>
     <section class="card panel" aria-live="polite">
       <CardView
         bind:this={cardView}

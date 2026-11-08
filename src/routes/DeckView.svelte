@@ -16,6 +16,7 @@
   import { plainKey } from '../lib/shortcuts.svelte';
   import { formatInterval } from '../lib/study/day';
   import { studyState } from '../lib/study/queue';
+  import Tip from '../components/Tip.svelte';
 
   let { id }: { id: string } = $props();
 
@@ -164,6 +165,12 @@
     </div>
   {/if}
   {#if error}<p class="error">{error}</p>{/if}
+
+  <Tip id="deck" title="Three ways through a deck">
+    <strong>Study now</strong> shows cards when they’re due, and your answers decide when you see
+    them next. <strong>Read through</strong> shows front and back together, to learn new cards
+    first. <strong>Preview</strong> flips through every card. Those two never change due dates.
+  </Tip>
 
   <section class="panel study">
     <div class="legend">

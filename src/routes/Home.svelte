@@ -3,6 +3,7 @@
   import Counts from '../components/Counts.svelte';
   import SwipeRow from '../components/SwipeRow.svelte';
   import GrowthRings from '../components/GrowthRings.svelte';
+  import Tip from '../components/Tip.svelte';
   import { confirmAction } from '../lib/confirm.svelte';
   import { db } from '../lib/db';
   import { createDeck, deckSubtreeIds, deckTree, deleteDeck, type DeckNode } from '../lib/db/decks';
@@ -119,6 +120,10 @@
 {#if $decks === undefined}
   <p class="muted">Loading…</p>
 {:else if $decks.length === 0}
+  <Tip id="name" title="Nenrin, 年輪, means “tree rings”">
+    A tree grows a ring at a time, and so does memory: a few minutes a day, with each card coming
+    back just before you’d forget it.
+  </Tip>
   <section class="empty">
     <img src={logo} alt="" width="132" height="132" />
     <h2>Memory grows ring by ring</h2>
@@ -187,6 +192,10 @@
     {#if error}<p class="error">{error}</p>{/if}
   </section>
 {:else}
+  <Tip id="name" title="Nenrin, 年輪, means “tree rings”">
+    A tree grows a ring at a time, and so does memory: a few minutes a day, with each card coming
+    back just before you’d forget it.
+  </Tip>
   <section class="today" aria-label="Today">
     <GrowthRings
       done={$today?.reviewedToday ?? 0}
@@ -220,6 +229,11 @@
       {/if}
     </div>
   </section>
+
+  <Tip id="today" title="Today’s ring">
+    The ring fills as you study, and each day adds one. <strong>Study now</strong> (<kbd>S</kbd>)
+    opens the deck with the most cards due. Press <kbd>?</kbd> for every shortcut.
+  </Tip>
 
   <nav class="quick" aria-label="Quick actions">
     <a href="#/add">

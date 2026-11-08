@@ -177,6 +177,8 @@ try {
       colorScheme: shot.scheme,
       serviceWorkers: 'block',
     });
+    // Welcome tips would crowd every shot.
+    await context.addInitScript(() => localStorage.setItem('nenrin:tips', 'false'));
     const page = await context.newPage();
     await page.goto(url);
     await page.getByRole('heading', { name: 'Nenrin' }).waitFor();

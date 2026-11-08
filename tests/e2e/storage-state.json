@@ -3,7 +3,10 @@
   "origins": [
     {
       "origin": "http://localhost:4173",
-      "localStorage": [{ "name": "nenrin:splash", "value": "false" }]
+      "localStorage": [
+        { "name": "nenrin:splash", "value": "false" },
+        { "name": "nenrin:tips", "value": "false" }
+      ]
     }
   ]
 }
