@@ -73,7 +73,7 @@ New here? Read the **[user guide](docs/guide/README.md)** (also built into the a
 - **Stats**: review heatmap, retention, streaks, a 30-day forecast and cards by stage, per deck or overall
 - **Personal scheduling**: optimize FSRS to your own review history with the official optimizer (WASM, on your device)
 - **Your data**: JSON backup and restore, including review history and images; a configurable day rollover hour; persistent-storage request
-- **Themes**: System / Light / Dark, with Wood, Matcha, Sakura and Indigo accents
+- **Themes**: System / Light / Dark / Black (pure black for OLED screens), with Wood, Matcha, Sakura, Indigo, Wisteria, Gold and Ink accents
 - **Offline PWA**: install it on any device; it works with no network. When a new version is deployed, it asks before reloading
 
 ## Install it

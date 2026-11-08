@@ -12,7 +12,7 @@
   } from '../lib/palette.svelte';
   import { navigate } from '../lib/router.svelte';
   import { MOD, shortcutsDialog } from '../lib/shortcuts.svelte';
-  import { loadTheme, MODES, PALETTES, saveTheme } from '../lib/theme';
+  import { loadTheme, MODES, PALETTES, saveTheme, type ThemeMode } from '../lib/theme';
 
   const MAX = 50;
   let dialog: HTMLDialogElement;
@@ -22,6 +22,13 @@
   let decks = $state<DeckNode[]>([]);
   let recent = $state<string[]>([]);
   let note = $state('');
+
+  const MODE_KEYWORDS: Record<ThemeMode, string> = {
+    system: 'auto os',
+    light: 'day mode',
+    dark: 'night mode',
+    black: 'night mode oled amoled pure black',
+  };
 
   $effect(() => {
     if (paletteState.open && !dialog.open) {
@@ -136,7 +143,7 @@
         id: `theme-${m.id}`,
         label: `Theme: ${m.label}`,
         group: 'Appearance',
-        keywords: m.id === 'dark' ? 'night mode' : m.id === 'light' ? 'day mode' : 'auto os',
+        keywords: MODE_KEYWORDS[m.id],
         run: () => saveTheme({ ...loadTheme(), mode: m.id }),
       })),
       ...PALETTES.map((p) => ({

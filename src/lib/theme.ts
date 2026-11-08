@@ -2,8 +2,9 @@
  * Appearance: light/dark/system mode and an accent palette, stored per device in localStorage.
  * index.html applies the same key before first paint to avoid a flash; keep the two in sync.
  */
-export type ThemeMode = 'system' | 'light' | 'dark';
-export type Palette = 'wood' | 'matcha' | 'sakura' | 'ai';
+/** Black is Dark with a pure-black page, for OLED screens. */
+export type ThemeMode = 'system' | 'light' | 'dark' | 'black';
+export type Palette = 'wood' | 'matcha' | 'sakura' | 'ai' | 'fuji' | 'yamabuki' | 'sumi';
 
 export interface Theme {
   mode: ThemeMode;
@@ -17,6 +18,7 @@ export const MODES: { id: ThemeMode; label: string }[] = [
   { id: 'system', label: 'System' },
   { id: 'light', label: 'Light' },
   { id: 'dark', label: 'Dark' },
+  { id: 'black', label: 'Black' },
 ];
 
 export const PALETTES: { id: Palette; label: string; kanji: string; swatch: string }[] = [
@@ -24,6 +26,9 @@ export const PALETTES: { id: Palette; label: string; kanji: string; swatch: stri
   { id: 'matcha', label: 'Matcha', kanji: '抹茶', swatch: '#4a7424' },
   { id: 'sakura', label: 'Sakura', kanji: '桜', swatch: '#b03e63' },
   { id: 'ai', label: 'Indigo', kanji: '藍', swatch: '#2f4f8f' },
+  { id: 'fuji', label: 'Wisteria', kanji: '藤', swatch: '#6a4a9c' },
+  { id: 'yamabuki', label: 'Gold', kanji: '山吹', swatch: '#8a5a00' },
+  { id: 'sumi', label: 'Ink', kanji: '墨', swatch: '#3d3935' },
 ];
 
 export function loadTheme(): Theme {
@@ -59,6 +64,6 @@ export function saveTheme(theme: Theme): void {
 /** Whether the app is currently dark (explicit choice, or the OS setting in System mode). */
 export function isDarkMode(root: HTMLElement = document.documentElement): boolean {
   const explicit = root.getAttribute('data-theme');
-  if (explicit) return explicit === 'dark';
+  if (explicit) return explicit === 'dark' || explicit === 'black';
   return globalThis.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false;
 }

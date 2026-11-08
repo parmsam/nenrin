@@ -61,6 +61,23 @@ test('theme and accent choices apply immediately and persist', async ({ page }) 
   await expect(html).not.toHaveAttribute('data-theme', /.*/);
 });
 
+test('Black mode uses a pure-black page, survives a reload, and counts as dark', async ({
+  page,
+}) => {
+  await page.goto('./#/settings');
+  const html = page.locator('html');
+  await page.getByText('Black', { exact: true }).click();
+  await page.getByText('Wisteria').click();
+  await expect(html).toHaveAttribute('data-theme', 'black');
+  await expect(html).toHaveAttribute('data-palette', 'fuji');
+  await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(0, 0, 0)');
+  await expect(html).toHaveCSS('color-scheme', 'dark');
+
+  await page.reload();
+  await expect(html).toHaveAttribute('data-theme', 'black');
+  await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(0, 0, 0)');
+});
+
 test('the gear toggles settings open and closed', async ({ page }) => {
   await page.goto('./');
   await page.getByRole('button', { name: 'Add a sample deck' }).click();

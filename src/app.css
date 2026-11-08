@@ -1,6 +1,7 @@
 /*
  * Theme = mode × palette.
- * Mode: light / dark / system via <html data-theme>; system follows the OS.
+ * Mode: light / dark / black / system via <html data-theme>; system follows the OS.
+ * Black is dark with a pure-black page (for OLED screens).
  * Palette: accent colors via <html data-palette>. Each palette defines a light (-l) and dark (-d) variant.
  */
 :root {
@@ -32,6 +33,30 @@
   --accent-soft-l: #e1e8f6;
   --accent-d: #9db6ee;
   --accent-soft-d: #1f2738;
+}
+
+/* 藤 Fuji (wisteria) */
+:root[data-palette='fuji'] {
+  --accent-l: #6a4a9c;
+  --accent-soft-l: #ece4f6;
+  --accent-d: #c4a9ee;
+  --accent-soft-d: #2c2438;
+}
+
+/* 山吹 Yamabuki (golden yellow) */
+:root[data-palette='yamabuki'] {
+  --accent-l: #8a5a00;
+  --accent-soft-l: #f7ebcf;
+  --accent-d: #efc15a;
+  --accent-soft-d: #352a15;
+}
+
+/* 墨 Sumi (ink): no colour, just ink on paper. */
+:root[data-palette='sumi'] {
+  --accent-l: #3d3935;
+  --accent-soft-l: #ebe6df;
+  --accent-d: #d8d0c5;
+  --accent-soft-d: #302b27;
 }
 
 :root {
@@ -116,8 +141,9 @@
   }
 }
 
-/* Same values as above, for an explicit dark choice regardless of the OS setting. */
-:root[data-theme='dark'] {
+/* Same values as above, for an explicit dark (or black) choice regardless of the OS setting. */
+:root[data-theme='dark'],
+:root[data-theme='black'] {
   --bg: #1a1714;
   --surface: #241f1b;
   --surface-2: #312a24;
@@ -155,6 +181,17 @@
   --chart-mature: #9085e9;
   --chart-muted: #5a534b;
   color-scheme: dark;
+}
+
+/* Black: the dark theme on a pure-black page, so OLED screens switch pixels off. */
+:root[data-theme='black'] {
+  --bg: #000000;
+  --surface: #110f0d;
+  --surface-2: #1f1b18;
+  --border: #2a2520;
+  --accent-text: #000000;
+  --hero: #21180f;
+  --stamp-text: #000000;
 }
 
 *,

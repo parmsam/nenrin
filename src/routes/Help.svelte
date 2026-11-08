@@ -99,10 +99,12 @@
       display: block;
     }
   }
-  :global(:root[data-theme='dark']) .guide :global(.shot-light) {
+  :global(:root[data-theme='dark']) .guide :global(.shot-light),
+  :global(:root[data-theme='black']) .guide :global(.shot-light) {
     display: none;
   }
-  :global(:root[data-theme='dark']) .guide :global(.shot-dark) {
+  :global(:root[data-theme='dark']) .guide :global(.shot-dark),
+  :global(:root[data-theme='black']) .guide :global(.shot-dark) {
     display: block;
   }
   .guide :global(li) {

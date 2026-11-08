@@ -61,7 +61,7 @@ Last updated: 2026-10-25
 - [x] Home screen for returning users: a tree cross-section of your studying (one ring per study day over the past year, wider for more reviews; the trunk grows with study days, older days become heartwood, breaks of more than a week leave a scar; today's ring closes as you finish, `src/lib/study/rings.ts`), cards left, reviews today, streak, one-tap "Study now" for the deck with the most due, per-deck Study buttons, and quick actions (Add, Import, Browse)
 - [x] Version shown in the app (header badge, footer, Settings → About) from `package.json`, with a README badge and `CHANGELOG.md`. Each phase bumps the minor version until 1.0
 - [x] Update prompt: new deploys wait for "A new version of Nenrin is ready → Reload" instead of swapping in mid-review; checks hourly and when the app comes back to the foreground
-- [x] Theme options: System / Light / Dark, plus accent palettes Wood 木, Matcha 抹茶, Sakura 桜 and Indigo 藍 (Settings → Appearance; per device, applied before first paint)
+- [x] Theme options: System / Light / Dark / Black (pure black for OLED), plus accent palettes Wood 木, Matcha 抹茶, Sakura 桜, Indigo 藍, Wisteria 藤, Gold 山吹 and Ink 墨 (Settings → Appearance; per device, applied before first paint)
 - [ ] Exit criteria: a week of real daily use on a phone (needs a human!)
 
 Known gaps from Phase 1, now closed: browse/search and suspend shipped in Phase 3.

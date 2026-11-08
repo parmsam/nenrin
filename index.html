@@ -9,7 +9,7 @@
       // Apply the saved theme before first paint (see src/lib/theme.ts).
       try {
         var t = JSON.parse(localStorage.getItem('nenrin:theme') || '{}');
-        if (t.mode === 'light' || t.mode === 'dark')
+        if (t.mode === 'light' || t.mode === 'dark' || t.mode === 'black')
           document.documentElement.dataset.theme = t.mode;
         if (t.palette && t.palette !== 'wood') document.documentElement.dataset.palette = t.palette;
       } catch (e) {}
