@@ -95,12 +95,18 @@
     for (const deckId of await deckSubtreeIds(db, id)) await updateDeckConfig(db, deckId, reset);
   }
 
-  /** S study, P preview, C custom study (Anki uses S and C on the deck overview too). */
+  /**
+   * S study, R read through, P preview, C custom study (Anki uses S and C on the deck
+   * overview too).
+   */
   function onKey(e: KeyboardEvent) {
     if (!plainKey(e) || !$data) return;
-    const to = { s: `/study/${id}`, p: `/session/${id}?kind=all`, c: `/custom/${id}` }[
-      e.key.toLowerCase()
-    ];
+    const to = {
+      s: `/study/${id}`,
+      r: `/session/${id}?kind=all&sides=both`,
+      p: `/session/${id}?kind=all`,
+      c: `/custom/${id}`,
+    }[e.key.toLowerCase()];
     if (to) {
       e.preventDefault();
       navigate(to);
@@ -165,7 +171,14 @@
       <span class="muted">new · learning · review</span>
     </div>
     {#if total > 0}
-      <a class="button big" href="#/study/{id}" title="Study (S)">Study now</a>
+      <div class="row primary">
+        <a class="button big" href="#/study/{id}" title="Study (S)">Study now</a>
+        <a
+          class="button secondary big"
+          href="#/session/{id}?kind=all&sides=both"
+          title="See each card's front and back together, to learn them (R)">Read through</a
+        >
+      </div>
     {:else if study.waitUntil}
       <p>
         Next learning card in {formatInterval(study.waitUntil - Date.now())}.
@@ -177,6 +190,13 @@
       <p><strong>Done for today.</strong> <span class="muted">Come back tomorrow.</span></p>
     {/if}
     <div class="row">
+      {#if total === 0 && (cardCount > 0 || children.length > 0)}
+        <a
+          class="button secondary"
+          href="#/session/{id}?kind=all&sides=both"
+          title="See each card's front and back together, to learn them (R)">Read through</a
+        >
+      {/if}
       <a
         class="button secondary"
         href="#/session/{id}?kind=all"
@@ -298,6 +318,10 @@
   .big {
     font-size: 1.1rem;
     padding: 0.85rem 2rem;
+  }
+  /* Study now and Read through side by side, even on a phone. */
+  .primary .big {
+    padding: 0.85rem 1.4rem;
   }
   .subdecks {
     margin: 0 0 0.75rem;

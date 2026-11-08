@@ -6,6 +6,14 @@ On a deck, choose **Preview** (or press <kbd>P</kbd>) to flip through every card
 
 <kbd>Space</kbd> shows the answer and then moves on; <kbd>←</kbd> and <kbd>→</kbd> go back and forward; <kbd>1</kbd> (**Again**) puts the card at the end to see once more.
 
+**Edit** (<kbd>E</kbd>) opens the note and brings you back to the same card. **Delete** (<kbd>Delete</kbd>) removes the note, all its cards and their review history, after asking.
+
+## Read through
+
+To learn cards before you study them, choose **Read through** next to **Study now** (or press <kbd>R</kbd> on a deck). It's a preview where every card shows its front and back together, so <kbd>Space</kbd> or <kbd>→</kbd> just moves to the next card. Nothing is scheduled.
+
+In any preview or practice session, **Both sides** (<kbd>B</kbd>) switches between this and flipping each card.
+
 ## Custom study
 
 On a deck, choose **Custom study** (or press <kbd>C</kbd>). It's also offered when you finish a deck for the day.

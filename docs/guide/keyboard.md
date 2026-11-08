@@ -21,6 +21,7 @@ Press <kbd>?</kbd> anywhere in Nenrin to see this list. On a Mac, <kbd>⌘</kbd>
 | Keys         | Action                                                   |
 | ------------ | -------------------------------------------------------- |
 | <kbd>S</kbd> | Study (the deck you're on, or the one with the most due) |
+| <kbd>R</kbd> | Read through: every card with front and back together    |
 | <kbd>P</kbd> | Preview every card in the deck                           |
 | <kbd>C</kbd> | Custom study                                             |
 
@@ -46,6 +47,9 @@ Press <kbd>?</kbd> anywhere in Nenrin to see this list. On a Mac, <kbd>⌘</kbd>
 | <kbd>Space</kbd> or <kbd>Enter</kbd> | Show answer, then next card               |
 | <kbd>←</kbd> <kbd>→</kbd>            | Previous / next card (preview)            |
 | <kbd>1</kbd>                         | Again: see it again later in this session |
+| <kbd>B</kbd>                         | Both sides: show front and back together  |
+| <kbd>E</kbd>                         | Edit current note                         |
+| <kbd>Delete</kbd>                    | Delete current note (asks first)          |
 
 ## Browsing
 

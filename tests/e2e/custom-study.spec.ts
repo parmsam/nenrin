@@ -49,6 +49,38 @@ test('preview a deck with the keyboard, without scheduling anything', async ({ p
   await expect(page.getByLabel('2 new, 0 learning, 0 to review')).toBeVisible();
 });
 
+test('read through a deck with both sides showing, and delete a note', async ({ page }) => {
+  await deckWithCards(page, 'Fruit', [
+    ['apple', 'ringo'],
+    ['pear', 'nashi'],
+    ['peach', 'momo'],
+  ]);
+  await page.getByRole('link', { name: 'Read through' }).click();
+  await expect(page.getByText('Read through · Fruit')).toBeVisible();
+  // Front and back together, no Show answer step.
+  await expect(page.getByText('apple')).toBeVisible();
+  await expect(page.getByText('ringo')).toBeVisible();
+  await expect(page.getByRole('button', { name: /Show answer/ })).toHaveCount(0);
+  await page.keyboard.press('Space');
+  await expect(page.getByText('nashi')).toBeVisible();
+
+  // B switches back to flipping.
+  await page.keyboard.press('b');
+  await expect(page.getByText('Preview · Fruit')).toBeVisible();
+  await expect(page.getByText('nashi')).toHaveCount(0);
+  await page.keyboard.press('b');
+  await expect(page.getByText('nashi')).toBeVisible();
+
+  // Delete asks first, then moves on to the next card.
+  await page.getByRole('button', { name: 'Delete', exact: true }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Delete' }).click();
+  await expect(page.getByText('momo')).toBeVisible();
+  await expect(page.getByText('2 / 2')).toBeVisible();
+
+  await page.keyboard.press('Escape');
+  await expect(page.getByLabel('2 new, 0 learning, 0 to review')).toBeVisible();
+});
+
 test('custom study: extra new cards today, and a tag session', async ({ page }) => {
   await deckWithCards(page, 'Numbers', [
     ['one', 'ichi'],

@@ -3,6 +3,8 @@
   import CardView from '../components/CardView.svelte';
   import { db, DEFAULT_PREFS, type Card, type Prefs } from '../lib/db';
   import { getPrefs } from '../lib/db/prefs';
+  import { confirmAction } from '../lib/confirm.svelte';
+  import { deleteNote } from '../lib/notes';
   import { recordReview, undoReview, type UndoEntry } from '../lib/db/repo';
   import { navigate, router } from '../lib/router.svelte';
   import { createScheduler, GRADES, Rating, type Grade } from '../lib/scheduler';
@@ -44,6 +46,8 @@
   let content = $state<CardContent | null>(null);
   let intervals = $state<Record<Grade, string> | null>(null);
   let revealed = $state(false);
+  /** Read-through: each card opens with its answer showing. Only when nothing is scheduled. */
+  let bothSides = $state(!options.reschedule && query.get('sides') === 'both');
   /** Type-in-the-answer text for the current card. */
   let typed = $state('');
   let loading = $state(true);
@@ -54,11 +58,13 @@
 
   const finished = $derived(!loading && pos >= queue.length);
   const title = $derived(
-    options.kind === 'all'
-      ? 'Preview'
-      : options.reschedule
-        ? 'Custom study'
-        : 'Practice (not scheduled)',
+    bothSides
+      ? 'Read through'
+      : options.kind === 'all'
+        ? 'Preview'
+        : options.reschedule
+          ? 'Custom study'
+          : 'Practice (not scheduled)',
   );
 
   /** Mulberry32: a tiny seeded PRNG, so a reload or a trip to the editor keeps the shuffle. */
@@ -78,6 +84,8 @@
     const q = new URLSearchParams(query);
     q.set('seed', String(seed));
     q.set('at', String(pos));
+    if (bothSides) q.set('sides', 'both');
+    else q.delete('sides');
     return `/session/${deckId}?${q}`;
   }
 
@@ -87,7 +95,7 @@
   async function show() {
     const token = ++showToken;
     navigate(here(), { replace: true });
-    revealed = false;
+    revealed = bothSides;
     typed = '';
     if (pos >= queue.length) {
       card = null;
@@ -172,6 +180,39 @@
     if (card) navigate(`/edit/${card.noteId}?return=${encodeURIComponent(here())}`);
   }
 
+  /** Switches between flipping each card and seeing both sides at once. */
+  function toggleSides() {
+    if (options.reschedule) return;
+    bothSides = !bothSides;
+    revealed = bothSides;
+    navigate(here(), { replace: true });
+  }
+
+  /** Deletes the current note (all its cards and their history) after confirming. */
+  async function remove() {
+    if (!card || busy) return;
+    const noteId = card.noteId;
+    const ok = await confirmAction({
+      title: 'Delete note?',
+      message: 'This deletes the note and all its cards, including their review history.',
+      confirmLabel: 'Delete',
+      danger: true,
+    });
+    if (!ok) return;
+    busy = true;
+    try {
+      const gone = new Set(await db.cards.where('noteId').equals(noteId).primaryKeys());
+      await deleteNote(db, noteId);
+      pos -= queue.slice(0, pos).filter((id) => gone.has(id)).length;
+      queue = queue.filter((id) => !gone.has(id));
+      // Positions in the history no longer line up, and its reviews are gone with the note.
+      history = [];
+    } finally {
+      busy = false;
+    }
+    await show();
+  }
+
   function restart() {
     history = [];
     pos = 0;
@@ -194,7 +235,11 @@
       back();
     } else if (key === 'r') cardView?.replay();
     else if (key === 'e') edit();
-    else if (key === ' ' || key === 'enter') {
+    else if (key === 'b' && !options.reschedule) toggleSides();
+    else if (key === 'delete') {
+      e.preventDefault();
+      remove();
+    } else if (key === ' ' || key === 'enter') {
       e.preventDefault();
       if (pos >= queue.length) return;
       if (!revealed) revealed = true;
@@ -241,7 +286,18 @@
       title={options.reschedule ? 'Undo (Z)' : 'Previous (←)'}
       >{options.reschedule ? 'Undo' : '← Prev'}</button
     >
+    {#if !options.reschedule}
+      <button
+        class="secondary tool"
+        onclick={toggleSides}
+        aria-pressed={bothSides}
+        title="Show front and back together (B)">Both sides</button
+      >
+    {/if}
     <button class="secondary tool" onclick={edit} disabled={!card} title="Edit (E)">Edit</button>
+    <button class="secondary tool" onclick={remove} disabled={!card} title="Delete note (Delete)"
+      >Delete</button
+    >
     <button
       class="secondary tool kbd-button"
       onclick={() => (shortcutsDialog.open = true)}
@@ -291,7 +347,7 @@
     </section>
 
     <footer class="answer">
-      {#if !revealed}
+      {#if !revealed && !bothSides}
         <button class="show" onclick={() => (revealed = true)}>
           Show answer <kbd>Space</kbd>
         </button>
@@ -358,6 +414,10 @@
   .tool {
     padding: 0.4rem 0.7rem;
     font-size: 0.8rem;
+  }
+  .tool[aria-pressed='true'] {
+    border-color: var(--accent);
+    color: var(--accent);
   }
   .card {
     flex: 1;

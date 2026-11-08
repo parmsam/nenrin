@@ -28,6 +28,7 @@ export const SHORTCUTS: { group: string; items: Shortcut[] }[] = [
     group: 'Decks',
     items: [
       { keys: [['S']], action: 'Study (the deck you’re on, or the one with most due)' },
+      { keys: [['R']], action: 'Read through: every card with front and back together' },
       { keys: [['P']], action: 'Preview every card in the deck' },
       { keys: [['C']], action: 'Custom study' },
     ],
@@ -56,6 +57,9 @@ export const SHORTCUTS: { group: string; items: Shortcut[] }[] = [
       { keys: [['Space'], ['Enter']], action: 'Show answer, then next card' },
       { keys: [['←'], ['→']], action: 'Previous / next card (preview)' },
       { keys: [['1']], action: 'Again: see it again later in this session' },
+      { keys: [['B']], action: 'Both sides: show front and back together (preview)' },
+      { keys: [['E']], action: 'Edit current note' },
+      { keys: [['Delete']], action: 'Delete current note (asks first)' },
     ],
   },
   {
