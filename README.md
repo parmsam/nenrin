@@ -83,6 +83,7 @@ Open **<https://parmsam.github.io/nenrin/>**, then:
 - **iPhone / iPad:** Share → _Add to Home Screen_
 - **Mac (Safari):** File → _Add to Dock_
 - **Chrome / Edge / Android:** the install icon in the address bar, or menu → _Install app_
+- **Mac app:** an unsigned native app built with Tauri. Build it with `npm run mac:build` (needs Rust and Xcode's command line tools); see [Getting started](docs/guide/getting-started.md#the-mac-app) for opening an unsigned app
 
 After the first visit, it works fully offline.
 
@@ -105,7 +106,7 @@ After the first visit, it works fully offline.
 - **Offline:** service worker via `vite-plugin-pwa`
 - **Diagrams and Typst (Phase 3):** [Pele](https://github.com/obsidianmd/pele) for Mermaid; [typst.ts](https://github.com/Myriad-Dreamin/typst.ts) for opt-in Typst (WASM, lazy-loaded)
 - **Anki import (Phase 2):** `sql.js` (SQLite → WASM), `fflate` (zip), `fzstd` (newer zstd-compressed collections)
-- **Desktop (later):** [Tauri 2](https://tauri.app) for a signed macOS `.app`
+- **Desktop:** [Tauri 2](https://tauri.app) for an unsigned macOS `.app` and `.dmg` (`src-tauri/`)
 - **Hosting:** GitHub Pages via GitHub Actions
 
 ## Development
@@ -121,6 +122,8 @@ npm run lint         # ESLint + Prettier
 npm run build        # type-check + production build to dist/
 npm run brand        # regenerate the logo from scripts/generate-brand.mjs
 npm run screenshots  # regenerate public/screenshots/*.png
+npm run mac:dev      # Mac app against the dev server (needs Rust)
+npm run mac:build    # Mac .app and .dmg in src-tauri/target/release/bundle/
 ```
 
 Every push to `main` runs CI and deploys to GitHub Pages.

@@ -4,7 +4,7 @@ Instructions for AI coding agents and human contributors working on Nenrin. Read
 
 ## Project in one paragraph
 
-Nenrin is an MIT-licensed, local-first flashcard PWA that uses the FSRS spaced-repetition algorithm. It runs fully offline in the browser, stores everything in IndexedDB, imports Anki decks, and deploys as a static site to GitHub Pages. A Tauri wrapper for macOS comes later. There is **no backend server** in v1.
+Nenrin is an MIT-licensed, local-first flashcard PWA that uses the FSRS spaced-repetition algorithm. It runs fully offline in the browser, stores everything in IndexedDB, imports Anki decks, and deploys as a static site to GitHub Pages. An unsigned Tauri wrapper for macOS lives in `src-tauri/`. There is **no backend server** in v1.
 
 ## Commands
 
@@ -19,6 +19,9 @@ npm run check        # svelte-check (types)
 npm run check:decks -- ref/decks   # import + render real Anki decks in Chromium (decks not committed)
 npm run brand        # regenerate logo SVGs from scripts/generate-brand.mjs
 npm run screenshots  # regenerate public/screenshots/ (do this after UI changes)
+npm run mac:dev     # Tauri Mac app against the dev server (needs Rust)
+npm run mac:build   # unsigned Mac .app + .dmg (src-tauri/target/release/bundle/)
+npm run brand:mac   # regenerate src-tauri/icons/ from docs/brand/app-icon.svg
 ```
 
 Run `npm run lint && npm test` before you call a task done. If you can't run them, say so explicitly.
@@ -41,6 +44,7 @@ src/
   workers/       # anki.worker.ts: package parsing; typst.worker.ts: opt-in Typst compiles
 public/          # favicon.svg, logo.svg, screenshots/, sw-custom.js (imported into the service worker), typst/fonts/ (vendored, licenses in NOTICE.txt)
 optimize.html    # separate cross-origin isolated page for the FSRS optimizer (see PLAN decision log)
+src-tauri/       # macOS app: Tauri 2 wrapper around dist/ (links, downloads in src/lib.rs)
 scripts/         # generate-brand.mjs (logo), screenshots.mjs
 docs/brand/      # logo files + palette; see docs/brand/README.md
 docs/guide/      # user guide (Markdown); also bundled as the in-app Help screen (src/lib/help.ts)

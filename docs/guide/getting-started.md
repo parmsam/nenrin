@@ -10,6 +10,14 @@ Installing it puts an icon on your home screen or dock, opens it in its own wind
 - **Android (Chrome):** open the menu, then **Install app** (or **Add to Home screen**).
 - **Mac (Safari):** **File → Add to Dock**. **Chrome or Edge on any computer:** the install icon at the right of the address bar.
 
+### The Mac app
+
+There's also a Mac app (Apple silicon, macOS 13 or later). It's the same Nenrin in its own window, with no browser around it. Web links open in your browser, and backups and exports are saved to your Downloads folder.
+
+- **It isn't signed by Apple**, so the first time you open it macOS refuses. Go to **System Settings → Privacy & Security**, scroll down to the message about Nenrin, and click **Open Anyway**. After that it opens normally.
+- **It keeps its own cards**, separate from Nenrin in a browser. To move them across, make a backup in one ([Backups](backups.md)) and restore it in the other.
+- **Not in the app yet:** study reminder notifications (the calendar reminder works), the FSRS optimizer, sharing files to Nenrin, and update prompts (install a newer app to update).
+
 ## Your first deck
 
 On the first visit you have three ways to start:
