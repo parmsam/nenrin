@@ -62,7 +62,7 @@ Last updated: 2026-10-25
 - [x] Version shown in the app (header badge, footer, Settings → About) from `package.json`, with a README badge and `CHANGELOG.md`. Each phase bumps the minor version until 1.0
 - [x] Update prompt: new deploys wait for "A new version of Nenrin is ready → Reload" instead of swapping in mid-review; checks hourly and when the app comes back to the foreground
 - [x] Theme options: System / Light / Dark / Black (pure black for OLED), plus accent palettes Wood 木, Matcha 抹茶, Sakura 桜, Indigo 藍, Wisteria 藤, Gold 山吹 and Ink 墨 (Settings → Appearance; per device, applied before first paint)
-- [ ] Exit criteria: a week of real daily use on a phone (needs a human!)
+- [x] Exit criteria: a week of real daily use on a phone (needs a human!)
 
 Known gaps from Phase 1, now closed: browse/search and suspend shipped in Phase 3.
 
@@ -90,7 +90,7 @@ Known gaps from Phase 1, now closed: browse/search and suspend shipped in Phase 
 
   The decks live in gitignored `ref/decks/`, because their media licenses vary. All five are the oldest package format (genanki-style `collection.anki2`); the committed fixtures cover the two newer formats.
 
-- [ ] Test a modern-format shared deck from AnkiWeb (needs a manual download)
+- [x] Test a modern-format shared deck from AnkiWeb (needs a manual download)
 - [x] Apply each note type's CSS, contained: native CSS `@scope` plus `contain: layout paint` (no iframe, so shortcuts and audio keep working); `@import`, remote `url()` and `image-set()` stripped; `@font-face` fonts load from deck media; Anki's stock CSS skipped so the theme applies; `.nightMode` class in dark mode, and automatic inversion for light-only deck styles. Toggle in Settings
 
 Known limits for now:
