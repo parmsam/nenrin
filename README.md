@@ -30,7 +30,7 @@
   </picture>
 </p>
 
-> **Status: v0.11.0, pre-alpha, usable for daily study.** See the [changelog](CHANGELOG.md). Import your Anki decks (`.apkg` / `.colpkg` / CrowdAnki) and export them back, or make your own Basic, Reversed, Type-in, Cloze and Image Occlusion cards (or design your own note types) with Markdown, math, diagrams and images (or have an LLM write them), and review them with FSRS, offline. New here? Read the [user guide](docs/guide/README.md). See [PLAN.md](PLAN.md) for what's next.
+> **Status: v0.12.0, pre-alpha, usable for daily study.** See the [changelog](CHANGELOG.md). Import your Anki decks (`.apkg` / `.colpkg` / CrowdAnki) and export them back, or make your own Basic, Reversed, Type-in, Cloze and Image Occlusion cards (or design your own note types) with Markdown, math, diagrams and images (or have an LLM write them), and review them with FSRS, offline. New here? Read the [user guide](docs/guide/README.md). See [PLAN.md](PLAN.md) for what's next.
 
 ## What's in the name
 
@@ -83,7 +83,7 @@ Open **<https://parmsam.github.io/nenrin/>**, then:
 - **iPhone / iPad:** Share → _Add to Home Screen_
 - **Mac (Safari):** File → _Add to Dock_
 - **Chrome / Edge / Android:** the install icon in the address bar, or menu → _Install app_
-- **Mac app:** an unsigned native app built with Tauri. Build it with `npm run mac:build` (needs Rust and Xcode's command line tools); see [Getting started](docs/guide/getting-started.md#the-mac-app) for opening an unsigned app
+- **Mac app:** download the `.dmg` from the [latest release](https://github.com/parmsam/nenrin/releases/latest) (Apple silicon), or build it with `npm run mac:build` (needs Rust and Xcode's command line tools). It's unsigned; see [Getting started](docs/guide/getting-started.md#the-mac-app) for opening an unsigned app
 
 After the first visit, it works fully offline.
 

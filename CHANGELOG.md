@@ -2,6 +2,12 @@
 
 Nenrin follows [semantic versioning](https://semver.org/). Until 1.0, each roadmap phase in [PLAN.md](PLAN.md) bumps the minor version.
 
+## 0.12.0 (2026-11-13): A Mac app
+
+- **Mac app**: Nenrin in its own window, without a browser around it (Apple silicon, macOS 13 or later). Download the `.dmg` from the release, drag Nenrin to Applications, and the first time go to **System Settings → Privacy & Security → Open Anyway**, because the app isn't signed by Apple. Web links open in your browser, and backups and exports go to your Downloads folder. It keeps its own cards, so move them over with a backup and restore. Not in the app yet: notification reminders, the FSRS optimizer, sharing files to Nenrin, and update prompts. See [Getting started](docs/guide/getting-started.md#the-mac-app).
+- **Black theme**: the dark theme on a pure-black page, for OLED screens.
+- **New accents**: Wisteria, Gold and Ink, all readable as button text in light and dark.
+
 ## 0.11.0 (2026-11-08): Read through and welcome tips
 
 - **Read through**: next to **Study now** on a deck (or press R), see every card with its front and back together, to learn cards before you study them. Nothing is scheduled. In any preview or practice session, **Both sides** (B) switches between this and flipping.
