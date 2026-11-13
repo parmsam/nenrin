@@ -7,7 +7,15 @@ import svelteConfig from './svelte.config.js';
 
 export default defineConfig(
   {
-    ignores: ['dist/', 'dev-dist/', 'ref/', 'playwright-report/', 'test-results/'],
+    ignores: [
+      'dist/',
+      'dev-dist/',
+      'ref/',
+      'playwright-report/',
+      'test-results/',
+      'src-tauri/target/',
+      'src-tauri/gen/',
+    ],
   },
   js.configs.recommended,
   ts.configs.recommended,

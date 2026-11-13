@@ -5,3 +5,5 @@ public/
 playwright-report/
 test-results/
 package-lock.json
+src-tauri/target/
+src-tauri/gen/
