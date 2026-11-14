@@ -170,6 +170,7 @@ Math is already covered by KaTeX (`$…$`, `$$…$$`, and Anki's `\(…\)` / `\[
 
 - [x] Tauri 2 macOS app (`src-tauri/`): the PWA build in a native window, unsigned (ad-hoc) `.app` and `.dmg` via `npm run mac:build`. Web links open in the browser and downloads save to ~/Downloads (handled in Rust, so the web code is unchanged)
 - [ ] Mac app: native menus, file associations for `.apkg`, notifications through Tauri, the optimizer natively (fsrs-rs) since the app has no service worker to isolate `optimize.html`
+- [ ] Mac app release workflow: a GitHub Actions job on a macOS runner that, when a `v*` tag or GitHub release is published, runs `npm run mac:build` and attaches the `.dmg` to the release, so it isn't built and uploaded by hand. Start with Apple silicon (`aarch64`); add an Intel or universal build if anyone asks. Cache `src-tauri/target` and the Cargo registry to keep it fast. Unsigned, like the local build (see the 2026-11-13 decision)
 - [ ] Optional sync (design doc first): candidates are a file-based sync folder (iCloud Drive/Dropbox) via Tauri, WebDAV, or a CRDT log
 - [x] `.apkg` export for round-tripping back to Anki: legacy layout (schema 11, which every Anki 2.1+ imports), built with sql.js in the import worker. Optional progress: due dates, FSRS memory (`card.data`) and the review log. Stable ids for decks and note types (imported types keep Anki's), GUIDs kept, so re-exports update. Checked by importing into real Anki 26.09 (dev-only, like the fixtures)
 
